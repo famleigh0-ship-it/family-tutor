@@ -13,15 +13,19 @@ interface Props {
   onSwitchToChecklist: () => void
 }
 
-// Uses a plain file input with capture="environment" rather than
-// getUserMedia — much more reliable across mobile browsers for a PWA, per
-// spec. Trade-off: on some Android/Chrome devices, opening the native
-// camera app can cause the backgrounded tab to be reclaimed for memory,
-// reloading the page (and wiping all React state) by the time the camera
-// hands control back. sessionStorage here lets ClassroomLog detect that on
-// remount and tell the student what happened instead of silently
-// resetting to the method selector with no explanation. See the matching
-// check in ClassroomLog.tsx.
+// Uses a plain file input rather than getUserMedia — much more reliable
+// across mobile browsers for a PWA, per spec. Deliberately does NOT set
+// capture="environment": forcing straight-to-camera turned out to be
+// unreliable on at least one real Android device (the file input's change
+// event never fired at all after the camera closed — no photo, no error,
+// no state change of any kind). Letting the OS show its normal
+// Camera/Gallery/Files chooser is the more broadly-compatible behavior;
+// the trade-off is one extra tap to pick "Camera" from that chooser.
+// sessionStorage here lets ClassroomLog detect a mid-capture page reload
+// (a separate, real risk on some devices when backgrounded for the camera)
+// and tell the student what happened instead of silently resetting to the
+// method selector with no explanation. See the matching check in
+// ClassroomLog.tsx.
 export const PHOTO_CAPTURE_FLAG_KEY = 'falp:photoCaptureInProgress'
 
 export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: Props) {
@@ -99,7 +103,6 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
         ref={fileInputRef}
         type="file"
         accept="image/*"
-        capture="environment"
         onChange={handleFileChange}
         className="hidden"
       />
@@ -112,7 +115,7 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
             onClick={handleOpenCamera}
             className="block w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-10 text-center text-base font-medium text-slate-600"
           >
-            📷 Tap to take a photo of your notes
+            📷 Tap to add a photo of your notes
           </button>
         </div>
       ) : (
