@@ -159,7 +159,7 @@ function buildPrompt(pack, topic, questionType, n) {
   if (questionType === 'mc') {
     return {
       system: `${personaContext}\n\nYou generate multiple choice questions for AP exam practice.\nEach question must:\n- Test understanding, not just recall\n- Have exactly one clearly correct answer\n- Have three plausible distractors that reflect common errors\n- Include a brief explanation of why each option is right or wrong\nReturn JSON only, no other text.`,
-      user: `Generate ${n} multiple choice questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors to incorporate as distractors: ${JSON.stringify(topic.common_errors)}\nHints for question design: ${JSON.stringify(topic.prompt_hints)}\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "options": [\n    { "label": "A", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "B", "text": "...", "is_correct": true, "distractor_note": null },\n    { "label": "C", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "D", "text": "...", "is_correct": false, "distractor_note": "why students pick this" }\n  ],\n  "correct_answer": "B",\n  "explanation": "full explanation of the correct reasoning",\n  "key_reasoning": ["reasoning element 1", "reasoning element 2"]\n}]`
+      user: `Generate ${n} multiple choice questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors to incorporate as distractors: ${JSON.stringify(topic.common_errors)}\nHints for question design: ${JSON.stringify(topic.prompt_hints)}\n\nKeep each explanation to 2-3 sentences, each distractor_note to one sentence, and key_reasoning to at most 2 short items — this is a large batch, so concision matters more than exhaustiveness.\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "options": [\n    { "label": "A", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "B", "text": "...", "is_correct": true, "distractor_note": null },\n    { "label": "C", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "D", "text": "...", "is_correct": false, "distractor_note": "why students pick this" }\n  ],\n  "correct_answer": "B",\n  "explanation": "full explanation of the correct reasoning",\n  "key_reasoning": ["reasoning element 1", "reasoning element 2"]\n}]`
     }
   }
 
@@ -259,9 +259,11 @@ async function handleFill(req, res) {
   let response
   try {
     // A batch of 10 verbose MC questions (each with 3 distractor notes,
-    // an explanation, and key_reasoning) can run well past 4096 tokens,
-    // truncating the JSON array mid-response — confirmed in testing.
-    response = await callClaude({ task, system, messages: [{ role: 'user', content: user }], max_tokens: 8192 })
+    // an explanation, and key_reasoning) can run well past 8192 tokens,
+    // truncating the JSON array mid-response — confirmed in testing at
+    // both 4096 and 8192. Paired with a conciseness instruction in the
+    // MC prompt above so this isn't just betting on a bigger ceiling.
+    response = await callClaude({ task, system, messages: [{ role: 'user', content: user }], max_tokens: 16000 })
   } catch (err) {
     res.status(502).json({ error: 'Claude API request failed', detail: err.message })
     return
