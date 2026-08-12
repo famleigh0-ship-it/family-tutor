@@ -6,8 +6,8 @@
 
 import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
-import { getPack } from '../src/packs/loader.ts'
-import { unlockTopics } from '../src/engine/unlock.ts'
+import { getPack } from '../src/packs/loader.js'
+import { unlockTopics } from '../src/engine/unlock.js'
 
 loadEnv({ path: '.env.local' })
 

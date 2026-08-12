@@ -1,15 +1,21 @@
 // Server-side only. Reads/writes Supabase with the service role key — never
 // import from src/pages or src/components.
+//
+// Plain JS (not .ts) so this loads identically under Vite, plain Node
+// script execution, AND Vercel's serverless function bundler — which
+// cannot resolve a directly-imported .ts file at runtime (confirmed via
+// ERR_MODULE_NOT_FOUND when api/classroom/confirm-log.js imported the old
+// unlock.ts). See src/packs/loader.js for the same fix, applied first.
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-import type { UnlockSource } from './types'
+import { createClient } from '@supabase/supabase-js'
 
 const PRIORITIZED_DAYS = 5
 const MS_PER_DAY = 86_400_000
 
-let client: SupabaseClient | undefined
+/** @type {import('@supabase/supabase-js').SupabaseClient | undefined} */
+let client
 
-function getSupabaseAdmin(): SupabaseClient {
+function getSupabaseAdmin() {
   if (!client) {
     const url = process.env.VITE_SUPABASE_URL
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -25,14 +31,13 @@ function getSupabaseAdmin(): SupabaseClient {
   return client
 }
 
-// Idempotent: only inserts topic_unlock_log rows for topics that don't
-// already have one for this user + pack.
-export async function unlockTopics(params: {
-  userId: string
-  packId: string
-  topicIds: string[]
-  source: UnlockSource
-}): Promise<void> {
+/**
+ * Idempotent: only inserts topic_unlock_log rows for topics that don't
+ * already have one for this user + pack.
+ * @param {{ userId: string, packId: string, topicIds: string[], source: import('./types').UnlockSource }} params
+ * @returns {Promise<void>}
+ */
+export async function unlockTopics(params) {
   const { userId, packId, topicIds, source } = params
   if (topicIds.length === 0) return
 
@@ -47,7 +52,7 @@ export async function unlockTopics(params: {
 
   if (existingErr) throw existingErr
 
-  const alreadyUnlocked = new Set((existing ?? []).map((r) => r.topic_id as string))
+  const alreadyUnlocked = new Set((existing ?? []).map((r) => r.topic_id))
   const toInsert = topicIds.filter((id) => !alreadyUnlocked.has(id))
   if (toInsert.length === 0) return
 
@@ -63,13 +68,13 @@ export async function unlockTopics(params: {
   if (insertErr) throw insertErr
 }
 
-// Sets prioritized_until = now + 5 days on existing topic_unlock_log rows.
-// Call after unlockTopics so the rows are guaranteed to exist.
-export async function prioritizeTopics(params: {
-  userId: string
-  packId: string
-  topicIds: string[]
-}): Promise<void> {
+/**
+ * Sets prioritized_until = now + 5 days on existing topic_unlock_log rows.
+ * Call after unlockTopics so the rows are guaranteed to exist.
+ * @param {{ userId: string, packId: string, topicIds: string[] }} params
+ * @returns {Promise<void>}
+ */
+export async function prioritizeTopics(params) {
   const { userId, packId, topicIds } = params
   if (topicIds.length === 0) return
 
@@ -86,7 +91,12 @@ export async function prioritizeTopics(params: {
   if (error) throw error
 }
 
-export async function getPrioritizedTopicIds(userId: string, packId: string): Promise<string[]> {
+/**
+ * @param {string} userId
+ * @param {string} packId
+ * @returns {Promise<string[]>}
+ */
+export async function getPrioritizedTopicIds(userId, packId) {
   const admin = getSupabaseAdmin()
   const nowIso = new Date().toISOString()
 
@@ -99,5 +109,5 @@ export async function getPrioritizedTopicIds(userId: string, packId: string): Pr
 
   if (error) throw error
 
-  return Array.from(new Set((data ?? []).map((r) => r.topic_id as string)))
+  return Array.from(new Set((data ?? []).map((r) => r.topic_id)))
 }

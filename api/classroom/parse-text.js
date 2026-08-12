@@ -1,7 +1,7 @@
 import { getUserFromRequest, getUserProfile } from '../_lib/supabaseAdmin.js'
 import { getAnthropicClient } from '../_lib/anthropicClient.js'
 import { parseClaudeJson, buildTopicList } from '../_lib/claudeJson.js'
-import { getPack } from '../../src/packs/loader.ts'
+import { getPack } from '../../src/packs/loader.js'
 
 const SYSTEM_PROMPT = `You are a curriculum mapper for a high school course. Map the student's description of what they learned in class to specific topics from the provided list. Only match topics clearly described — do not over-match vague descriptions. Return JSON only, no other text.`
 

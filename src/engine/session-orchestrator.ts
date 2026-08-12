@@ -3,14 +3,16 @@
 // only from Vercel serverless functions (api/) or Node scripts.
 
 import { createClient, type SupabaseClient } from '@supabase/supabase-js'
-// Explicit .ts extensions: this module is imported directly by
+// Explicit extensions: this module is imported directly by
 // scripts/test-engine.js under plain Node (no bundler), whose native ESM
 // loader — unlike Vite's — requires extensions on relative specifiers.
-import { getPack } from '../packs/loader.ts'
+// loader.js/unlock.js are plain JS rather than .ts specifically so Vercel's
+// serverless function bundler can resolve them too (see their file headers).
+import { getPack } from '../packs/loader.js'
 import { applyDecay, updateMastery } from './mastery.ts'
 import { detectSessionMode } from './session-mode.ts'
 import { selectTopics } from './topic-selector.ts'
-import { getPrioritizedTopicIds } from './unlock.ts'
+import { getPrioritizedTopicIds } from './unlock.js'
 import type { MasteryRecord, QuestionResult, QuizPrepEvent, SessionPlan } from './types'
 
 const RECENT_SESSIONS_FOR_TOPICS = 2 // "topics from last 2 sessions"

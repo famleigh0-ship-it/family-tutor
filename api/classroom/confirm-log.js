@@ -1,6 +1,6 @@
 import { getUserFromRequest, getUserProfile, getSupabaseAdmin } from '../_lib/supabaseAdmin.js'
-import { getPack } from '../../src/packs/loader.ts'
-import { unlockTopics, prioritizeTopics } from '../../src/engine/unlock.ts'
+import { getPack } from '../../src/packs/loader.js'
+import { unlockTopics, prioritizeTopics } from '../../src/engine/unlock.js'
 
 const VALID_INPUT_METHODS = ['photo', 'text', 'checklist']
 
