@@ -1,6 +1,17 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from 'react'
 import { supabase } from './supabaseClient'
 
+/** @typedef {{ id: string, name: string, role: 'student' | 'parent' }} Profile */
+/**
+ * @typedef {{
+ *   session: import('@supabase/supabase-js').Session | null | undefined,
+ *   profile: Profile | null | undefined,
+ *   profileError: string | null,
+ *   loading: boolean
+ * }} AuthContextValue
+ */
+
+/** @type {import('react').Context<AuthContextValue | null>} */
 const AuthContext = createContext(null)
 
 export function AuthProvider({ children }) {

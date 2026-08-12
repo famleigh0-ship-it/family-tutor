@@ -3,10 +3,12 @@ import { Link } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
+import { getAllPacks } from '../packs/loader'
 
 export default function ParentDashboard() {
   const { session } = useAuth()
   const [students, setStudents] = useState(null) // null = loading
+  const [lastLogByStudentPack, setLastLogByStudentPack] = useState({})
 
   useEffect(() => {
     let cancelled = false
@@ -29,6 +31,24 @@ export default function ParentDashboard() {
         .in('id', studentIds)
 
       if (!cancelled) setStudents(linkedUsers || [])
+
+      // Most recent classroom_logs.logged_at per (student, pack) — ordering
+      // descending and keeping only the first occurrence per key gives the
+      // latest without a separate aggregate query.
+      const { data: logs } = await supabase
+        .from('classroom_logs')
+        .select('user_id, pack_id, logged_at')
+        .in('user_id', studentIds)
+        .order('logged_at', { ascending: false })
+
+      if (cancelled) return
+
+      const lastLogMap = {}
+      for (const log of logs ?? []) {
+        const key = `${log.user_id}:${log.pack_id}`
+        if (!lastLogMap[key]) lastLogMap[key] = log.logged_at
+      }
+      setLastLogByStudentPack(lastLogMap)
     }
 
     load()
@@ -36,6 +56,8 @@ export default function ParentDashboard() {
       cancelled = true
     }
   }, [session.user.id])
+
+  const packs = getAllPacks()
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -53,9 +75,19 @@ export default function ParentDashboard() {
             <Link
               key={student.id}
               to={`/parent/${student.id}`}
-              className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5 text-slate-700"
+              className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-4 text-slate-700"
             >
-              {student.name}
+              <p className="font-medium">{student.name}</p>
+              <div className="mt-1 space-y-0.5">
+                {packs.map((pack) => {
+                  const lastLog = lastLogByStudentPack[`${student.id}:${pack.id}`]
+                  return (
+                    <p key={pack.id} className="text-xs text-slate-500">
+                      {pack.name}: {lastLog ? `logged ${new Date(lastLog).toLocaleDateString()}` : 'no log yet'}
+                    </p>
+                  )
+                })}
+              </div>
             </Link>
           ))}
         </div>

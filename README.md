@@ -48,6 +48,10 @@ functions, Claude API, installable PWA.
      on Row Level Security for `users`, `family_links`, and `streaks` (the
      tables the frontend queries directly with the anon key). Without this,
      any signed-in user could read every other family's rows.
+   - `migrations/003_classroom_signals.sql` — adds `prioritized_until` to
+     `topic_unlock_log` and turns on Row Level Security for `classroom_logs`
+     and `topic_unlock_log` (queried directly from the browser by Home, the
+     classroom-log checklist, and the parent dashboard).
 4. In **Authentication → Providers**, confirm Email is enabled (it is by
    default).
 5. Under **Authentication → URL Configuration**, add both your local
@@ -210,3 +214,64 @@ row into `quiz_prep_events` for that test user in the Supabase dashboard
 - [x] `mastery_records` rows are written/updated after simulated question results
 - [x] `sessions` rows are created and correctly closed (`ended_at`, `duration_seconds`, `topics_covered`)
 - [x] `streaks` increments correctly (and correctly holds steady across same-day sessions)
+
+## Classroom signal system
+
+Students log what was covered in class each day at `/log/:packId`, via
+photo, free-text, or a topic checklist. This is what drives topic unlocking
+outside the pacing calendar and gives the adaptive engine same-day priority
+boosts.
+
+- `POST /api/classroom/parse-photo` — Claude Vision (`claude-sonnet-4-6`)
+  reads a photo of notes/board and returns matched topic ids, a confidence
+  level, and whether the image was even readable.
+- `POST /api/classroom/parse-text` — Claude (`claude-haiku-4-5`) does the
+  same from a free-text description (500 char max).
+- `POST /api/classroom/confirm-log` — inserts the `classroom_logs` row and
+  calls `unlockTopics`/`prioritizeTopics` for each confirmed topic. Always
+  uses the authenticated user's id from the verified bearer token, never a
+  client-supplied one.
+- The checklist path skips Claude entirely — it's a direct pick-from-list
+  UI, so `topics_extracted` and `topics_confirmed` are identical and no
+  parse step runs.
+
+`src/engine/unlock.ts` backs all of this: `unlockTopics` idempotently
+inserts into `topic_unlock_log`; `prioritizeTopics` sets
+`prioritized_until` 5 days out; `getPrioritizedTopicIds` (used by
+`session-orchestrator.ts`) returns topics still inside that window. A topic
+counts as "prioritized" purely off that column now — no more approximating
+it from `unlocked_at`.
+
+`scripts/run-pacing-calendar.js` is the (currently manual) calendar-driven
+unlock job — it walks every row in `user_course_packs`, figures out the
+current pacing week per pack, and unlocks (`source: 'pacing_calendar'`)
+every topic scheduled for a week that's already started:
+
+```bash
+node scripts/run-pacing-calendar.js
+```
+
+Since `/api/classroom/*` are Vercel serverless functions, they don't run
+under plain `npm run dev` (Vite alone doesn't serve `api/`) — test them
+either with `vercel dev` (requires `vercel login` first) or on the deployed
+Vercel site after a push, same as the parent-PIN endpoints in Phase 2.
+
+## Phase 5 milestone checklist
+
+- [x] `/log/:packId` method selector shows photo, text, checklist, and skip
+- [x] Text description flow calls Claude and shows a topic-confirmation
+      screen with a confidence banner on low/medium confidence
+- [ ] Photo flow: clear photo of notes returns matched topics; blurry/dark
+      photo triggers the retake prompt
+- [ ] Checklist flow saves directly with no Claude call and no confirmation
+      screen
+- [x] Confirmed log writes a `classroom_logs` row
+- [x] Confirmed topics appear in `topic_unlock_log` with `prioritized_until`
+      ~5 days out
+- [x] `node scripts/test-engine.js` shows the two classroom-log-sourced
+      topics as `prioritized` with elevated priority scores
+- [ ] `node scripts/run-pacing-calendar.js` unlocks the right topics for a
+      real enrollment
+- [x] Home shows "Log today's class" per course with no log yet, and
+      "Logged ✓ — N topics" once one exists; Parent dashboard shows each
+      student's last log date per course

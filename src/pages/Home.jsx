@@ -15,6 +15,7 @@ function daysUntil(dateStr) {
 export default function Home() {
   const { session, profile } = useAuth()
   const [streak, setStreak] = useState(0)
+  const [loggedToday, setLoggedToday] = useState({}) // pack_id -> topics_confirmed count
 
   useEffect(() => {
     let cancelled = false
@@ -26,6 +27,34 @@ export default function Home() {
       .then(({ data }) => {
         if (!cancelled) setStreak(data?.current_streak ?? 0)
       })
+    return () => {
+      cancelled = true
+    }
+  }, [session.user.id])
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function checkLoggedToday() {
+      const todayStart = new Date()
+      todayStart.setHours(0, 0, 0, 0)
+
+      const { data } = await supabase
+        .from('classroom_logs')
+        .select('pack_id, topics_confirmed, logged_at')
+        .eq('user_id', session.user.id)
+        .gte('logged_at', todayStart.toISOString())
+
+      if (cancelled) return
+
+      const byPack = {}
+      for (const row of data ?? []) {
+        byPack[row.pack_id] = (row.topics_confirmed ?? []).length
+      }
+      setLoggedToday(byPack)
+    }
+
+    checkLoggedToday()
     return () => {
       cancelled = true
     }
@@ -58,18 +87,35 @@ export default function Home() {
         <div className="mt-6 space-y-3">
           {packs.map((pack) => {
             const days = daysUntil(pack.exam_date)
+            const topicsLoggedCount = loggedToday[pack.id]
+
             return (
-              <Link
-                key={pack.id}
-                to={`/session/${pack.id}`}
-                className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5"
-              >
-                <p className="text-base font-medium text-slate-700">{pack.name}</p>
-                <p className="mt-1 text-sm text-slate-500">{pack.units.length} units</p>
-                <p className="mt-1 text-sm text-slate-500">
-                  {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
-                </p>
-              </Link>
+              <div key={pack.id} className="space-y-2">
+                <Link
+                  to={`/session/${pack.id}`}
+                  className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5"
+                >
+                  <p className="text-base font-medium text-slate-700">{pack.name}</p>
+                  <p className="mt-1 text-sm text-slate-500">{pack.units.length} units</p>
+                  <p className="mt-1 text-sm text-slate-500">
+                    {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
+                  </p>
+                </Link>
+
+                {topicsLoggedCount !== undefined ? (
+                  <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    Logged ✓ — {topicsLoggedCount} topic{topicsLoggedCount === 1 ? '' : 's'} today
+                  </div>
+                ) : (
+                  <Link
+                    to={`/log/${pack.id}`}
+                    className="block rounded-lg border border-dashed border-slate-300 px-4 py-3"
+                  >
+                    <span className="text-sm font-medium text-slate-700">{pack.name}</span>
+                    <span className="block text-sm text-slate-500">What did you cover today? 📝</span>
+                  </Link>
+                )}
+              </div>
             )
           })}
         </div>

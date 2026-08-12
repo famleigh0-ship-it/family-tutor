@@ -35,6 +35,10 @@ function daysAgo(n) {
   return new Date(Date.now() - n * DAY_MS).toISOString()
 }
 
+function daysFromNow(n) {
+  return new Date(Date.now() + n * DAY_MS).toISOString()
+}
+
 async function getOrCreateTestUser() {
   const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 })
   if (error) throw error
@@ -70,8 +74,18 @@ async function seedMockData(userId) {
     { topic_id: 'kinematics.projectile-motion', unlocked_at: daysAgo(50), unlock_source: 'pacing_calendar' },
     { topic_id: 'kinematics.relative-motion', unlocked_at: daysAgo(45), unlock_source: 'pacing_calendar' },
     { topic_id: 'dynamics.newtons-1st-2nd-law', unlocked_at: daysAgo(40), unlock_source: 'pacing_calendar' },
-    { topic_id: 'dynamics.newtons-3rd-law-force-pairs', unlocked_at: daysAgo(2), unlock_source: 'classroom_log' },
-    { topic_id: 'dynamics.free-body-diagrams', unlocked_at: daysAgo(2), unlock_source: 'classroom_log' },
+    {
+      topic_id: 'dynamics.newtons-3rd-law-force-pairs',
+      unlocked_at: daysAgo(2),
+      unlock_source: 'classroom_log',
+      prioritized_until: daysFromNow(3)
+    },
+    {
+      topic_id: 'dynamics.free-body-diagrams',
+      unlocked_at: daysAgo(2),
+      unlock_source: 'classroom_log',
+      prioritized_until: daysFromNow(3)
+    },
     { topic_id: 'dynamics.friction-normal-force', unlocked_at: daysAgo(35), unlock_source: 'pacing_calendar' }
     // Everything else in the pack stays locked — never appears in
     // topic_unlock_log for this user.
@@ -91,6 +105,21 @@ async function seedMockData(userId) {
     const { error } = await admin
       .from('topic_unlock_log')
       .insert(toInsert.map((u) => ({ user_id: userId, pack_id: PACK_ID, ...u })))
+    if (error) throw error
+  }
+
+  // On a re-run days later, an already-existing classroom_log row's
+  // prioritized_until from the earlier run may have lapsed — refresh it so
+  // the "prioritized" demonstration stays meaningful regardless of when
+  // this script is re-run.
+  for (const u of unlocks) {
+    if (!u.prioritized_until) continue
+    const { error } = await admin
+      .from('topic_unlock_log')
+      .update({ prioritized_until: u.prioritized_until })
+      .eq('user_id', userId)
+      .eq('pack_id', PACK_ID)
+      .eq('topic_id', u.topic_id)
     if (error) throw error
   }
 

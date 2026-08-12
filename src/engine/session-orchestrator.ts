@@ -10,10 +10,10 @@ import { getPack } from '../packs/loader.ts'
 import { applyDecay, updateMastery } from './mastery.ts'
 import { detectSessionMode } from './session-mode.ts'
 import { selectTopics } from './topic-selector.ts'
+import { getPrioritizedTopicIds } from './unlock.ts'
 import type { MasteryRecord, QuestionResult, QuizPrepEvent, SessionPlan } from './types'
 
 const RECENT_SESSIONS_FOR_TOPICS = 2 // "topics from last 2 sessions"
-const PRIORITIZED_WINDOW_DAYS = 5 // "unlocked in last 5 days"
 const MS_PER_DAY = 86_400_000
 
 let client: SupabaseClient | undefined
@@ -90,11 +90,10 @@ export async function startSession(params: {
   }
   masteryRecords = decayed
 
-  // 3 & 4. Unlocked + prioritized (unlocked in the last 5 days) topic ids
-  // from topic_unlock_log.
+  // 3. Unlocked topic ids from topic_unlock_log.
   const { data: unlockRows, error: unlockErr } = await admin
     .from('topic_unlock_log')
-    .select('topic_id, unlocked_at')
+    .select('topic_id')
     .eq('user_id', userId)
     .eq('pack_id', packId)
 
@@ -102,14 +101,10 @@ export async function startSession(params: {
 
   const unlockedTopicIds = Array.from(new Set((unlockRows ?? []).map((r) => r.topic_id as string)))
 
-  const prioritizedCutoff = new Date(now.getTime() - PRIORITIZED_WINDOW_DAYS * MS_PER_DAY)
-  const prioritizedTopicIds = Array.from(
-    new Set(
-      (unlockRows ?? [])
-        .filter((r) => new Date(r.unlocked_at as string) >= prioritizedCutoff)
-        .map((r) => r.topic_id as string)
-    )
-  )
+  // 4. Prioritized topic ids — prioritized_until > now, set by
+  // unlockTopics/prioritizeTopics (src/engine/unlock.ts) when a classroom
+  // log is confirmed.
+  const prioritizedTopicIds = await getPrioritizedTopicIds(userId, packId)
 
   // 5. Active quiz prep event: quiz_date >= today, not expired.
   const todayStr = toDateOnly(now)
