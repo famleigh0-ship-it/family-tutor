@@ -1,9 +1,10 @@
-// Fires a POST to /api/bank/fill using the internal service-role auth
-// header (see api/bank/fill.js — it checks this same header against
-// SUPABASE_SERVICE_ROLE_KEY, since that key is already a properly-guarded
-// secret never exposed to the browser, rather than inventing a second
-// internal-only credential). Plain JS so both Vercel functions
-// (api/bank/serve.js) and engine .js files (bank-manager.js) can import it.
+// Fires a POST to /api/bank (fill) using the internal service-role auth
+// header (see api/bank/index.js's handleFill — it checks this same header
+// against SUPABASE_SERVICE_ROLE_KEY, since that key is already a
+// properly-guarded secret never exposed to the browser, rather than
+// inventing a second internal-only credential). Plain JS so both Vercel
+// functions (api/bank/index.js's own GET path) and engine .js files
+// (bank-manager.js) can import it.
 //
 // APP_BASE_URL must point at the deployed site (e.g.
 // https://family-tutor-ten.vercel.app) — Vercel serverless functions and
@@ -21,7 +22,7 @@ export async function postBankFill({ packId, topicId, questionType }) {
     throw new Error('Missing APP_BASE_URL or SUPABASE_SERVICE_ROLE_KEY in the environment.')
   }
 
-  const res = await fetch(`${baseUrl}/api/bank/fill`, {
+  const res = await fetch(`${baseUrl}/api/bank`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',

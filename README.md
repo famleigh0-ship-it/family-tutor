@@ -293,32 +293,38 @@ returns `{ content, tokens_used }`. Every Phase 6 route builds its own
 prompt text and calls this rather than touching the Anthropic SDK
 directly.
 
-**Bank fill** (`api/bank/fill.js`) generates one batch of questions
-(MC 10 / conceptual 5 / FRQ 3 per call) for a `pack_id` + `topic_id` +
-`question_type` and inserts them into `question_bank`. It's an internal
-endpoint — only our own backend calls it, authenticated with the same
-`SUPABASE_SERVICE_ROLE_KEY` already used everywhere else server-side,
-sent as an `X-Service-Role-Key` header (there's no separate "service
-role" concept for our own HTTP API the way there is for Supabase, so the
-already-guarded key doubles as the shared secret rather than adding a
-second one).
+**Bank** (`api/bank/index.js`, `GET` = serve / `POST` = fill — see the
+function-count note below for why they share a file):
 
-**Bank serve** (`api/bank/serve.js`) picks one question for a student:
-prefers never-seen, falls back to not-seen-in-60-days, and if truly
-exhausted triggers an async fill while still returning the
-least-recently-seen question rather than making the student wait.
-`key_reasoning` and each option's `distractor_note` are stripped before
-the response ever reaches the client — that's what actually keeps the
-answer key server-side, not just convention.
+- `POST` generates one batch of questions (MC 10 / conceptual 5 / FRQ 3
+  per call) for a `pack_id` + `topic_id` + `question_type` and inserts
+  them into `question_bank`. It's an internal endpoint — only our own
+  backend calls it, authenticated with the same `SUPABASE_SERVICE_ROLE_KEY`
+  already used everywhere else server-side, sent as an
+  `X-Service-Role-Key` header (there's no separate "service role" concept
+  for our own HTTP API the way there is for Supabase, so the
+  already-guarded key doubles as the shared secret rather than adding a
+  second one).
+- `GET` picks one question for a student: prefers never-seen, falls back
+  to not-seen-in-60-days, and if truly exhausted triggers an async fill
+  while still returning the least-recently-seen question rather than
+  making the student wait. `key_reasoning` and each option's
+  `distractor_note` are stripped before the response ever reaches the
+  client — that's what actually keeps the answer key server-side, not
+  just convention.
 
-**Grading**: `grade-mc.js` is fully deterministic (no Claude call,
-`tokens_used: 0`) — it just compares against `correct_answer` and builds
-feedback from `distractor_note`. `grade-typed.js` (FRQ/conceptual) and
-`grade-photo.js` (Vision, handwritten work) both call Claude with a
-rubric-aware grading prompt and write the result back to
-`student_question_history` and, via `recordQuestionResult`, into
-`mastery_records`/`question_log`. All three verify the session actually
-belongs to the authenticated user before writing anything.
+**Grading** (`api/grading/grade.js`, one endpoint handling all three
+question types — same function-count reason): MC grading is fully
+deterministic (no Claude call, `tokens_used: 0`) — it just compares
+against `correct_answer` and builds feedback from `distractor_note`.
+FRQ/conceptual typed answers and FRQ photo submissions (Vision, handwritten
+work) both call Claude with a rubric-aware grading prompt and write the
+result back to `student_question_history` and, via `recordQuestionResult`,
+into `mastery_records`/`question_log`. Which path runs is decided by the
+loaded question's `question_type` together with which body field the
+client sent (`selected_option` / `student_answer` / `image_base64`). All
+three verify the session actually belongs to the authenticated user
+before writing anything.
 
 **Hints** (`api/hints/get-hint.js`) are Socratic and free — no grading
 impact, no history writes, just a 2-3 sentence nudge from Haiku.
@@ -333,12 +339,12 @@ an async fill and logs it — never blocking session start on a thin bank.
 (`status`, `fill`, `fill-all`) — see the milestone checklist below for
 exact commands.
 
-### A note on file layout vs. the literal spec
+### Notes on file layout vs. the literal spec
 
 `session-orchestrator.ts`, `mastery.ts`, `session-mode.ts`,
 `topic-selector.ts`, and `bank-manager.ts` all became plain `.js` in this
-phase (not `.ts`, despite the original naming). `api/grading/*.js` now
-import `recordQuestionResult` from `session-orchestrator.js` directly,
+phase (not `.ts`, despite the original naming). `api/grading/grade.js` now
+imports `recordQuestionResult` from `session-orchestrator.js` directly,
 and Vercel's serverless function bundler cannot resolve a
 directly-imported `.ts` file at runtime — confirmed the hard way in
 Phase 5 (`src/packs/loader.ts` → `ERR_MODULE_NOT_FOUND` in production).
@@ -346,6 +352,20 @@ Once one file in that dependency chain needed converting, everything it
 transitively imports at runtime (not just type-only) needed the same
 treatment. TypeScript still type-checks against these via JSDoc; only
 runtime resolution changed.
+
+**Vercel's Hobby plan caps a deployment at 12 serverless functions.**
+Every file under `api/` counts as one, except `api/_lib/` (Vercel's
+underscore-prefix convention excludes those). The spec's literal file
+structure — separate `fill.js`/`serve.js` and `grade-mc.js`/
+`grade-typed.js`/`grade-photo.js` — would have pushed the real total to
+13, and the deployment silently failed to build (showed as a stuck/yellow
+deployment in the dashboard, no visible error, with every new route
+404ing while the previous deployment kept serving traffic). Fixed by
+merging bank fill+serve into one `api/bank/index.js` (dispatched on
+`req.method`) and all three grading paths into one `api/grading/grade.js`
+(dispatched on the loaded question's `question_type` plus which body
+field the client sent), and deleting the unused Phase 1 `api/session`
+stub. That's 9 functions now — some headroom for what Phase 7+ adds.
 
 ## Phase 6 milestone checklist
 
@@ -359,14 +379,14 @@ runtime resolution changed.
       bank health report for every topic/type
 - [ ] `node scripts/manage-bank.js fill-all --pack ap-physics-1` fills the
       whole AP Physics 1 bank (several minutes, many API calls — expected)
-- [ ] `GET /api/bank/serve` returns a question with no `key_reasoning` and
-      no `distractor_note` on any option
-- [ ] A correct MC answer to `/api/grading/grade-mc` returns correct
-      feedback with zero Claude calls
-- [ ] A typed answer to `/api/grading/grade-typed` gets Claude-graded
-      structured feedback
-- [ ] A photo of handwritten work submitted to `/api/grading/grade-photo`
-      returns a readable, graded response
+- [ ] `GET /api/bank` returns a question with no `key_reasoning` and no
+      `distractor_note` on any option
+- [ ] A correct MC answer (`selected_option`) to `POST /api/grading/grade`
+      returns correct feedback with zero Claude calls
+- [ ] A typed answer (`student_answer`) to `POST /api/grading/grade` gets
+      Claude-graded structured feedback
+- [ ] A photo of handwritten work (`image_base64`) submitted to
+      `POST /api/grading/grade` returns a readable, graded response
 - [ ] `/api/hints/get-hint` returns a Socratic hint that doesn't reveal
       the answer
 - [ ] `node scripts/manage-bank.js fill-all --pack calc-ab-bc` fills the
