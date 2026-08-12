@@ -9,4 +9,8 @@ if (!supabaseUrl || !supabaseAnonKey) {
   )
 }
 
-export const supabase = createClient(supabaseUrl, supabaseAnonKey)
+// Explicit: session must survive browser closes (default behavior, spelled
+// out here so it isn't accidentally disabled later).
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: { persistSession: true, autoRefreshToken: true }
+})

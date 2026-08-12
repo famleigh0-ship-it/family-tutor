@@ -1,14 +1,23 @@
+import { useParams } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
+import { loadCoursePack } from '../packs/loader.js'
 
 export default function Session() {
+  const { packId } = useParams()
+
+  let pack = null
+  try {
+    pack = loadCoursePack(packId)
+  } catch {
+    pack = null
+  }
+
   return (
     <div className="min-h-screen bg-slate-50">
-      <TopBar title="Session" />
+      <TopBar title="FALP" />
       <main className="mx-auto max-w-sm px-4 py-8">
-        <p className="text-slate-500">
-          Adaptive question session UI goes here. Depends on the engine and course pack
-          loader (Phase 2).
-        </p>
+        <h1 className="text-xl font-semibold text-slate-900">{pack ? pack.name : packId}</h1>
+        <p className="mt-2 text-slate-500">Session coming in Phase 11.</p>
       </main>
     </div>
   )

@@ -1,47 +1,69 @@
 import { Routes, Route, Navigate } from 'react-router-dom'
 import Login from './pages/Login.jsx'
+import ResetPassword from './pages/ResetPassword.jsx'
 import Home from './pages/Home.jsx'
 import Session from './pages/Session.jsx'
 import Progress from './pages/Progress.jsx'
 import ParentDashboard from './pages/ParentDashboard.jsx'
-import ProtectedRoute from './components/ProtectedRoute.jsx'
+import ParentStudentDetail from './pages/ParentStudentDetail.jsx'
+import RoleProtectedRoute from './components/RoleProtectedRoute.jsx'
+import RootRedirect from './components/RootRedirect.jsx'
+import ParentPinGate from './components/ParentPinGate.jsx'
 
 export default function App() {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      <Route path="/reset-password" element={<ResetPassword />} />
+
+      <Route path="/" element={<RootRedirect />} />
+
       <Route
-        path="/"
+        path="/home"
         element={
-          <ProtectedRoute>
+          <RoleProtectedRoute allowedRole="student">
             <Home />
-          </ProtectedRoute>
+          </RoleProtectedRoute>
         }
       />
       <Route
-        path="/session"
+        path="/session/:packId"
         element={
-          <ProtectedRoute>
+          <RoleProtectedRoute allowedRole="student">
             <Session />
-          </ProtectedRoute>
+          </RoleProtectedRoute>
         }
       />
       <Route
-        path="/progress"
+        path="/progress/:packId"
         element={
-          <ProtectedRoute>
+          <RoleProtectedRoute allowedRole="student">
             <Progress />
-          </ProtectedRoute>
+          </RoleProtectedRoute>
         }
       />
+
       <Route
         path="/parent"
         element={
-          <ProtectedRoute>
-            <ParentDashboard />
-          </ProtectedRoute>
+          <RoleProtectedRoute allowedRole="parent">
+            <ParentPinGate>
+              <ParentDashboard />
+            </ParentPinGate>
+          </RoleProtectedRoute>
         }
       />
+      <Route
+        path="/parent/:studentId"
+        element={
+          <RoleProtectedRoute allowedRole="parent">
+            <ParentPinGate>
+              <ParentStudentDetail />
+            </ParentPinGate>
+          </RoleProtectedRoute>
+        }
+      />
+
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   )

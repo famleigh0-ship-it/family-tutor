@@ -35,3 +35,18 @@ export async function getUserFromRequest(req) {
   if (error) return null
   return data.user
 }
+
+/**
+ * Fetches a user's row from `users` (id, role, name) using the service role,
+ * bypassing RLS. Returns null if no row exists.
+ */
+export async function getUserProfile(userId) {
+  const { data, error } = await getSupabaseAdmin()
+    .from('users')
+    .select('id, role, name')
+    .eq('id', userId)
+    .maybeSingle()
+
+  if (error) throw error
+  return data
+}
