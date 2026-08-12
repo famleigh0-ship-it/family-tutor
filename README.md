@@ -123,9 +123,41 @@ bounces you to `/login`.
 
 ## Phase 2 milestone checklist
 
-- [ ] `create-user.js` creates a parent account and a student account
-- [ ] Student login → `/home` with their name and two course cards
-- [ ] Parent login → `/parent` → PIN prompt → set PIN on first access → placeholder dashboard
-- [ ] Student account cannot navigate to `/parent` (redirects to `/login`)
-- [ ] Wrong-role/unauthenticated visits to any protected route redirect to `/login`
-- [ ] Forgot-password flow sends a reset email and `/reset-password` lets you set a new password
+- [x] `create-user.js` creates a parent account and a student account
+- [x] Student login → `/home` with their name and two course cards
+- [x] Parent login → `/parent` → PIN prompt → set PIN on first access → placeholder dashboard
+- [x] Student account cannot navigate to `/parent` (redirects to `/login`)
+- [x] Wrong-role/unauthenticated visits to any protected route redirect to `/login`
+- [x] Forgot-password flow sends a reset email and `/reset-password` lets you set a new password
+
+## Course packs and the pack loader
+
+Course content lives entirely in `course-packs/*/pack.json`, validated
+against `src/packs/types.ts` at load time by `src/packs/loader.ts`. The
+engine and UI never hardcode subject content — everything (units, topics,
+pacing, misconceptions, FRQ rubric) comes from the pack file.
+
+Validate both packs (checks structural shape plus cross-references — every
+prerequisite id and pacing-calendar topic id must actually resolve, and no
+`bc_only` topic may appear in the AB pacing calendar):
+
+```bash
+npm run validate-packs
+```
+
+`getUnlockedTopics(packId, referenceDate)` computes which topics should be
+visible as of a given date: AB topics unlock week-by-week per
+`pacing_calendar`; BC-only topics (Calc pack) have no calendar entries at
+all and instead unlock once every prerequisite unit's calendar-scheduled
+weeks have fully passed. In dev mode (`npm run dev`), `getPack`,
+`getAllPacks`, `getUnit`, `getTopic`, `getTopicsForWeek`, and
+`getUnlockedTopics` are exposed on `window` from the Home page for
+console testing, e.g. `getUnlockedTopics('ap-physics-1', '2026-08-11')`.
+
+## Phase 3 milestone checklist
+
+- [x] `npm run validate-packs` passes for both packs
+- [x] `/home` shows real course names, unit counts, and exam countdowns
+- [x] `getPack('ap-physics-1')` inspectable from the browser console
+- [x] `getUnlockedTopics('ap-physics-1', '2026-08-11')` returns the week 1 kinematics topic
+- [x] BC-only Calc topics stay hidden from `getUnlockedTopics` until their AB prerequisite units are calendar-complete

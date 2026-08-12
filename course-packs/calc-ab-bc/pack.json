@@ -2,7 +2,1066 @@
   "id": "calc-ab-bc",
   "name": "Calculus AB→BC",
   "school_year_start": "2026-08-11",
-  "exam_date": null,
-  "units": [],
-  "pacing_calendar": []
+  "exam_date": "2027-05-11",
+  "exam_crunch_weeks": 8,
+  "tutor_persona": "You are an experienced AP Calculus tutor covering both AB and BC content. You distinguish clearly between AB topics (being learned in school) and BC-only topics (self-study). You connect calculus concepts to physical intuition where possible, since this student is also taking AP Physics 1. You are patient with algebraic errors but rigorous about conceptual understanding.",
+  "subject_context": "This student is taking Calc AB in school and self-studying BC content simultaneously. AB topics should reinforce what is being taught in class. BC-only topics (series, parametric, polar, advanced integration, advanced differential equations) are introduced only after AB prerequisites are solid. The BC exam tests all AB content plus BC-only content — mastery of AB is non-negotiable before advancing BC topics.",
+  "units": [
+    {
+      "id": "limits-continuity",
+      "name": "Limits and Continuity",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 12,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "limits-continuity.limit-laws-and-evaluation",
+          "name": "Limit Laws and Evaluation",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to try direct substitution first and justify why it does or doesn't work",
+            "Push them to identify indeterminate forms like 0/0 before choosing a technique"
+          ],
+          "common_errors": [
+            "Canceling factors without checking that the function is still defined afterward",
+            "Treating an indeterminate form 0/0 as if it simply equals zero"
+          ]
+        },
+        {
+          "id": "limits-continuity.one-sided-limits",
+          "name": "One-Sided Limits",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["limits-continuity.limit-laws-and-evaluation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to evaluate the left-hand and right-hand limits separately before concluding whether the two-sided limit exists",
+            "Push them to justify their answer using the function's actual behavior near the point, not just its value at the point"
+          ],
+          "common_errors": [
+            "Assuming a two-sided limit exists just because the function is defined at that point",
+            "Confusing one-sided limit notation and evaluating the wrong side"
+          ]
+        },
+        {
+          "id": "limits-continuity.limits-at-infinity",
+          "name": "Limits at Infinity",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["limits-continuity.one-sided-limits"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to compare the degrees of numerator and denominator before evaluating",
+            "Ask them to justify horizontal asymptote behavior using the limit, not just a memorized rule"
+          ],
+          "common_errors": [
+            "Applying the 'compare degrees' shortcut without understanding why it works",
+            "Confusing limits at infinity with limits of infinite value at a finite point"
+          ]
+        },
+        {
+          "id": "limits-continuity.continuity-and-ivt",
+          "name": "Continuity and the Intermediate Value Theorem",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["limits-continuity.limits-at-infinity"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to check all three conditions of continuity explicitly at a point before concluding it's continuous",
+            "Ask them to justify why IVT requires continuity on a closed interval"
+          ],
+          "common_errors": [
+            "Concluding continuity just because a limit exists, without checking it matches the function's value",
+            "Misapplying IVT to a function that is not continuous on the interval in question"
+          ]
+        },
+        {
+          "id": "limits-continuity.squeeze-theorem",
+          "name": "Squeeze Theorem",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["limits-continuity.continuity-and-ivt"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify both inequalities bounding the function before applying the theorem",
+            "Ask them to explain why both bounding functions must approach the same limit"
+          ],
+          "common_errors": [
+            "Applying the squeeze theorem with bounding functions that don't actually converge to the same limit",
+            "Skipping the justification for why the target function is squeezed between the two bounds"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "differentiation",
+      "name": "Differentiation",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 12,
+      "prerequisite_unit_ids": ["limits-continuity"],
+      "topics": [
+        {
+          "id": "differentiation.derivative-definition-and-notation",
+          "name": "Derivative Definition and Notation",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["limits-continuity.squeeze-theorem"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to compute a derivative from the limit definition at least once to justify why shortcuts work",
+            "Push them to use correct and consistent notation (dy/dx, f'(x), etc.)"
+          ],
+          "common_errors": [
+            "Treating the derivative as just 'the slope formula' without connecting it to the limit definition",
+            "Mixing notations inconsistently within the same problem"
+          ]
+        },
+        {
+          "id": "differentiation.basic-differentiation-rules",
+          "name": "Basic Differentiation Rules",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.derivative-definition-and-notation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to identify which rule (power, constant, sum) applies to each term before differentiating",
+            "Ask them to justify why the derivative of a constant is zero"
+          ],
+          "common_errors": [
+            "Applying the power rule to terms that aren't in the form x^n",
+            "Forgetting to differentiate every term in a sum or difference"
+          ]
+        },
+        {
+          "id": "differentiation.product-and-quotient-rules",
+          "name": "Product and Quotient Rules",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.basic-differentiation-rules"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to write out the product/quotient rule formula explicitly before substituting",
+            "Ask them to justify why simply multiplying the two derivatives is incorrect"
+          ],
+          "common_errors": [
+            "Differentiating a product by just multiplying the derivatives of each factor",
+            "Getting the quotient rule's numerator terms in the wrong order"
+          ]
+        },
+        {
+          "id": "differentiation.chain-rule",
+          "name": "Chain Rule",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.product-and-quotient-rules"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explicitly identify the outer and inner functions before differentiating",
+            "Ask them to justify each factor in the chain rule product"
+          ],
+          "common_errors": [
+            "Forgetting to multiply by the derivative of the inner function",
+            "Applying the chain rule when it isn't needed, over-complicating simple derivatives"
+          ]
+        },
+        {
+          "id": "differentiation.implicit-differentiation",
+          "name": "Implicit Differentiation",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.chain-rule"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify why dy/dx must be attached via the chain rule every time y is differentiated",
+            "Ask them to solve for dy/dx as a distinct algebraic step at the end"
+          ],
+          "common_errors": [
+            "Forgetting to multiply by dy/dx when differentiating a term containing y",
+            "Treating x and y asymmetrically when both should get chain rule treatment"
+          ]
+        },
+        {
+          "id": "differentiation.related-rates",
+          "name": "Related Rates",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.implicit-differentiation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to write the relevant equation relating the variables BEFORE differentiating with respect to time",
+            "Ask them to justify which rates are given and which is unknown before solving"
+          ],
+          "common_errors": [
+            "Substituting known numeric values before differentiating instead of after",
+            "Misidentifying which quantity's rate of change is actually being asked for"
+          ]
+        },
+        {
+          "id": "differentiation.derivatives-of-trig-exp-log",
+          "name": "Derivatives of Trig, Exponential, and Log Functions",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.related-rates"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify the derivative of e^x as the unique function that is its own derivative",
+            "Push them to be careful with chain rule when trig/exp/log functions have non-x arguments"
+          ],
+          "common_errors": [
+            "Confusing the derivatives of sin and cos (sign error)",
+            "Forgetting the chain rule factor when the argument of ln, e, or a trig function isn't simply x"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "applications-of-derivatives",
+      "name": "Applications of Derivatives",
+      "ap_exam_weight_min": 15,
+      "ap_exam_weight_max": 18,
+      "prerequisite_unit_ids": ["differentiation"],
+      "topics": [
+        {
+          "id": "applications-of-derivatives.mvt-and-rolles-theorem",
+          "name": "MVT and Rolle's Theorem",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["differentiation.derivatives-of-trig-exp-log"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to verify the hypotheses (continuity, differentiability) before applying MVT or Rolle's theorem",
+            "Ask them to justify what the theorem guarantees versus what it doesn't"
+          ],
+          "common_errors": [
+            "Applying MVT without checking differentiability on the open interval",
+            "Assuming MVT identifies where the guaranteed point is, not just that it exists"
+          ]
+        },
+        {
+          "id": "applications-of-derivatives.increasing-decreasing-first-derivative-test",
+          "name": "Increasing/Decreasing and the First Derivative Test",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["applications-of-derivatives.mvt-and-rolles-theorem"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify sign changes in the first derivative using a sign chart, not guessing",
+            "Ask them to connect increasing/decreasing behavior directly to the sign of f'(x), not f(x)"
+          ],
+          "common_errors": [
+            "Using the sign of f(x) instead of f'(x) to determine increasing/decreasing",
+            "Missing critical points where f' is undefined, not just where f'=0"
+          ]
+        },
+        {
+          "id": "applications-of-derivatives.concavity-second-derivative-test",
+          "name": "Concavity and the Second Derivative Test",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["applications-of-derivatives.increasing-decreasing-first-derivative-test"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify inflection points as places where concavity actually changes, not just where f''=0",
+            "Ask them to distinguish clearly between the first derivative test and second derivative test"
+          ],
+          "common_errors": [
+            "Calling every point where f''=0 an inflection point without checking that concavity actually changes there",
+            "Confusing concavity with increasing/decreasing behavior"
+          ]
+        },
+        {
+          "id": "applications-of-derivatives.optimization",
+          "name": "Optimization",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["applications-of-derivatives.concavity-second-derivative-test"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify their constraint equation before substituting into the objective function",
+            "Ask them to verify a critical point is actually a max or min using the first or second derivative test"
+          ],
+          "common_errors": [
+            "Finding a critical point and assuming it's the answer without verifying it's a maximum or minimum",
+            "Forgetting to check endpoints on a closed interval"
+          ]
+        },
+        {
+          "id": "applications-of-derivatives.curve-sketching",
+          "name": "Curve Sketching",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["applications-of-derivatives.optimization"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify each feature (intercepts, asymptotes, extrema, inflection points) with actual calculus, not guessing from a rough shape",
+            "Ask them to reconcile the first and second derivative information into one consistent sketch"
+          ],
+          "common_errors": [
+            "Sketching a curve based on a few points without using derivative information to justify shape",
+            "Contradicting their own first/second derivative sign chart in the final sketch"
+          ]
+        },
+        {
+          "id": "applications-of-derivatives.lhopitals-rule",
+          "name": "L'Hopital's Rule",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["applications-of-derivatives.curve-sketching"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify that the limit is actually an indeterminate form before applying L'Hopital's rule",
+            "Ask them to differentiate numerator and denominator separately, not use the quotient rule"
+          ],
+          "common_errors": [
+            "Applying L'Hopital's rule to a limit that isn't actually an indeterminate form",
+            "Using the quotient rule instead of differentiating numerator and denominator separately"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "integration-ab",
+      "name": "Integration AB",
+      "ap_exam_weight_min": 17,
+      "ap_exam_weight_max": 20,
+      "prerequisite_unit_ids": ["applications-of-derivatives"],
+      "topics": [
+        {
+          "id": "integration-ab.riemann-sums-definite-integral",
+          "name": "Riemann Sums and the Definite Integral",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["applications-of-derivatives.lhopitals-rule"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify how a Riemann sum approximates area, and how the definite integral is its limit",
+            "Ask them to distinguish left, right, and midpoint sums and when each over- or under-estimates"
+          ],
+          "common_errors": [
+            "Assuming all Riemann sum types give the same approximation",
+            "Confusing the definite integral's value with a Riemann sum approximation of it"
+          ]
+        },
+        {
+          "id": "integration-ab.ftc-parts-1-and-2",
+          "name": "Fundamental Theorem of Calculus, Parts 1 and 2",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["integration-ab.riemann-sums-definite-integral"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to state which part of the Fundamental Theorem they're using and justify why it applies",
+            "Ask them to be careful with chain rule when the upper limit of integration isn't simply x"
+          ],
+          "common_errors": [
+            "Confusing FTC Part 1 (differentiating an integral) with Part 2 (evaluating a definite integral)",
+            "Forgetting the chain rule factor when the integral's bound is a function of x, not x itself"
+          ]
+        },
+        {
+          "id": "integration-ab.basic-antiderivatives",
+          "name": "Basic Antiderivatives",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["integration-ab.ftc-parts-1-and-2"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify their antiderivative by differentiating it back",
+            "Push them to remember the +C for indefinite integrals and justify why it's needed"
+          ],
+          "common_errors": [
+            "Forgetting the constant of integration on indefinite integrals",
+            "Misapplying the power rule for integration when the exponent is -1"
+          ]
+        },
+        {
+          "id": "integration-ab.u-substitution",
+          "name": "U-Substitution",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["integration-ab.basic-antiderivatives"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify their choice of u and show du explicitly before substituting",
+            "Ask them to convert the limits of integration when using u-substitution on a definite integral"
+          ],
+          "common_errors": [
+            "Substituting u without changing du or accounting for it in the integral",
+            "Forgetting to change the limits of integration (or convert back to x) for definite integrals"
+          ]
+        },
+        {
+          "id": "integration-ab.initial-value-problems",
+          "name": "Initial Value Problems",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["integration-ab.u-substitution"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify using the given initial condition to solve for the constant of integration",
+            "Ask them to check their final answer satisfies both the differential equation and the initial condition"
+          ],
+          "common_errors": [
+            "Forgetting to apply the initial condition to solve for C",
+            "Solving for C using the wrong point"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "applications-of-integration-ab",
+      "name": "Applications of Integration AB",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 15,
+      "prerequisite_unit_ids": ["integration-ab"],
+      "topics": [
+        {
+          "id": "applications-of-integration-ab.area-between-curves",
+          "name": "Area Between Curves",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["integration-ab.initial-value-problems"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify which function is on top (or right) before setting up the integral",
+            "Ask them to identify intersection points as the bounds of integration, with reasoning, not just by inspection"
+          ],
+          "common_errors": [
+            "Subtracting functions in the wrong order, producing a negative area",
+            "Using incorrect bounds by not solving for actual intersection points"
+          ]
+        },
+        {
+          "id": "applications-of-integration-ab.accumulation-functions",
+          "name": "Accumulation Functions",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["applications-of-integration-ab.area-between-curves"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to interpret an accumulation function as net change, justified by FTC",
+            "Ask them to distinguish net change from total accumulated amount when the rate changes sign"
+          ],
+          "common_errors": [
+            "Confusing net change with total accumulated amount when the integrand changes sign",
+            "Misreading an accumulation function graph's meaning at a given point"
+          ]
+        },
+        {
+          "id": "applications-of-integration-ab.average-value-of-function",
+          "name": "Average Value of a Function",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["applications-of-integration-ab.accumulation-functions"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify the average value formula as (1/(b-a)) times the definite integral",
+            "Ask them to connect this back to the Mean Value Theorem for integrals conceptually"
+          ],
+          "common_errors": [
+            "Forgetting to divide by (b-a) after computing the definite integral",
+            "Confusing average value of a function with average rate of change"
+          ]
+        },
+        {
+          "id": "applications-of-integration-ab.particle-motion-integrals",
+          "name": "Particle Motion with Integrals",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["applications-of-integration-ab.average-value-of-function"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify the difference between total distance and displacement using absolute value of velocity",
+            "Ask them to identify when the particle changes direction before computing distance"
+          ],
+          "common_errors": [
+            "Computing displacement when the question asks for total distance traveled, or vice versa",
+            "Forgetting to split the integral at points where velocity changes sign when finding total distance"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "differential-equations-ab",
+      "name": "Differential Equations AB",
+      "ap_exam_weight_min": 6,
+      "ap_exam_weight_max": 9,
+      "prerequisite_unit_ids": ["integration-ab"],
+      "topics": [
+        {
+          "id": "differential-equations-ab.slope-fields",
+          "name": "Slope Fields",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["applications-of-integration-ab.particle-motion-integrals"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify the slope drawn at each point using the differential equation itself",
+            "Ask them to sketch a solution curve consistent with the slope field and a given initial condition"
+          ],
+          "common_errors": [
+            "Drawing slopes that don't match the differential equation at that point",
+            "Sketching a solution curve that crosses slope lines inconsistently"
+          ]
+        },
+        {
+          "id": "differential-equations-ab.separation-of-variables",
+          "name": "Separation of Variables",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["differential-equations-ab.slope-fields"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify why variables can be separated before integrating both sides",
+            "Ask them to apply the initial condition after integrating, not before"
+          ],
+          "common_errors": [
+            "Forgetting to include the constant of integration when separating variables",
+            "Losing track of which variable belongs on which side during separation"
+          ]
+        },
+        {
+          "id": "differential-equations-ab.exponential-growth-decay-models",
+          "name": "Exponential Growth and Decay Models",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["differential-equations-ab.separation-of-variables"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify why dy/dt = ky leads to exponential behavior, not just memorize the formula",
+            "Ask them to interpret k's sign in context (growth vs decay)"
+          ],
+          "common_errors": [
+            "Confusing the sign of k between growth and decay scenarios",
+            "Misapplying the exponential model to a situation that isn't actually proportional growth"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advanced-integration-bc",
+      "name": "Advanced Integration BC",
+      "ap_exam_weight_min": 5,
+      "ap_exam_weight_max": 8,
+      "prerequisite_unit_ids": ["integration-ab"],
+      "topics": [
+        {
+          "id": "advanced-integration-bc.integration-by-parts",
+          "name": "Integration by Parts",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify their choice of u and dv (e.g., using LIATE) before proceeding",
+            "Ask them to check whether repeated integration by parts is needed and why"
+          ],
+          "common_errors": [
+            "Choosing u and dv in a way that makes the resulting integral more complex, not less",
+            "Forgetting the sign in the integration by parts formula"
+          ]
+        },
+        {
+          "id": "advanced-integration-bc.partial-fractions",
+          "name": "Partial Fractions",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["advanced-integration-bc.integration-by-parts"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify the decomposition setup based on the denominator's factors before solving for constants",
+            "Ask them to check their decomposition by recombining it back into a single fraction"
+          ],
+          "common_errors": [
+            "Setting up an incorrect partial fraction form for repeated or irreducible quadratic factors",
+            "Making algebra errors when solving for the unknown constants"
+          ]
+        },
+        {
+          "id": "advanced-integration-bc.improper-integrals",
+          "name": "Improper Integrals",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["advanced-integration-bc.partial-fractions"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify rewriting the improper integral as a limit before evaluating",
+            "Ask them to determine convergence or divergence explicitly, not just compute a number"
+          ],
+          "common_errors": [
+            "Evaluating an improper integral as if it were a normal definite integral, without the limit",
+            "Concluding convergence without actually checking the limit exists and is finite"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "parametric-vectors-bc",
+      "name": "Parametric Equations and Vectors BC",
+      "ap_exam_weight_min": 6,
+      "ap_exam_weight_max": 7,
+      "prerequisite_unit_ids": ["differentiation", "integration-ab"],
+      "topics": [
+        {
+          "id": "parametric-vectors-bc.parametric-derivatives",
+          "name": "Parametric Derivatives",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify dy/dx as (dy/dt)/(dx/dt), not a single differentiation step",
+            "Ask them to be careful applying the quotient rule again for the second derivative"
+          ],
+          "common_errors": [
+            "Differentiating y with respect to x directly instead of using the parametric derivative formula",
+            "Using the wrong formula for the second derivative of a parametric curve"
+          ]
+        },
+        {
+          "id": "parametric-vectors-bc.arc-length-parametric",
+          "name": "Arc Length (Parametric)",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["parametric-vectors-bc.parametric-derivatives"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify the arc length formula as coming from the Pythagorean theorem applied to (dx)^2 + (dy)^2",
+            "Ask them to set up the integral with correct bounds in terms of t"
+          ],
+          "common_errors": [
+            "Using the arc length formula in terms of x instead of the parametric (t-based) version",
+            "Forgetting to take the square root before integrating"
+          ]
+        },
+        {
+          "id": "parametric-vectors-bc.speed-and-distance-parametric",
+          "name": "Speed and Distance (Parametric)",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["parametric-vectors-bc.arc-length-parametric"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify speed as the magnitude of the velocity vector, sqrt((dx/dt)^2 + (dy/dt)^2)",
+            "Ask them to distinguish speed from the individual velocity components"
+          ],
+          "common_errors": [
+            "Reporting a velocity component as if it were the speed",
+            "Forgetting to take the square root when computing speed from velocity components"
+          ]
+        },
+        {
+          "id": "parametric-vectors-bc.vector-valued-functions",
+          "name": "Vector-Valued Functions",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["parametric-vectors-bc.speed-and-distance-parametric"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify that differentiating a vector-valued function means differentiating each component separately",
+            "Ask them to interpret the derivative as a velocity vector, tangent to the path"
+          ],
+          "common_errors": [
+            "Treating a vector-valued function as a single scalar function when differentiating or integrating",
+            "Misinterpreting the derivative vector's direction relative to the path"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "polar-coordinates-bc",
+      "name": "Polar Coordinates BC",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 5,
+      "prerequisite_unit_ids": ["parametric-vectors-bc"],
+      "topics": [
+        {
+          "id": "polar-coordinates-bc.polar-curves-and-graphing",
+          "name": "Polar Curves and Graphing",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify key points on a polar graph by evaluating r at specific angles, not guessing the shape",
+            "Ask them to explain what a negative r value means when plotting"
+          ],
+          "common_errors": [
+            "Assuming polar graphs always pass through the origin the same way a Cartesian graph would",
+            "Mishandling negative r values when plotting points"
+          ]
+        },
+        {
+          "id": "polar-coordinates-bc.derivatives-in-polar",
+          "name": "Derivatives in Polar",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["polar-coordinates-bc.polar-curves-and-graphing"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify converting to x = r cos(theta), y = r sin(theta) before finding dy/dx",
+            "Ask them to apply the parametric derivative approach since polar curves are parametrized by theta"
+          ],
+          "common_errors": [
+            "Trying to differentiate r with respect to theta and calling it dy/dx directly",
+            "Forgetting the product rule when differentiating x and y in terms of theta"
+          ]
+        },
+        {
+          "id": "polar-coordinates-bc.area-in-polar-coordinates",
+          "name": "Area in Polar Coordinates",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["polar-coordinates-bc.derivatives-in-polar"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify the polar area formula as built from infinitesimal circular sectors, not rectangles",
+            "Ask them to identify correct bounds of theta, especially when curves overlap"
+          ],
+          "common_errors": [
+            "Using the Cartesian area formula instead of the polar sector formula",
+            "Using incorrect theta bounds when regions are bounded by two different curves"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "sequences-series-bc",
+      "name": "Sequences and Series BC",
+      "ap_exam_weight_min": 17,
+      "ap_exam_weight_max": 18,
+      "prerequisite_unit_ids": ["integration-ab", "applications-of-integration-ab"],
+      "topics": [
+        {
+          "id": "sequences-series-bc.sequences-and-convergence",
+          "name": "Sequences and Convergence",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify convergence by evaluating the limit of the sequence's general term as n approaches infinity",
+            "Ask them to distinguish a sequence from a series explicitly"
+          ],
+          "common_errors": [
+            "Confusing a sequence with the series formed by summing it",
+            "Concluding convergence without properly evaluating the limit of the general term"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.geometric-series",
+          "name": "Geometric Series",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.sequences-and-convergence"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify the convergence condition |r| < 1 before using the sum formula",
+            "Ask them to identify the first term and common ratio explicitly before applying the formula"
+          ],
+          "common_errors": [
+            "Applying the geometric series sum formula when |r| >= 1",
+            "Misidentifying the first term, especially when the series doesn't start at n=0"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.integral-test",
+          "name": "Integral Test",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.geometric-series"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify that the function is positive, continuous, and decreasing before applying the integral test",
+            "Ask them to connect the convergence of the improper integral directly to the convergence of the series"
+          ],
+          "common_errors": [
+            "Applying the integral test without checking the function is decreasing",
+            "Concluding the series' sum equals the integral's value instead of just matching convergence behavior"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.comparison-tests",
+          "name": "Comparison Tests",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.integral-test"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify the inequality between the given series and the comparison series explicitly, term by term",
+            "Ask them to pick a comparison series whose convergence behavior is already known"
+          ],
+          "common_errors": [
+            "Comparing to a series without verifying the inequality holds for all relevant n",
+            "Using the comparison test in the wrong direction"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.ratio-and-root-tests",
+          "name": "Ratio and Root Tests",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.comparison-tests"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify computing the limit correctly and interpreting the result relative to 1",
+            "Ask them to note that these tests are inconclusive when the limit equals exactly 1"
+          ],
+          "common_errors": [
+            "Concluding convergence or divergence when the ratio/root test limit equals 1 (it's inconclusive)",
+            "Algebra errors when simplifying the ratio of consecutive terms"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.alternating-series-error-bound",
+          "name": "Alternating Series and Error Bound",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.ratio-and-root-tests"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify the alternating series test's two conditions (decreasing terms, limit to zero) before applying it",
+            "Ask them to use the error bound as the magnitude of the first omitted term, and justify why"
+          ],
+          "common_errors": [
+            "Applying the alternating series error bound to a series that isn't actually alternating or decreasing",
+            "Using the wrong term (not the first omitted one) as the error bound"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.power-series-radius-of-convergence",
+          "name": "Power Series and Radius of Convergence",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.alternating-series-error-bound"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify using the ratio test to find the radius of convergence before checking endpoints separately",
+            "Ask them to explicitly test both endpoints, since the ratio test doesn't determine convergence there"
+          ],
+          "common_errors": [
+            "Forgetting to check the endpoints of the interval of convergence separately",
+            "Concluding the interval of convergence without justifying endpoint behavior with a different test"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.taylor-and-maclaurin-series",
+          "name": "Taylor and Maclaurin Series",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.power-series-radius-of-convergence"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify each coefficient using the Taylor series formula involving derivatives at the center point",
+            "Ask them to distinguish a Maclaurin series as simply a Taylor series centered at zero"
+          ],
+          "common_errors": [
+            "Computing Taylor coefficients with an error in the factorial or derivative order",
+            "Confusing the center of the Taylor series with x=0 when a different center is specified"
+          ]
+        },
+        {
+          "id": "sequences-series-bc.taylor-polynomial-error-lagrange-remainder",
+          "name": "Taylor Polynomial Error (Lagrange Remainder)",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["sequences-series-bc.taylor-and-maclaurin-series"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify the Lagrange remainder bound using the correct order derivative and interval",
+            "Ask them to explain what the remainder represents: the error between the polynomial approximation and the actual function"
+          ],
+          "common_errors": [
+            "Using the wrong order of derivative in the Lagrange remainder formula",
+            "Failing to bound the derivative over the correct interval when estimating the maximum error"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "advanced-differential-equations-bc",
+      "name": "Advanced Differential Equations BC",
+      "ap_exam_weight_min": 3,
+      "ap_exam_weight_max": 5,
+      "prerequisite_unit_ids": ["differential-equations-ab"],
+      "topics": [
+        {
+          "id": "advanced-differential-equations-bc.eulers-method",
+          "name": "Euler's Method",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Push the student to justify each step as a linear approximation using the slope at the current point",
+            "Ask them to explain how step size affects the accuracy of Euler's method's approximation"
+          ],
+          "common_errors": [
+            "Using the slope at the wrong point for a given step",
+            "Assuming Euler's method gives an exact solution rather than an approximation"
+          ]
+        },
+        {
+          "id": "advanced-differential-equations-bc.logistic-growth-model",
+          "name": "Logistic Growth Model",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["advanced-differential-equations-bc.eulers-method"],
+          "input_mode": "typed",
+          "bc_only": true,
+          "prompt_hints": [
+            "Require the student to justify the logistic model's carrying capacity as the value where growth rate goes to zero",
+            "Ask them to explain why growth rate is fastest at half the carrying capacity"
+          ],
+          "common_errors": [
+            "Confusing the logistic growth model with simple exponential growth, ignoring the carrying capacity term",
+            "Assuming growth rate is constant rather than changing as the population approaches carrying capacity"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing_calendar": [
+    { "week": 1, "topic_ids": ["limits-continuity.limit-laws-and-evaluation"] },
+    { "week": 2, "topic_ids": ["limits-continuity.one-sided-limits"] },
+    { "week": 3, "topic_ids": ["limits-continuity.limits-at-infinity"] },
+    { "week": 4, "topic_ids": ["limits-continuity.continuity-and-ivt"] },
+    { "week": 5, "topic_ids": ["limits-continuity.squeeze-theorem"] },
+    { "week": 6, "topic_ids": ["differentiation.derivative-definition-and-notation"] },
+    { "week": 7, "topic_ids": ["differentiation.basic-differentiation-rules"] },
+    { "week": 8, "topic_ids": ["differentiation.product-and-quotient-rules", "differentiation.chain-rule"] },
+    { "week": 9, "topic_ids": ["differentiation.implicit-differentiation"] },
+    { "week": 10, "topic_ids": ["differentiation.related-rates"] },
+    { "week": 11, "topic_ids": ["differentiation.derivatives-of-trig-exp-log"] },
+    { "week": 12, "topic_ids": ["applications-of-derivatives.mvt-and-rolles-theorem"] },
+    { "week": 13, "topic_ids": ["applications-of-derivatives.increasing-decreasing-first-derivative-test"] },
+    { "week": 14, "topic_ids": ["applications-of-derivatives.concavity-second-derivative-test"] },
+    { "week": 15, "topic_ids": ["applications-of-derivatives.optimization", "applications-of-derivatives.curve-sketching"] },
+    { "week": 16, "topic_ids": ["applications-of-derivatives.lhopitals-rule"] },
+    { "week": 17, "topic_ids": ["integration-ab.riemann-sums-definite-integral"] },
+    { "week": 18, "topic_ids": ["integration-ab.ftc-parts-1-and-2"] },
+    { "week": 19, "topic_ids": ["integration-ab.basic-antiderivatives"] },
+    { "week": 20, "topic_ids": ["integration-ab.u-substitution"] },
+    { "week": 21, "topic_ids": ["integration-ab.initial-value-problems"] },
+    { "week": 22, "topic_ids": [] },
+    { "week": 23, "topic_ids": ["applications-of-integration-ab.area-between-curves"] },
+    { "week": 24, "topic_ids": ["applications-of-integration-ab.accumulation-functions"] },
+    { "week": 25, "topic_ids": ["applications-of-integration-ab.average-value-of-function"] },
+    { "week": 26, "topic_ids": ["applications-of-integration-ab.particle-motion-integrals"] },
+    { "week": 27, "topic_ids": [] },
+    { "week": 28, "topic_ids": ["differential-equations-ab.slope-fields"] },
+    { "week": 29, "topic_ids": ["differential-equations-ab.separation-of-variables"] },
+    { "week": 30, "topic_ids": ["differential-equations-ab.exponential-growth-decay-models"] },
+    { "week": 31, "topic_ids": [] },
+    { "week": 32, "topic_ids": [] },
+    { "week": 33, "topic_ids": [] },
+    { "week": 34, "topic_ids": [] },
+    { "week": 35, "topic_ids": [] },
+    { "week": 36, "topic_ids": [] }
+  ],
+  "common_misconceptions": [
+    {
+      "id": "correct-answer-without-work",
+      "description": "Students give a correct final answer without showing supporting work or notation — this scores zero on the actual AP Calculus exam even with a correct number.",
+      "affected_topic_ids": ["integration-ab.ftc-parts-1-and-2", "differentiation.chain-rule"],
+      "detection_hints": ["Check whether intermediate steps and proper notation are shown, not just a final boxed answer"]
+    },
+    {
+      "id": "series-convergence-test-misapplication",
+      "description": "Students apply a convergence test without verifying its required conditions hold, or misinterpret an inconclusive result as proof of convergence or divergence.",
+      "affected_topic_ids": [
+        "sequences-series-bc.ratio-and-root-tests",
+        "sequences-series-bc.comparison-tests",
+        "sequences-series-bc.integral-test"
+      ],
+      "detection_hints": [
+        "Check whether the student explicitly verifies the test's conditions before applying it",
+        "Watch for treating a ratio/root test result of exactly 1 as conclusive"
+      ]
+    },
+    {
+      "id": "series-vs-sequence-confusion",
+      "description": "Students confuse the convergence of a sequence (its terms approaching a limit) with the convergence of the series formed by summing that sequence.",
+      "affected_topic_ids": ["sequences-series-bc.sequences-and-convergence", "sequences-series-bc.geometric-series"],
+      "detection_hints": ["Check whether the student is discussing the limit of terms or the sum, and whether they're using the right one for the question asked"]
+    },
+    {
+      "id": "forgetting-constant-of-integration",
+      "description": "Students drop the +C on indefinite integrals, or forget to solve for it using an initial condition when one is given.",
+      "affected_topic_ids": [
+        "integration-ab.basic-antiderivatives",
+        "differential-equations-ab.separation-of-variables",
+        "integration-ab.initial-value-problems"
+      ],
+      "detection_hints": [
+        "Check indefinite integral answers for a missing +C",
+        "Check whether an initial condition given in the problem was actually used"
+      ]
+    },
+    {
+      "id": "chain-rule-omission",
+      "description": "Students forget to apply the chain rule's inner-function derivative factor, especially in implicit differentiation and derivatives of composite trig/exp/log functions.",
+      "affected_topic_ids": [
+        "differentiation.chain-rule",
+        "differentiation.implicit-differentiation",
+        "differentiation.derivatives-of-trig-exp-log"
+      ],
+      "detection_hints": ["Check whether a derivative of a composite function is missing an inner-derivative factor"]
+    },
+    {
+      "id": "endpoint-convergence-skipped",
+      "description": "Students find a radius of convergence using the ratio test but never separately check the endpoints of the interval, which the ratio test cannot determine.",
+      "affected_topic_ids": ["sequences-series-bc.power-series-radius-of-convergence"],
+      "detection_hints": ["Check whether both endpoints of the interval are tested individually with a different convergence test"]
+    },
+    {
+      "id": "net-change-vs-total-distance",
+      "description": "Students confuse net change (a definite integral) with total accumulated distance or amount when the integrand changes sign.",
+      "affected_topic_ids": [
+        "applications-of-integration-ab.particle-motion-integrals",
+        "applications-of-integration-ab.accumulation-functions"
+      ],
+      "detection_hints": ["Check whether the student split the integral at sign changes when total distance/amount, not net change, was asked for"]
+    },
+    {
+      "id": "alternating-series-conditions-skipped",
+      "description": "Students apply the alternating series error bound without first verifying the series terms are decreasing and approach zero.",
+      "affected_topic_ids": ["sequences-series-bc.alternating-series-error-bound"],
+      "detection_hints": ["Check whether the two alternating series test conditions were verified before using the error bound"]
+    }
+  ],
+  "frq_rubric": {
+    "general_guidance": "Calculus FRQs require showing all work — a correct answer with no supporting work scores zero. Key requirements: proper notation (especially for integrals and derivatives), correct use of theorems by name where applicable (FTC, MVT), and units on any applied problem. For BC series questions: always state the convergence test being used and verify all conditions of the test are met before applying it.",
+    "point_allocation_pattern": "AP Calculus FRQs typically award points for each of: setting up the correct expression or equation, correct use of a named theorem or rule where relevant (FTC, MVT, a specific convergence test), correct execution of calculus mechanics (differentiation, integration, algebra), and a final answer with correct units or interpretation in context. Work shown that supports each step earns credit even if a later step contains an error.",
+    "common_reasoning_gaps": [
+      "Gives a correct final answer without any supporting work or proper notation",
+      "Applies a convergence test without verifying its required conditions hold",
+      "Uses a theorem (FTC, MVT) without naming it or justifying why it applies",
+      "Confuses net change with total accumulated distance or amount",
+      "Omits units or context interpretation on applied problems"
+    ]
+  }
 }

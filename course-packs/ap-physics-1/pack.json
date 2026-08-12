@@ -2,7 +2,915 @@
   "id": "ap-physics-1",
   "name": "AP Physics 1",
   "school_year_start": "2026-08-11",
-  "exam_date": null,
-  "units": [],
-  "pacing_calendar": []
+  "exam_date": "2027-05-10",
+  "exam_crunch_weeks": 6,
+  "tutor_persona": "You are an experienced AP Physics 1 tutor. You are encouraging but academically rigorous. You do not give away answers — you ask guiding questions and explain reasoning. You always require students to justify their answers, not just state them.",
+  "subject_context": "AP Physics 1 is algebra-based and heavily conceptual. The hardest part for most students is not the math but explaining WHY — free response questions require written justification, not just numerical answers. A correct number with no reasoning scores zero on the AP exam. Common failure modes: sign errors in vector quantities, confusing Newton's 3rd law pairs, treating centripetal force as a separate force, and skipping energy/momentum justification.",
+  "units": [
+    {
+      "id": "kinematics",
+      "name": "Kinematics",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 16,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "kinematics.1d-motion",
+          "name": "1D Motion",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Distinguish carefully between speed and velocity, distance and displacement",
+            "Emphasize sign conventions: choose a positive direction and stick to it"
+          ],
+          "common_errors": [
+            "Confusing average velocity with instantaneous velocity",
+            "Dropping or flipping signs when an object reverses direction"
+          ]
+        },
+        {
+          "id": "kinematics.vectors-2d-motion",
+          "name": "Vectors and 2D Motion",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["kinematics.1d-motion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to break vectors into x and y components before combining them",
+            "Ask them to justify why x and y motion can be treated independently"
+          ],
+          "common_errors": [
+            "Adding vector magnitudes directly instead of components",
+            "Mixing x and y components into the same equation"
+          ]
+        },
+        {
+          "id": "kinematics.projectile-motion",
+          "name": "Projectile Motion",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["kinematics.vectors-2d-motion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to identify that horizontal velocity is constant and vertical acceleration is -g",
+            "Ask what determines time of flight versus range"
+          ],
+          "common_errors": [
+            "Using a single equation for both horizontal and vertical motion",
+            "Forgetting that vertical velocity is zero at the peak, not the speed"
+          ]
+        },
+        {
+          "id": "kinematics.relative-motion",
+          "name": "Relative Motion",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["kinematics.projectile-motion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Have the student define a reference frame explicitly before writing any velocity",
+            "Ask them to add or subtract velocity vectors between frames, not just magnitudes"
+          ],
+          "common_errors": [
+            "Treating relative velocity as simple subtraction of speeds without considering direction",
+            "Failing to specify which frame a velocity is measured in"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "dynamics",
+      "name": "Dynamics — Newton's Laws",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 18,
+      "prerequisite_unit_ids": ["kinematics"],
+      "topics": [
+        {
+          "id": "dynamics.newtons-1st-2nd-law",
+          "name": "Newton's 1st and 2nd Law",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["kinematics.relative-motion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to state which forces act on the object before writing F=ma",
+            "Push them to justify why net force, not just any force, determines acceleration"
+          ],
+          "common_errors": [
+            "Applying F=ma using only one force instead of the net force",
+            "Assuming an object at constant velocity must have zero forces acting on it, rather than zero net force"
+          ]
+        },
+        {
+          "id": "dynamics.newtons-3rd-law-force-pairs",
+          "name": "Newton's 3rd Law and Force Pairs",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["dynamics.newtons-1st-2nd-law"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name both objects in a 3rd law pair explicitly",
+            "Ask why 3rd law pairs never appear on the same free body diagram"
+          ],
+          "common_errors": [
+            "Pairing a normal force with gravity as if they were 3rd law partners",
+            "Putting both members of a force pair on the same object's free body diagram"
+          ]
+        },
+        {
+          "id": "dynamics.free-body-diagrams",
+          "name": "Free Body Diagrams",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["dynamics.newtons-3rd-law-force-pairs"],
+          "input_mode": "photo",
+          "prompt_hints": [
+            "Have the student draw every force as a separate arrow from the object's center, labeled by type and source",
+            "Ask them to justify the direction of each force before solving"
+          ],
+          "common_errors": [
+            "Omitting forces that don't obviously 'move' the object, like normal force",
+            "Combining multiple forces into one arrow instead of drawing them separately"
+          ]
+        },
+        {
+          "id": "dynamics.friction-normal-force",
+          "name": "Friction and Normal Force",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["dynamics.free-body-diagrams"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to determine whether friction is static or kinetic before choosing a formula",
+            "Push them to justify why normal force isn't always equal to weight"
+          ],
+          "common_errors": [
+            "Assuming normal force always equals mg, even on inclines or with vertical applied forces",
+            "Using the kinetic friction coefficient when the object isn't actually sliding"
+          ]
+        },
+        {
+          "id": "dynamics.applying-newtons-laws-systems",
+          "name": "Applying Newton's Laws to Systems",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["dynamics.friction-normal-force"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require separate free body diagrams for each object in a connected system before combining equations",
+            "Ask the student to justify why connected objects share the same magnitude of acceleration"
+          ],
+          "common_errors": [
+            "Writing one F=ma equation for a multi-object system without accounting for internal tension forces separately",
+            "Losing track of which forces are internal (and cancel) versus external"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "circular-motion-gravitation",
+      "name": "Circular Motion and Gravitation",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 6,
+      "prerequisite_unit_ids": ["dynamics"],
+      "topics": [
+        {
+          "id": "circular-motion-gravitation.uniform-circular-motion",
+          "name": "Uniform Circular Motion",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["dynamics.applying-newtons-laws-systems"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to explain why velocity is tangent but acceleration points toward the center",
+            "Push them to justify why speed can be constant even though velocity changes"
+          ],
+          "common_errors": [
+            "Saying velocity is constant in uniform circular motion instead of just speed",
+            "Drawing centripetal acceleration tangent to the path instead of radial"
+          ]
+        },
+        {
+          "id": "circular-motion-gravitation.centripetal-acceleration-force",
+          "name": "Centripetal Acceleration and Force",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["circular-motion-gravitation.uniform-circular-motion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to identify which real force (tension, gravity, friction, normal) is providing the centripetal force",
+            "Ask them to justify why 'centripetal force' is not a new force but a role played by an existing one"
+          ],
+          "common_errors": [
+            "Treating centripetal force as an additional force on the free body diagram",
+            "Confusing centripetal force with centrifugal force"
+          ]
+        },
+        {
+          "id": "circular-motion-gravitation.universal-gravitation",
+          "name": "Universal Gravitation",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["circular-motion-gravitation.centripetal-acceleration-force"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify why gravitational force depends on 1/r^2, not 1/r",
+            "Ask them to compare gravitational force at different distances using ratios rather than recomputing from scratch"
+          ],
+          "common_errors": [
+            "Using surface gravity g in situations where the object is far from Earth's surface",
+            "Confusing r in Newton's law of gravitation with altitude instead of distance from Earth's center"
+          ]
+        },
+        {
+          "id": "circular-motion-gravitation.orbital-motion",
+          "name": "Orbital Motion",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["circular-motion-gravitation.universal-gravitation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to set gravitational force equal to the required centripetal force and justify why",
+            "Push them to explain why orbital speed depends only on orbital radius and central mass, not the orbiting object's mass"
+          ],
+          "common_errors": [
+            "Including the orbiting object's mass in the final orbital speed formula",
+            "Assuming a stable orbit requires a forward thrust force"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "energy",
+      "name": "Energy",
+      "ap_exam_weight_min": 16,
+      "ap_exam_weight_max": 24,
+      "prerequisite_unit_ids": ["circular-motion-gravitation"],
+      "topics": [
+        {
+          "id": "energy.work-work-energy-theorem",
+          "name": "Work and the Work-Energy Theorem",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["circular-motion-gravitation.orbital-motion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify whether the force is parallel to displacement before computing work",
+            "Ask them to connect the sign of work to whether kinetic energy increases or decreases"
+          ],
+          "common_errors": [
+            "Computing work by multiplying force and displacement without accounting for the angle between them",
+            "Assuming any force acting on a moving object does work on it"
+          ]
+        },
+        {
+          "id": "energy.kinetic-potential-energy",
+          "name": "Kinetic and Potential Energy",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["energy.work-work-energy-theorem"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to specify their reference point for potential energy explicitly",
+            "Ask them to justify why kinetic energy depends on speed squared, not speed"
+          ],
+          "common_errors": [
+            "Using different reference heights inconsistently within the same problem",
+            "Treating potential energy as a property of the object alone rather than the object-field system"
+          ]
+        },
+        {
+          "id": "energy.conservation-of-energy",
+          "name": "Conservation of Energy",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["energy.kinetic-potential-energy"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to identify every energy type present before and after, and justify why total mechanical energy is or isn't conserved",
+            "Push them to explicitly state what nonconservative forces are doing work in the system"
+          ],
+          "common_errors": [
+            "Assuming energy is always conserved without checking for friction or air resistance",
+            "Forgetting to include all forms of energy present in the system"
+          ]
+        },
+        {
+          "id": "energy.power",
+          "name": "Power",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["energy.conservation-of-energy"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify whether they need average or instantaneous power",
+            "Ask them to connect power to both work-over-time and force-times-velocity forms"
+          ],
+          "common_errors": [
+            "Confusing power with work by dropping the time dependence",
+            "Using instantaneous velocity when the problem calls for average power, or vice versa"
+          ]
+        },
+        {
+          "id": "energy.non-conservative-forces",
+          "name": "Non-Conservative Forces",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["energy.power"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify why work done against friction leaves the system as thermal energy",
+            "Ask them to set up the energy equation explicitly showing the nonconservative work term"
+          ],
+          "common_errors": [
+            "Omitting the nonconservative work term entirely from the energy equation",
+            "Assuming nonconservative work is always negative, even when an external force adds energy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "momentum-impulse",
+      "name": "Momentum and Impulse",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 18,
+      "prerequisite_unit_ids": ["dynamics", "energy"],
+      "topics": [
+        {
+          "id": "momentum-impulse.impulse-momentum-theorem",
+          "name": "Impulse-Momentum Theorem",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["energy.non-conservative-forces"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify why impulse equals the area under a force-time graph",
+            "Push them to connect a change in momentum directly to the net impulse, not just one force"
+          ],
+          "common_errors": [
+            "Using only one force's impulse when multiple forces act during the interval",
+            "Confusing impulse (a vector, force times time) with momentum itself"
+          ]
+        },
+        {
+          "id": "momentum-impulse.conservation-of-momentum",
+          "name": "Conservation of Momentum",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["momentum-impulse.impulse-momentum-theorem"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify that the system is isolated (no significant external impulse) before applying conservation",
+            "Ask them to set up momentum as a vector equation with explicit signs for direction"
+          ],
+          "common_errors": [
+            "Applying conservation of momentum to a system with a significant external force without justification",
+            "Dropping direction/sign when combining momenta of objects moving oppositely"
+          ]
+        },
+        {
+          "id": "momentum-impulse.elastic-inelastic-collisions",
+          "name": "Elastic vs Inelastic Collisions",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["momentum-impulse.conservation-of-momentum"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify which type of collision applies based on whether kinetic energy is conserved",
+            "Ask them to verify their answer against both momentum and (if elastic) energy conservation"
+          ],
+          "common_errors": [
+            "Assuming kinetic energy is conserved in all collisions, including perfectly inelastic ones",
+            "Using elastic collision formulas without checking the assumptions apply"
+          ]
+        },
+        {
+          "id": "momentum-impulse.center-of-mass",
+          "name": "Center of Mass",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["momentum-impulse.elastic-inelastic-collisions"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify why the center of mass moves as if all external force acts there",
+            "Push them to compute center of mass using mass-weighted averages, not simple averages"
+          ],
+          "common_errors": [
+            "Averaging positions without weighting by mass",
+            "Assuming internal forces (like an explosion) can move the system's center of mass"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "shm",
+      "name": "Simple Harmonic Motion",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 6,
+      "prerequisite_unit_ids": ["energy"],
+      "topics": [
+        {
+          "id": "shm.restoring-force-shm-conditions",
+          "name": "Restoring Force and SHM Conditions",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["momentum-impulse.center-of-mass"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify why the restoring force must be proportional to displacement and opposite in direction for true SHM",
+            "Push them to identify the equilibrium position explicitly before analyzing motion"
+          ],
+          "common_errors": [
+            "Assuming any oscillation is SHM without checking the force is linear in displacement",
+            "Confusing the direction of restoring force with the direction of velocity"
+          ]
+        },
+        {
+          "id": "shm.period-and-frequency",
+          "name": "Period and Frequency",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["shm.restoring-force-shm-conditions"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify why period is independent of amplitude in ideal SHM",
+            "Ask them to distinguish clearly between period, frequency, and angular frequency"
+          ],
+          "common_errors": [
+            "Assuming period depends on amplitude",
+            "Mixing up frequency (1/T) with angular frequency (2*pi/T)"
+          ]
+        },
+        {
+          "id": "shm.energy-in-shm",
+          "name": "Energy in SHM",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["shm.period-and-frequency"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify how kinetic and potential energy trade off through a cycle while total energy stays constant",
+            "Ask them to identify where in the cycle speed and restoring force are maximum vs zero"
+          ],
+          "common_errors": [
+            "Assuming kinetic energy is maximum at the same point as potential energy",
+            "Forgetting that total mechanical energy in ideal SHM stays constant throughout the cycle"
+          ]
+        },
+        {
+          "id": "shm.spring-mass-pendulum-systems",
+          "name": "Spring-Mass and Pendulum Systems",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["shm.energy-in-shm"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify why a pendulum only approximates SHM for small angles",
+            "Push them to identify what physical quantities determine each system's period"
+          ],
+          "common_errors": [
+            "Assuming a pendulum's period depends on the mass of the bob",
+            "Applying the spring-mass period formula to a pendulum or vice versa"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "torque-rotational-motion",
+      "name": "Torque and Rotational Motion",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 18,
+      "prerequisite_unit_ids": ["dynamics", "circular-motion-gravitation"],
+      "topics": [
+        {
+          "id": "torque-rotational-motion.torque-and-lever-arm",
+          "name": "Torque and Lever Arm",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["shm.spring-mass-pendulum-systems"],
+          "input_mode": "photo",
+          "prompt_hints": [
+            "Require the student to identify the lever arm as the perpendicular distance from the axis to the line of force, not just the distance to the point of application",
+            "Ask them to justify the sign (direction) of torque using a consistent convention"
+          ],
+          "common_errors": [
+            "Using the full distance to the force's application point instead of the perpendicular lever arm",
+            "Losing track of rotational direction (sign) when combining multiple torques"
+          ]
+        },
+        {
+          "id": "torque-rotational-motion.rotational-equilibrium",
+          "name": "Rotational Equilibrium",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["torque-rotational-motion.torque-and-lever-arm"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify that both net force AND net torque must be zero for full equilibrium",
+            "Ask them to choose a pivot point strategically and justify the choice"
+          ],
+          "common_errors": [
+            "Checking only force balance and forgetting torque balance, or vice versa",
+            "Choosing an inconsistent pivot point partway through a solution"
+          ]
+        },
+        {
+          "id": "torque-rotational-motion.rotational-inertia",
+          "name": "Rotational Inertia",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["torque-rotational-motion.rotational-equilibrium"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify why rotational inertia depends on how mass is distributed relative to the axis, not just total mass",
+            "Push them to explain why the same object has different rotational inertia about different axes"
+          ],
+          "common_errors": [
+            "Treating rotational inertia as a fixed property independent of the axis of rotation",
+            "Confusing rotational inertia with mass in torque equations"
+          ]
+        },
+        {
+          "id": "torque-rotational-motion.rotational-kinematics",
+          "name": "Rotational Kinematics",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["torque-rotational-motion.rotational-inertia"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to draw the direct parallel between linear and angular kinematics equations before substituting",
+            "Ask them to justify units (radians) throughout rather than mixing degrees"
+          ],
+          "common_errors": [
+            "Mixing degrees and radians within the same calculation",
+            "Applying linear kinematics formulas directly without converting to angular quantities"
+          ]
+        },
+        {
+          "id": "torque-rotational-motion.angular-momentum-conservation",
+          "name": "Angular Momentum Conservation",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["torque-rotational-motion.rotational-kinematics"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify that angular momentum is conserved specifically when net external torque is zero",
+            "Ask them to explain qualitatively why a figure skater spins faster when pulling their arms in"
+          ],
+          "common_errors": [
+            "Assuming angular momentum conservation applies without checking for external torques",
+            "Confusing conservation of angular momentum with conservation of rotational kinetic energy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "fluids",
+      "name": "Fluids",
+      "ap_exam_weight_min": 6,
+      "ap_exam_weight_max": 8,
+      "prerequisite_unit_ids": ["dynamics"],
+      "topics": [
+        {
+          "id": "fluids.pressure-and-pascals-law",
+          "name": "Pressure and Pascal's Law",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["torque-rotational-motion.angular-momentum-conservation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify why pressure in a fluid depends on depth, not the shape of the container",
+            "Push them to explain how Pascal's law lets force be multiplied hydraulically"
+          ],
+          "common_errors": [
+            "Assuming pressure depends on the amount (volume) of fluid rather than depth",
+            "Confusing force and pressure when applying Pascal's law"
+          ]
+        },
+        {
+          "id": "fluids.buoyancy-archimedes-principle",
+          "name": "Buoyancy and Archimedes' Principle",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["fluids.pressure-and-pascals-law"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify buoyant force as equal to the weight of displaced fluid, not the weight of the object",
+            "Ask them to explain why an object floats, sinks, or is neutrally buoyant by comparing densities"
+          ],
+          "common_errors": [
+            "Calculating buoyant force using the object's weight instead of the displaced fluid's weight",
+            "Assuming buoyant force depends on the object's mass rather than its submerged volume"
+          ]
+        },
+        {
+          "id": "fluids.fluid-flow-continuity",
+          "name": "Fluid Flow and Continuity",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["fluids.buoyancy-archimedes-principle"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify the continuity equation as a statement of volume conservation",
+            "Ask them to explain why fluid speeds up in a narrower section of pipe"
+          ],
+          "common_errors": [
+            "Assuming flow speed is the same everywhere in a pipe regardless of cross-sectional area",
+            "Mixing up which variable (area or speed) increases when a pipe narrows"
+          ]
+        },
+        {
+          "id": "fluids.bernoullis-principle",
+          "name": "Bernoulli's Principle",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["fluids.fluid-flow-continuity"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify Bernoulli's principle qualitatively as a statement of energy conservation along a streamline",
+            "Push them to explain the pressure-speed tradeoff without necessarily doing a full quantitative calculation"
+          ],
+          "common_errors": [
+            "Assuming higher speed always means higher pressure instead of the inverse relationship Bernoulli's principle describes",
+            "Applying Bernoulli's equation to a fluid that clearly isn't behaving as an ideal, incompressible flow"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "waves-sound",
+      "name": "Waves and Sound",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 16,
+      "prerequisite_unit_ids": ["shm"],
+      "topics": [
+        {
+          "id": "waves-sound.wave-properties-and-speed",
+          "name": "Wave Properties and Speed",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["fluids.bernoullis-principle"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify that wave speed depends on the medium, not on frequency or amplitude",
+            "Ask them to distinguish clearly between transverse and longitudinal wave motion"
+          ],
+          "common_errors": [
+            "Assuming wave speed changes when frequency changes in the same medium",
+            "Confusing the motion of the medium's particles with the motion of the wave itself"
+          ]
+        },
+        {
+          "id": "waves-sound.superposition-and-interference",
+          "name": "Superposition and Interference",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["waves-sound.wave-properties-and-speed"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify constructive vs destructive interference in terms of path difference or phase",
+            "Ask them to explain superposition as simple addition of displacements, not a new phenomenon"
+          ],
+          "common_errors": [
+            "Assuming interference requires the waves to have equal amplitude",
+            "Confusing constructive interference with resonance"
+          ]
+        },
+        {
+          "id": "waves-sound.standing-waves",
+          "name": "Standing Waves",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["waves-sound.superposition-and-interference"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify the relationship between wavelength and the boundary conditions (fixed or free ends)",
+            "Push them to identify nodes and antinodes based on physical reasoning, not memorized diagrams alone"
+          ],
+          "common_errors": [
+            "Miscounting nodes and antinodes for a given harmonic",
+            "Applying open-pipe boundary conditions to a closed-pipe or fixed-string scenario"
+          ]
+        },
+        {
+          "id": "waves-sound.resonance",
+          "name": "Resonance",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["waves-sound.standing-waves"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify resonance as amplitude buildup when driving frequency matches a natural frequency",
+            "Ask them to connect resonance to real examples like pushing a swing at the right time"
+          ],
+          "common_errors": [
+            "Assuming resonance occurs at any driving frequency close to natural frequency with equal effect",
+            "Confusing resonance with simple constructive interference"
+          ]
+        },
+        {
+          "id": "waves-sound.sound-and-doppler-effect",
+          "name": "Sound and the Doppler Effect",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["waves-sound.resonance"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify the direction of frequency shift based on whether source and observer are approaching or receding",
+            "Ask them to explain the Doppler effect as a change in perceived wavelength, not actual wave speed"
+          ],
+          "common_errors": [
+            "Assuming the speed of sound itself changes due to the Doppler effect",
+            "Getting the sign of the frequency shift backwards for approaching vs receding motion"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "electric-charge-force",
+      "name": "Electric Charge and Force",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 6,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "electric-charge-force.charge-and-conservation",
+          "name": "Charge and Charge Conservation",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify that total charge is conserved in any isolated interaction, including charging by friction or induction",
+            "Push them to explain charge quantization qualitatively"
+          ],
+          "common_errors": [
+            "Assuming charge can be created or destroyed during charging processes like induction",
+            "Confusing charging by conduction with charging by induction"
+          ]
+        },
+        {
+          "id": "electric-charge-force.coulombs-law",
+          "name": "Coulomb's Law",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["electric-charge-force.charge-and-conservation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to justify Coulomb's law's 1/r^2 dependence and compare it structurally to gravitation",
+            "Ask them to reason about direction (attraction vs repulsion) before computing magnitude"
+          ],
+          "common_errors": [
+            "Forgetting that Coulomb force is a vector and combining magnitudes without considering direction",
+            "Mixing up the constant k with the gravitational constant G"
+          ]
+        },
+        {
+          "id": "electric-charge-force.conductors-and-insulators",
+          "name": "Conductors and Insulators",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["electric-charge-force.coulombs-law"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push the student to justify the difference in terms of how freely charge can move through the material",
+            "Ask them to explain why excess charge on a conductor resides on its surface"
+          ],
+          "common_errors": [
+            "Assuming insulators cannot hold any charge at all rather than just not allowing it to move freely",
+            "Assuming charge distributes uniformly through the volume of a conductor rather than on its surface"
+          ]
+        },
+        {
+          "id": "electric-charge-force.electric-field-concept",
+          "name": "Electric Field Concept",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["electric-charge-force.conductors-and-insulators"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to justify the electric field as force-per-unit-charge, independent of the test charge used to measure it",
+            "Push them to reason about field direction using a positive test charge convention"
+          ],
+          "common_errors": [
+            "Assuming the electric field depends on the magnitude of the test charge placed in it",
+            "Confusing field direction with the direction a negative charge would move"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing_calendar": [
+    { "week": 1, "topic_ids": ["kinematics.1d-motion"] },
+    { "week": 2, "topic_ids": ["kinematics.vectors-2d-motion"] },
+    { "week": 3, "topic_ids": ["kinematics.projectile-motion"] },
+    { "week": 4, "topic_ids": ["kinematics.relative-motion"] },
+    { "week": 5, "topic_ids": ["dynamics.newtons-1st-2nd-law"] },
+    { "week": 6, "topic_ids": ["dynamics.newtons-3rd-law-force-pairs", "dynamics.free-body-diagrams"] },
+    { "week": 7, "topic_ids": ["dynamics.friction-normal-force"] },
+    { "week": 8, "topic_ids": ["dynamics.applying-newtons-laws-systems"] },
+    {
+      "week": 9,
+      "topic_ids": [
+        "circular-motion-gravitation.uniform-circular-motion",
+        "circular-motion-gravitation.centripetal-acceleration-force"
+      ]
+    },
+    {
+      "week": 10,
+      "topic_ids": ["circular-motion-gravitation.universal-gravitation", "circular-motion-gravitation.orbital-motion"]
+    },
+    { "week": 11, "topic_ids": ["energy.work-work-energy-theorem"] },
+    { "week": 12, "topic_ids": ["energy.kinetic-potential-energy"] },
+    { "week": 13, "topic_ids": ["energy.conservation-of-energy"] },
+    { "week": 14, "topic_ids": ["energy.power"] },
+    { "week": 15, "topic_ids": ["energy.non-conservative-forces"] },
+    { "week": 16, "topic_ids": ["momentum-impulse.impulse-momentum-theorem"] },
+    { "week": 17, "topic_ids": ["momentum-impulse.conservation-of-momentum"] },
+    { "week": 18, "topic_ids": ["momentum-impulse.elastic-inelastic-collisions"] },
+    { "week": 19, "topic_ids": ["momentum-impulse.center-of-mass"] },
+    { "week": 20, "topic_ids": ["shm.restoring-force-shm-conditions"] },
+    { "week": 21, "topic_ids": ["shm.period-and-frequency", "shm.energy-in-shm"] },
+    { "week": 22, "topic_ids": ["shm.spring-mass-pendulum-systems"] },
+    { "week": 23, "topic_ids": ["torque-rotational-motion.torque-and-lever-arm"] },
+    { "week": 24, "topic_ids": ["torque-rotational-motion.rotational-equilibrium"] },
+    { "week": 25, "topic_ids": ["torque-rotational-motion.rotational-inertia"] },
+    { "week": 26, "topic_ids": ["torque-rotational-motion.rotational-kinematics"] },
+    { "week": 27, "topic_ids": ["torque-rotational-motion.angular-momentum-conservation"] },
+    { "week": 28, "topic_ids": ["fluids.pressure-and-pascals-law"] },
+    { "week": 29, "topic_ids": ["fluids.buoyancy-archimedes-principle", "fluids.fluid-flow-continuity"] },
+    { "week": 30, "topic_ids": ["fluids.bernoullis-principle"] },
+    { "week": 31, "topic_ids": ["waves-sound.wave-properties-and-speed"] },
+    { "week": 32, "topic_ids": ["waves-sound.superposition-and-interference", "waves-sound.standing-waves"] },
+    { "week": 33, "topic_ids": ["waves-sound.resonance"] },
+    { "week": 34, "topic_ids": ["waves-sound.sound-and-doppler-effect"] },
+    { "week": 35, "topic_ids": ["electric-charge-force.charge-and-conservation", "electric-charge-force.coulombs-law"] },
+    {
+      "week": 36,
+      "topic_ids": ["electric-charge-force.conductors-and-insulators", "electric-charge-force.electric-field-concept"]
+    }
+  ],
+  "common_misconceptions": [
+    {
+      "id": "sign-errors-vector-quantities",
+      "description": "Students drop or mishandle signs on vector quantities (velocity, momentum, force) especially when direction reverses.",
+      "affected_topic_ids": ["kinematics.1d-motion", "momentum-impulse.conservation-of-momentum", "dynamics.newtons-1st-2nd-law"],
+      "detection_hints": [
+        "Watch for a numeric answer with the wrong sign but otherwise correct magnitude",
+        "Check whether the student defined a positive direction before starting"
+      ]
+    },
+    {
+      "id": "newtons-third-law-pair-confusion",
+      "description": "Students pair a normal force with gravity, or otherwise pick two forces on the same object, as if they were a 3rd law pair.",
+      "affected_topic_ids": ["dynamics.newtons-3rd-law-force-pairs", "dynamics.free-body-diagrams"],
+      "detection_hints": ["Ask the student to name the two objects in the force pair — if they name only one object, flag it"]
+    },
+    {
+      "id": "centripetal-force-as-separate-force",
+      "description": "Students treat centripetal force as an additional force to draw on the free body diagram, rather than the net inward force provided by real forces like tension or gravity.",
+      "affected_topic_ids": [
+        "circular-motion-gravitation.centripetal-acceleration-force",
+        "circular-motion-gravitation.uniform-circular-motion"
+      ],
+      "detection_hints": ["Check whether 'centripetal force' appears as its own arrow on a free body diagram"]
+    },
+    {
+      "id": "energy-momentum-answer-without-justification",
+      "description": "Students give a numeric answer for an energy or momentum FRQ without stating which principle justifies the setup — this scores zero on the actual AP exam even with a correct number.",
+      "affected_topic_ids": ["energy.conservation-of-energy", "momentum-impulse.conservation-of-momentum"],
+      "detection_hints": ["Check whether the response states WHY a quantity is conserved before using that fact"]
+    },
+    {
+      "id": "normal-force-equals-weight-assumption",
+      "description": "Students assume normal force always equals gravitational force (mg), even on inclines or with additional vertical forces present.",
+      "affected_topic_ids": ["dynamics.friction-normal-force", "dynamics.free-body-diagrams"],
+      "detection_hints": ["Check whether normal force was recomputed for inclined or non-horizontal scenarios rather than reused as mg"]
+    },
+    {
+      "id": "rotational-inertia-independent-of-axis",
+      "description": "Students treat rotational inertia as a fixed property of an object rather than something that depends on the chosen axis of rotation.",
+      "affected_topic_ids": ["torque-rotational-motion.rotational-inertia"],
+      "detection_hints": ["Check whether the student re-derives or looks up rotational inertia when the axis changes between parts of a problem"]
+    },
+    {
+      "id": "heavier-objects-fall-faster",
+      "description": "Students believe heavier objects fall faster in free fall, ignoring that gravitational acceleration is independent of mass absent air resistance.",
+      "affected_topic_ids": ["kinematics.1d-motion", "dynamics.newtons-1st-2nd-law"],
+      "detection_hints": ["Watch for reasoning that references an object's mass as a reason it falls faster"]
+    }
+  ],
+  "frq_rubric": {
+    "general_guidance": "AP Physics 1 FRQs are graded on reasoning and justification, not just correct answers. A student who gets the right number without explaining the physics scores zero. Always check that the student has: identified the relevant principle or law, shown how it applies to this situation, and addressed direction/sign where relevant.",
+    "point_allocation_pattern": "Most AP Physics 1 FRQs award roughly one point per discrete step: identifying the correct principle or equation, correctly substituting known values, arriving at a numerically correct result with correct units, and — for many questions — a separate point for justifying direction or reasoning in words. Partial credit is given for each completed step even if a later step or the final numeric answer is wrong.",
+    "common_reasoning_gaps": [
+      "States a numeric answer without identifying which physical principle justifies it",
+      "Uses a correct equation but never explains why it applies to this specific scenario",
+      "Ignores sign/direction conventions on vector quantities like velocity, momentum, or force",
+      "Assumes a quantity is conserved without justifying that the system is isolated or the relevant forces are absent",
+      "Omits units on multi-step numeric answers"
+    ]
+  }
 }

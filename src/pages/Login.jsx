@@ -1,11 +1,12 @@
-import { useState } from 'react'
-import { Navigate, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
+import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAuth } from '../lib/AuthContext.jsx'
 
 export default function Login() {
   const { session } = useAuth()
   const location = useLocation()
+  const navigate = useNavigate()
 
   const [mode, setMode] = useState('sign-in') // 'sign-in' | 'forgot-password'
   const [email, setEmail] = useState('')
@@ -14,9 +15,14 @@ export default function Login() {
   const [resetSent, setResetSent] = useState(false)
   const [submitting, setSubmitting] = useState(false)
 
-  if (session) {
-    return <Navigate to="/" replace />
-  }
+  // Navigating imperatively from an effect (rather than rendering
+  // <Navigate> directly) avoids a render loop when Supabase fires several
+  // auth-state events in quick succession during sign-in.
+  useEffect(() => {
+    if (session) navigate('/', { replace: true })
+  }, [session, navigate])
+
+  if (session) return null
 
   async function handleSignIn(e) {
     e.preventDefault()

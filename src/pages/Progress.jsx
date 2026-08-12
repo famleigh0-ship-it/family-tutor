@@ -1,13 +1,13 @@
 import { useParams } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
-import { loadCoursePack } from '../packs/loader.js'
+import { getPack } from '../packs/loader'
 
 export default function Progress() {
   const { packId } = useParams()
 
   let pack = null
   try {
-    pack = loadCoursePack(packId)
+    pack = getPack(packId)
   } catch {
     pack = null
   }

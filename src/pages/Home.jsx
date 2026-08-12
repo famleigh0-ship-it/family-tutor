@@ -3,7 +3,14 @@ import { Link } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
-import { listCoursePacks } from '../packs/loader.js'
+import { getAllPacks, getPack, getUnit, getTopic, getTopicsForWeek, getUnlockedTopics } from '../packs/loader'
+
+function daysUntil(dateStr) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const target = new Date(dateStr)
+  return Math.ceil((target - today) / 86_400_000)
+}
 
 export default function Home() {
   const { session, profile } = useAuth()
@@ -24,7 +31,19 @@ export default function Home() {
     }
   }, [session.user.id])
 
-  const packs = listCoursePacks()
+  useEffect(() => {
+    if (!import.meta.env.DEV) return
+    // Exposed for manual testing per the Phase 3 milestone, e.g.
+    // getPack('ap-physics-1') or getUnlockedTopics('ap-physics-1', '2026-08-11')
+    window.getPack = getPack
+    window.getAllPacks = getAllPacks
+    window.getUnit = getUnit
+    window.getTopic = getTopic
+    window.getTopicsForWeek = getTopicsForWeek
+    window.getUnlockedTopics = getUnlockedTopics
+  }, [])
+
+  const packs = getAllPacks()
 
   return (
     <div className="min-h-screen bg-slate-50">
@@ -37,16 +56,22 @@ export default function Home() {
         </div>
 
         <div className="mt-6 space-y-3">
-          {packs.map((pack) => (
-            <Link
-              key={pack.id}
-              to={`/session/${pack.id}`}
-              className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5"
-            >
-              <p className="text-base font-medium text-slate-700">{pack.name}</p>
-              <p className="mt-1 text-sm text-slate-500">Course content coming soon</p>
-            </Link>
-          ))}
+          {packs.map((pack) => {
+            const days = daysUntil(pack.exam_date)
+            return (
+              <Link
+                key={pack.id}
+                to={`/session/${pack.id}`}
+                className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5"
+              >
+                <p className="text-base font-medium text-slate-700">{pack.name}</p>
+                <p className="mt-1 text-sm text-slate-500">{pack.units.length} units</p>
+                <p className="mt-1 text-sm text-slate-500">
+                  {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
+                </p>
+              </Link>
+            )
+          })}
         </div>
       </main>
     </div>
