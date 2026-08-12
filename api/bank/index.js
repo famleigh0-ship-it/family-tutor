@@ -258,7 +258,10 @@ async function handleFill(req, res) {
 
   let response
   try {
-    response = await callClaude({ task, system, messages: [{ role: 'user', content: user }], max_tokens: 4096 })
+    // A batch of 10 verbose MC questions (each with 3 distractor notes,
+    // an explanation, and key_reasoning) can run well past 4096 tokens,
+    // truncating the JSON array mid-response — confirmed in testing.
+    response = await callClaude({ task, system, messages: [{ role: 'user', content: user }], max_tokens: 8192 })
   } catch (err) {
     res.status(502).json({ error: 'Claude API request failed', detail: err.message })
     return
