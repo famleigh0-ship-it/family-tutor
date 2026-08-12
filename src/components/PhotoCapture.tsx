@@ -15,7 +15,15 @@ interface Props {
 
 // Uses a plain file input with capture="environment" rather than
 // getUserMedia — much more reliable across mobile browsers for a PWA, per
-// spec.
+// spec. Trade-off: on some Android/Chrome devices, opening the native
+// camera app can cause the backgrounded tab to be reclaimed for memory,
+// reloading the page (and wiping all React state) by the time the camera
+// hands control back. sessionStorage here lets ClassroomLog detect that on
+// remount and tell the student what happened instead of silently
+// resetting to the method selector with no explanation. See the matching
+// check in ClassroomLog.tsx.
+export const PHOTO_CAPTURE_FLAG_KEY = 'falp:photoCaptureInProgress'
+
 export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
@@ -24,6 +32,9 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
   const [error, setError] = useState<string | null>(null)
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    // The change event firing at all (even a cancel) proves the page
+    // survived the round trip to the camera app without reloading.
+    sessionStorage.removeItem(PHOTO_CAPTURE_FLAG_KEY)
     const file = e.target.files?.[0]
     if (!file) return
     const reader = new FileReader()
@@ -31,6 +42,11 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
     reader.readAsDataURL(file)
     setError(null)
     setNotReadable(false)
+  }
+
+  function handleOpenCamera() {
+    sessionStorage.setItem(PHOTO_CAPTURE_FLAG_KEY, packId)
+    fileInputRef.current?.click()
   }
 
   function handleRetake() {
@@ -83,7 +99,7 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
       {!imageDataUrl ? (
         <button
           type="button"
-          onClick={() => fileInputRef.current?.click()}
+          onClick={handleOpenCamera}
           className="block w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-10 text-center text-base font-medium text-slate-600"
         >
           📷 Tap to take a photo of your notes

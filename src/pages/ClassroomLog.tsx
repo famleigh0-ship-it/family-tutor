@@ -1,8 +1,8 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useParams, useNavigate } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
 import LogMethodSelector from '../components/LogMethodSelector.tsx'
-import PhotoCapture from '../components/PhotoCapture.tsx'
+import PhotoCapture, { PHOTO_CAPTURE_FLAG_KEY } from '../components/PhotoCapture.tsx'
 import TextLogInput from '../components/TextLogInput.tsx'
 import TopicChecklist from '../components/TopicChecklist.tsx'
 import TopicConfirmation from '../components/TopicConfirmation.tsx'
@@ -27,6 +27,18 @@ export default function ClassroomLog() {
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [savedCount, setSavedCount] = useState(0)
+  const [reloadedDuringPhoto, setReloadedDuringPhoto] = useState(false)
+
+  useEffect(() => {
+    // If this flag is still set on a fresh mount, the page reloaded (and
+    // lost all React state) while the native camera app had control —
+    // rather than silently resetting to the method selector with no
+    // explanation, tell the student what happened. See PhotoCapture.tsx.
+    if (sessionStorage.getItem(PHOTO_CAPTURE_FLAG_KEY) === packId) {
+      setReloadedDuringPhoto(true)
+      sessionStorage.removeItem(PHOTO_CAPTURE_FLAG_KEY)
+    }
+  }, [packId])
 
   let pack = null
   try {
@@ -99,12 +111,19 @@ export default function ClassroomLog() {
 
         {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
 
+        {reloadedDuringPhoto && (
+          <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+            Your browser reloaded while the camera was open — this can happen on some phones. Please try the photo again, or use "Describe what we covered" instead.
+          </div>
+        )}
+
         <div className="mt-6">
           {step === 'method' && (
             <LogMethodSelector
               onSelect={(method) => {
                 setInputMethod(method)
                 setStep(method)
+                setReloadedDuringPhoto(false)
               }}
               onSkip={() => navigate('/home', { replace: true })}
             />
