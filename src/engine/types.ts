@@ -1,0 +1,53 @@
+import type { Topic } from '../packs/types'
+
+export type SessionMode = 'onboarding' | 'adaptive' | 'quiz-prep' | 'exam-crunch'
+
+export type UnlockSource = 'classroom_log' | 'pacing_calendar'
+
+export interface MasteryRecord {
+  topic_id: string
+  pack_id: string
+  mastery_score: number // 0.0–1.0
+  attempts: number
+  correct: number
+  frq_attempts: number
+  frq_score_total: number
+  last_seen: Date | null
+  updated_at: Date
+}
+
+export interface TopicWithState extends Topic {
+  unlock_state: 'locked' | 'unlocked' | 'prioritized'
+  mastery_score: number
+  last_seen: Date | null
+  days_since_seen: number
+  priority_score: number // computed by selector
+}
+
+export interface SessionPlan {
+  mode: SessionMode
+  topics: TopicWithState[] // ordered by priority
+  target_question_count: number
+  target_duration_minutes: number
+  notes: string[] // human-readable explanation of selections
+}
+
+export interface QuestionResult {
+  topic_id: string
+  question_type: 'mc' | 'frq' | 'conceptual'
+  correct: boolean
+  frq_score?: number // 0–4, frq only
+  time_spent_seconds: number
+}
+
+// Mirrors the `quiz_prep_events` table (migrations/001_initial_schema.sql).
+export interface QuizPrepEvent {
+  id: string
+  user_id: string
+  pack_id: string
+  topic_ids: string[]
+  quiz_date: string // ISO date
+  created_at: string
+  expired_at: string | null
+  post_quiz_result: 'good' | 'okay' | 'rough' | null
+}

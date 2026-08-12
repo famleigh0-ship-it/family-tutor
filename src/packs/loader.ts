@@ -1,7 +1,7 @@
 import type { CoursePack, Unit, Topic } from './types'
 import { validatePackShape, checkPackIntegrity } from './validatePack.js'
-import apPhysics1Raw from '../../course-packs/ap-physics-1/pack.json'
-import calcAbBcRaw from '../../course-packs/calc-ab-bc/pack.json'
+import apPhysics1Raw from '../../course-packs/ap-physics-1/pack.json' with { type: 'json' }
+import calcAbBcRaw from '../../course-packs/calc-ab-bc/pack.json' with { type: 'json' }
 
 function loadAndValidate(raw: unknown): CoursePack {
   const shaped = validatePackShape(raw) as CoursePack

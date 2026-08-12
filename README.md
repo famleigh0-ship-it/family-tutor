@@ -12,7 +12,7 @@ functions, Claude API, installable PWA.
 
 ## Project layout
 
-- `src/` — frontend app (pages, shared components, course-agnostic engine, pack loader, Supabase client)
+- `src/` — frontend app (pages, shared components, Supabase client), plus `src/packs/` (pack loader) and `src/engine/` (adaptive engine)
 - `api/` — Vercel serverless functions (`session`, `grading`, `bank`, `classroom`, `parent-pin`)
 - `course-packs/` — per-course config (`ap-physics-1`, `calc-ab-bc`), stubbed for now
 - `migrations/` — SQL schema migrations, run manually against Supabase
@@ -161,3 +161,52 @@ console testing, e.g. `getUnlockedTopics('ap-physics-1', '2026-08-11')`.
 - [x] `getPack('ap-physics-1')` inspectable from the browser console
 - [x] `getUnlockedTopics('ap-physics-1', '2026-08-11')` returns the week 1 kinematics topic
 - [x] BC-only Calc topics stay hidden from `getUnlockedTopics` until their AB prerequisite units are calendar-complete
+
+## The adaptive engine
+
+`src/engine/` is the brain that decides what to practice each session —
+no UI, no Claude calls, no real question bank yet. It's split into pure
+functions plus one DB-integrated orchestrator:
+
+- `mastery.ts` — `updateMastery` (EMA update per question result),
+  `applyDecay` (2%/week fade after 7 days untouched), `getMasteryLabel`.
+  Pure, no DB access.
+- `session-mode.ts` — `detectSessionMode`: onboarding (< 3 sessions) →
+  quiz-prep (active `quiz_prep_events` row) → exam-crunch (within
+  `exam_crunch_weeks` of the exam) → adaptive. Pure.
+- `topic-selector.ts` — `selectTopics`: scores unlocked topics by exam
+  weight, difficulty, recency, and mastery, then applies mode-specific
+  rules (onboarding caps at 3 diagnostic difficulty-1 topics; quiz-prep
+  forces the quiz's topics to the top; exam-crunch doubles exam-weight
+  scoring and guarantees an FRQ-capable topic; adaptive guarantees a
+  critical-mastery topic and a stale-review topic when any exist). Pure.
+- `session-orchestrator.ts` — the only file that touches Supabase (service
+  role key, server-side only — never import it from `src/pages` or
+  `src/components`). `startSession` loads mastery/unlock/quiz-prep state,
+  applies decay, picks a plan, and opens a `sessions` row.
+  `recordQuestionResult` updates mastery and logs the question.
+  `endSession` closes the session and updates the streak.
+
+Test it end to end against real Supabase tables, with no Claude calls and
+no real questions — a dedicated `engine-test@family-tutor.local` student
+gets mock unlock/mastery data and runs through 4 simulated sessions:
+
+```bash
+node scripts/test-engine.js
+```
+
+It's idempotent (safe to re-run) and prints each session's plan, final
+mastery scores, and streak state. To see quiz-prep mode, manually insert a
+row into `quiz_prep_events` for that test user in the Supabase dashboard
+(`quiz_date` today or later, `expired_at` null) and run it again.
+
+## Phase 4 milestone checklist
+
+- [x] `node scripts/test-engine.js` prints a valid `SessionPlan` each session
+- [x] A brand-new student (0 sessions) gets `mode: 'onboarding'`
+- [x] Onboarding mode only ever selects difficulty-1 topics
+- [x] After 3+ sessions, mode switches to `'adaptive'`
+- [x] Manually inserting a `quiz_prep_event` switches mode to `'quiz-prep'` with its topics forced to the top
+- [x] `mastery_records` rows are written/updated after simulated question results
+- [x] `sessions` rows are created and correctly closed (`ended_at`, `duration_seconds`, `topics_covered`)
+- [x] `streaks` increments correctly (and correctly holds steady across same-day sessions)
