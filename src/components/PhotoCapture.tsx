@@ -28,6 +28,43 @@ interface Props {
 // ClassroomLog.tsx.
 export const PHOTO_CAPTURE_FLAG_KEY = 'falp:photoCaptureInProgress'
 
+// Vercel serverless functions reject request bodies over ~4.5MB, and a
+// phone gallery photo (often several MB, then +33% from base64 encoding)
+// blows past that easily. Downscale to a max dimension and re-encode as
+// JPEG before it ever hits the network — plenty of resolution to read
+// handwritten notes, comfortably under the limit.
+const MAX_DIMENSION = 1600
+const JPEG_QUALITY = 0.8
+
+function resizeImage(file: File): Promise<string> {
+  return new Promise((resolve, reject) => {
+    const objectUrl = URL.createObjectURL(file)
+    const img = new Image()
+    img.onload = () => {
+      URL.revokeObjectURL(objectUrl)
+      const scale = Math.min(1, MAX_DIMENSION / Math.max(img.width, img.height))
+      const width = Math.round(img.width * scale)
+      const height = Math.round(img.height * scale)
+
+      const canvas = document.createElement('canvas')
+      canvas.width = width
+      canvas.height = height
+      const ctx = canvas.getContext('2d')
+      if (!ctx) {
+        reject(new Error('Canvas not supported'))
+        return
+      }
+      ctx.drawImage(img, 0, 0, width, height)
+      resolve(canvas.toDataURL('image/jpeg', JPEG_QUALITY))
+    }
+    img.onerror = () => {
+      URL.revokeObjectURL(objectUrl)
+      reject(new Error('Could not load the selected image'))
+    }
+    img.src = objectUrl
+  })
+}
+
 export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: Props) {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const [imageDataUrl, setImageDataUrl] = useState<string | null>(null)
@@ -35,7 +72,7 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
   const [notReadable, setNotReadable] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
-  function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     // The change event firing at all (even with no file attached) proves
     // the page survived the round trip to the camera app without
     // reloading — see the reload-detection effect in ClassroomLog.tsx.
@@ -49,11 +86,13 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
       setError('No photo was received — tap the button below to try again.')
       return
     }
-    const reader = new FileReader()
-    reader.onload = () => setImageDataUrl(reader.result as string)
-    reader.readAsDataURL(file)
     setError(null)
     setNotReadable(false)
+    try {
+      setImageDataUrl(await resizeImage(file))
+    } catch {
+      setError('Could not process that photo — please try again.')
+    }
   }
 
   function handleOpenCamera() {
