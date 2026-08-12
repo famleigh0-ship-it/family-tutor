@@ -32,11 +32,19 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
   const [error, setError] = useState<string | null>(null)
 
   function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
-    // The change event firing at all (even a cancel) proves the page
-    // survived the round trip to the camera app without reloading.
+    // The change event firing at all (even with no file attached) proves
+    // the page survived the round trip to the camera app without
+    // reloading — see the reload-detection effect in ClassroomLog.tsx.
     sessionStorage.removeItem(PHOTO_CAPTURE_FLAG_KEY)
     const file = e.target.files?.[0]
-    if (!file) return
+    if (!file) {
+      // Camera closed without delivering a photo back (cancelled, or a
+      // device-specific quirk in how it hands off the captured image).
+      // Previously this silently did nothing, which looked identical to
+      // the button being unresponsive — always give some feedback.
+      setError('No photo was received — tap the button below to try again.')
+      return
+    }
     const reader = new FileReader()
     reader.onload = () => setImageDataUrl(reader.result as string)
     reader.readAsDataURL(file)
@@ -97,13 +105,16 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
       />
 
       {!imageDataUrl ? (
-        <button
-          type="button"
-          onClick={handleOpenCamera}
-          className="block w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-10 text-center text-base font-medium text-slate-600"
-        >
-          📷 Tap to take a photo of your notes
-        </button>
+        <div className="space-y-2">
+          {error && <p className="text-sm text-red-600">{error}</p>}
+          <button
+            type="button"
+            onClick={handleOpenCamera}
+            className="block w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-10 text-center text-base font-medium text-slate-600"
+          >
+            📷 Tap to take a photo of your notes
+          </button>
+        </div>
       ) : (
         <div className="space-y-3">
           <img src={imageDataUrl} alt="Your notes" className="w-full rounded-lg border border-slate-200" />
