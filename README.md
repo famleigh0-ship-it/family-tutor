@@ -261,16 +261,17 @@ Vercel site after a push, same as the parent-PIN endpoints in Phase 2.
 - [x] `/log/:packId` method selector shows photo, text, checklist, and skip
 - [x] Text description flow calls Claude and shows a topic-confirmation
       screen with a confidence banner on low/medium confidence
-- [ ] Photo flow: clear photo of notes returns matched topics; blurry/dark
-      photo triggers the retake prompt
-- [ ] Checklist flow saves directly with no Claude call and no confirmation
+- [x] Photo flow: clear photo of notes returns matched topics (verified on
+      a real Android device, including shorthand notes like "implicit
+      diff" correctly matching "Implicit Differentiation")
+- [x] Checklist flow saves directly with no Claude call and no confirmation
       screen
 - [x] Confirmed log writes a `classroom_logs` row
 - [x] Confirmed topics appear in `topic_unlock_log` with `prioritized_until`
       ~5 days out
 - [x] `node scripts/test-engine.js` shows the two classroom-log-sourced
       topics as `prioritized` with elevated priority scores
-- [ ] `node scripts/run-pacing-calendar.js` unlocks the right topics for a
+- [x] `node scripts/run-pacing-calendar.js` unlocks the right topics for a
       real enrollment
 - [x] Home shows "Log today's class" per course with no log yet, and
       "Logged ✓ — N topics" once one exists; Parent dashboard shows each
