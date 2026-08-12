@@ -52,6 +52,10 @@ functions, Claude API, installable PWA.
      `topic_unlock_log` and turns on Row Level Security for `classroom_logs`
      and `topic_unlock_log` (queried directly from the browser by Home, the
      classroom-log checklist, and the parent dashboard).
+   - `migrations/005_question_bank_extensions.sql` — adds `parts` (FRQ
+     multi-part structure) and `common_misconceptions` (conceptual
+     questions) columns to `question_bank`, needed to store the full
+     generation output from Phase 6.
 4. In **Authentication → Providers**, confirm Email is enabled (it is by
    default).
 5. Under **Authentication → URL Configuration**, add both your local
@@ -86,10 +90,13 @@ git push -u origin main
 
 1. Import the `family-tutor` GitHub repo at https://vercel.com/new. Vercel
    auto-detects Vite.
-2. In **Project Settings → Environment Variables**, add all four vars from
+2. In **Project Settings → Environment Variables**, add all vars from
    `.env.local.example` with your real values (Production + Preview +
    Development). `SUPABASE_SERVICE_ROLE_KEY` and `ANTHROPIC_API_KEY` must
-   never get a `VITE_` prefix.
+   never get a `VITE_` prefix. `APP_BASE_URL` (Phase 6+) should be the
+   deployed site's own origin — a serverless function calling one of its
+   own sibling endpoints has no implicit "call myself" URL, so this makes
+   it explicit.
 3. Deploy. Every push to `main` auto-deploys.
 
 ## Accounts, roles, and the parent PIN
@@ -276,3 +283,96 @@ Vercel site after a push, same as the parent-PIN endpoints in Phase 2.
 - [x] Home shows "Log today's class" per course with no log yet, and
       "Logged ✓ — N topics" once one exists; Parent dashboard shows each
       student's last log date per course
+
+## Claude API integration — question bank and grading
+
+`src/lib/claude.js` centralizes model routing (`MODEL_FOR_TASK`, e.g. MC
+generation/grading on Haiku, everything conceptual/FRQ on Sonnet) behind
+one `callClaude({ task, system, messages, max_tokens })` helper that
+returns `{ content, tokens_used }`. Every Phase 6 route builds its own
+prompt text and calls this rather than touching the Anthropic SDK
+directly.
+
+**Bank fill** (`api/bank/fill.js`) generates one batch of questions
+(MC 10 / conceptual 5 / FRQ 3 per call) for a `pack_id` + `topic_id` +
+`question_type` and inserts them into `question_bank`. It's an internal
+endpoint — only our own backend calls it, authenticated with the same
+`SUPABASE_SERVICE_ROLE_KEY` already used everywhere else server-side,
+sent as an `X-Service-Role-Key` header (there's no separate "service
+role" concept for our own HTTP API the way there is for Supabase, so the
+already-guarded key doubles as the shared secret rather than adding a
+second one).
+
+**Bank serve** (`api/bank/serve.js`) picks one question for a student:
+prefers never-seen, falls back to not-seen-in-60-days, and if truly
+exhausted triggers an async fill while still returning the
+least-recently-seen question rather than making the student wait.
+`key_reasoning` and each option's `distractor_note` are stripped before
+the response ever reaches the client — that's what actually keeps the
+answer key server-side, not just convention.
+
+**Grading**: `grade-mc.js` is fully deterministic (no Claude call,
+`tokens_used: 0`) — it just compares against `correct_answer` and builds
+feedback from `distractor_note`. `grade-typed.js` (FRQ/conceptual) and
+`grade-photo.js` (Vision, handwritten work) both call Claude with a
+rubric-aware grading prompt and write the result back to
+`student_question_history` and, via `recordQuestionResult`, into
+`mastery_records`/`question_log`. All three verify the session actually
+belongs to the authenticated user before writing anything.
+
+**Hints** (`api/hints/get-hint.js`) are Socratic and free — no grading
+impact, no history writes, just a 2-3 sentence nudge from Haiku.
+
+`src/engine/bank-manager.js` (`checkBankHealth`, `triggerBankFill`) is
+what `startSession` now calls after building a `SessionPlan`: for each
+selected topic, if the student's unseen-question count for that
+topic/type is below threshold (MC < 8, conceptual < 5, FRQ < 3), it fires
+an async fill and logs it — never blocking session start on a thin bank.
+
+`scripts/manage-bank.js` is the CLI for manual bank operations
+(`status`, `fill`, `fill-all`) — see the milestone checklist below for
+exact commands.
+
+### A note on file layout vs. the literal spec
+
+`session-orchestrator.ts`, `mastery.ts`, `session-mode.ts`,
+`topic-selector.ts`, and `bank-manager.ts` all became plain `.js` in this
+phase (not `.ts`, despite the original naming). `api/grading/*.js` now
+import `recordQuestionResult` from `session-orchestrator.js` directly,
+and Vercel's serverless function bundler cannot resolve a
+directly-imported `.ts` file at runtime — confirmed the hard way in
+Phase 5 (`src/packs/loader.ts` → `ERR_MODULE_NOT_FOUND` in production).
+Once one file in that dependency chain needed converting, everything it
+transitively imports at runtime (not just type-only) needed the same
+treatment. TypeScript still type-checks against these via JSDoc; only
+runtime resolution changed.
+
+## Phase 6 milestone checklist
+
+- [ ] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type mc`
+      generates and stores MC questions — inspect in Supabase for quality
+- [ ] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type conceptual`
+      stores conceptual questions
+- [ ] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic dynamics.free-body-diagrams --type frq`
+      stores FRQ questions with a photo `input_mode` among them
+- [ ] `node scripts/manage-bank.js status --pack ap-physics-1` prints a
+      bank health report for every topic/type
+- [ ] `node scripts/manage-bank.js fill-all --pack ap-physics-1` fills the
+      whole AP Physics 1 bank (several minutes, many API calls — expected)
+- [ ] `GET /api/bank/serve` returns a question with no `key_reasoning` and
+      no `distractor_note` on any option
+- [ ] A correct MC answer to `/api/grading/grade-mc` returns correct
+      feedback with zero Claude calls
+- [ ] A typed answer to `/api/grading/grade-typed` gets Claude-graded
+      structured feedback
+- [ ] A photo of handwritten work submitted to `/api/grading/grade-photo`
+      returns a readable, graded response
+- [ ] `/api/hints/get-hint` returns a Socratic hint that doesn't reveal
+      the answer
+- [ ] `node scripts/manage-bank.js fill-all --pack calc-ab-bc` fills the
+      calc bank too
+
+Before running `fill-all` for both packs: consider setting a temporary
+spending limit in the Anthropic Console. Filling both packs makes roughly
+60-80 API calls total — at Haiku + Sonnet rates, expect on the order of
+$0.50-1.50, a one-time cost for the initial bank population.

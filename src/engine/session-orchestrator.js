@@ -1,26 +1,30 @@
 // Server-side only. This module reads/writes Supabase with the service
 // role key and must never be imported from src/pages or src/components —
 // only from Vercel serverless functions (api/) or Node scripts.
+//
+// Plain JS (not .ts) — Vercel's serverless function bundler cannot resolve
+// a directly-imported .ts file at runtime. Converted in Phase 6 because
+// api/grading/*.js now import recordQuestionResult from here directly.
+// See src/packs/loader.js for the original fix (Phase 5).
 
-import { createClient, type SupabaseClient } from '@supabase/supabase-js'
+import { createClient } from '@supabase/supabase-js'
 // Explicit extensions: this module is imported directly by
 // scripts/test-engine.js under plain Node (no bundler), whose native ESM
 // loader — unlike Vite's — requires extensions on relative specifiers.
-// loader.js/unlock.js are plain JS rather than .ts specifically so Vercel's
-// serverless function bundler can resolve them too (see their file headers).
 import { getPack } from '../packs/loader.js'
-import { applyDecay, updateMastery } from './mastery.ts'
-import { detectSessionMode } from './session-mode.ts'
-import { selectTopics } from './topic-selector.ts'
+import { applyDecay, updateMastery } from './mastery.js'
+import { detectSessionMode } from './session-mode.js'
+import { selectTopics } from './topic-selector.js'
 import { getPrioritizedTopicIds } from './unlock.js'
-import type { MasteryRecord, QuestionResult, QuizPrepEvent, SessionPlan } from './types'
+import { checkBankHealth, triggerBankFill } from './bank-manager.js'
 
 const RECENT_SESSIONS_FOR_TOPICS = 2 // "topics from last 2 sessions"
 const MS_PER_DAY = 86_400_000
 
-let client: SupabaseClient | undefined
+/** @type {import('@supabase/supabase-js').SupabaseClient | undefined} */
+let client
 
-function getSupabaseAdmin(): SupabaseClient {
+function getSupabaseAdmin() {
   if (!client) {
     const url = process.env.VITE_SUPABASE_URL
     const serviceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY
@@ -36,8 +40,11 @@ function getSupabaseAdmin(): SupabaseClient {
   return client
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function rowToMasteryRecord(row: any): MasteryRecord {
+/**
+ * @param {any} row
+ * @returns {import('./types').MasteryRecord}
+ */
+function rowToMasteryRecord(row) {
   return {
     topic_id: row.topic_id,
     pack_id: row.pack_id,
@@ -51,15 +58,16 @@ function rowToMasteryRecord(row: any): MasteryRecord {
   }
 }
 
-function toDateOnly(date: Date): string {
+/** @param {Date} date */
+function toDateOnly(date) {
   return date.toISOString().slice(0, 10)
 }
 
-export async function startSession(params: {
-  userId: string
-  packId: string
-  targetDurationMinutes: number
-}): Promise<SessionPlan & { sessionId: string }> {
+/**
+ * @param {{ userId: string, packId: string, targetDurationMinutes: number }} params
+ * @returns {Promise<import('./types').SessionPlan & { sessionId: string }>}
+ */
+export async function startSession(params) {
   const { userId, packId, targetDurationMinutes } = params
   const admin = getSupabaseAdmin()
   const pack = getPack(packId)
@@ -101,10 +109,10 @@ export async function startSession(params: {
 
   if (unlockErr) throw unlockErr
 
-  const unlockedTopicIds = Array.from(new Set((unlockRows ?? []).map((r) => r.topic_id as string)))
+  const unlockedTopicIds = Array.from(new Set((unlockRows ?? []).map((r) => r.topic_id)))
 
   // 4. Prioritized topic ids — prioritized_until > now, set by
-  // unlockTopics/prioritizeTopics (src/engine/unlock.ts) when a classroom
+  // unlockTopics/prioritizeTopics (src/engine/unlock.js) when a classroom
   // log is confirmed.
   const prioritizedTopicIds = await getPrioritizedTopicIds(userId, packId)
 
@@ -122,8 +130,8 @@ export async function startSession(params: {
 
   if (quizPrepErr) throw quizPrepErr
 
-  const activeQuizPrepEvent: QuizPrepEvent | null =
-    quizPrepRows && quizPrepRows.length > 0 ? (quizPrepRows[0] as QuizPrepEvent) : null
+  /** @type {import('./types').QuizPrepEvent | null} */
+  const activeQuizPrepEvent = quizPrepRows && quizPrepRows.length > 0 ? quizPrepRows[0] : null
   const quizPrepTopicIds = activeQuizPrepEvent?.topic_ids ?? []
 
   // 6. Session count for this user + pack (before creating this session).
@@ -146,9 +154,7 @@ export async function startSession(params: {
 
   if (recentErr) throw recentErr
 
-  const recentTopicIds = Array.from(
-    new Set((recentSessions ?? []).flatMap((s) => (s.topics_covered as string[] | null) ?? []))
-  )
+  const recentTopicIds = Array.from(new Set((recentSessions ?? []).flatMap((s) => s.topics_covered ?? [])))
 
   // 7. Days until exam.
   const examDate = new Date(pack.exam_date)
@@ -190,17 +196,44 @@ export async function startSession(params: {
 
   if (sessionErr || !sessionRow) throw sessionErr ?? new Error('Failed to create session row')
 
-  // 11. Return the plan plus the session id (required by
+  // 11. Check bank health for each selected topic and fire off async fills
+  // for anything running low — deliberately not awaited, so a cold/thin
+  // bank never blocks session start. See src/engine/bank-manager.ts.
+  if (plan.topics.length > 0) {
+    checkAndTriggerBankFills(packId, userId, plan.topics).catch((err) =>
+      console.error('[session-orchestrator] bank health check failed', err)
+    )
+  }
+
+  // 12. Return the plan plus the session id (required by
   // recordQuestionResult/endSession, so it has to travel somehow).
-  return { ...plan, sessionId: sessionRow.id as string }
+  return { ...plan, sessionId: sessionRow.id }
 }
 
-export async function recordQuestionResult(params: {
-  sessionId: string
-  userId: string
-  result: QuestionResult
-}): Promise<void> {
-  const { sessionId, userId, result } = params
+/**
+ * @param {string} packId
+ * @param {string} userId
+ * @param {import('./types').TopicWithState[]} topics
+ */
+async function checkAndTriggerBankFills(packId, userId, topics) {
+  const health = await checkBankHealth(packId, userId)
+  const topicIds = new Set(topics.map((t) => t.id))
+  const needsFill = health.filter((h) => topicIds.has(h.topic_id) && h.needs_fill)
+
+  for (const entry of needsFill) {
+    console.log(
+      `[session-orchestrator] bank low for ${entry.topic_id} (${entry.question_type}): ${entry.unseen_by_user} unseen — triggering fill`
+    )
+    triggerBankFill(packId, entry.topic_id, entry.question_type)
+  }
+}
+
+/**
+ * @param {{ sessionId: string, userId: string, result: import('./types').QuestionResult, tokensUsed?: number | null }} params
+ * @returns {Promise<void>}
+ */
+export async function recordQuestionResult(params) {
+  const { sessionId, userId, result, tokensUsed } = params
   const admin = getSupabaseAdmin()
 
   const { data: sessionRow, error: sessionErr } = await admin
@@ -210,7 +243,7 @@ export async function recordQuestionResult(params: {
     .single()
 
   if (sessionErr || !sessionRow) throw sessionErr ?? new Error(`Session ${sessionId} not found`)
-  const packId = sessionRow.pack_id as string
+  const packId = sessionRow.pack_id
 
   // 1. Load current mastery record (or default if this is the first
   // attempt at this topic).
@@ -224,7 +257,8 @@ export async function recordQuestionResult(params: {
 
   if (existingErr) throw existingErr
 
-  const current: MasteryRecord = existing
+  /** @type {import('./types').MasteryRecord} */
+  const current = existing
     ? rowToMasteryRecord(existing)
     : {
         topic_id: result.topic_id,
@@ -260,8 +294,7 @@ export async function recordQuestionResult(params: {
 
   if (upsertErr) throw upsertErr
 
-  // 4. Write question_log. question_id is left null — no real question
-  // bank exists yet (that's a later phase); this is mocked/simulated data.
+  // 4. Write question_log.
   const { error: logErr } = await admin.from('question_log').insert({
     session_id: sessionId,
     user_id: userId,
@@ -270,7 +303,7 @@ export async function recordQuestionResult(params: {
     question_type: result.question_type,
     correct: result.correct,
     frq_score: result.frq_score ?? null,
-    tokens_used: null
+    tokens_used: tokensUsed ?? null
   })
 
   if (logErr) throw logErr
@@ -279,15 +312,19 @@ export async function recordQuestionResult(params: {
   const { error: updateSessionErr } = await admin
     .from('sessions')
     .update({
-      questions_attempted: (sessionRow.questions_attempted as number) + 1,
-      questions_correct: (sessionRow.questions_correct as number) + (result.correct ? 1 : 0)
+      questions_attempted: sessionRow.questions_attempted + 1,
+      questions_correct: sessionRow.questions_correct + (result.correct ? 1 : 0)
     })
     .eq('id', sessionId)
 
   if (updateSessionErr) throw updateSessionErr
 }
 
-export async function endSession(params: { sessionId: string; userId: string }): Promise<void> {
+/**
+ * @param {{ sessionId: string, userId: string }} params
+ * @returns {Promise<void>}
+ */
+export async function endSession(params) {
   const { sessionId, userId } = params
   const admin = getSupabaseAdmin()
 
@@ -300,19 +337,16 @@ export async function endSession(params: { sessionId: string; userId: string }):
   if (sessionErr || !sessionRow) throw sessionErr ?? new Error(`Session ${sessionId} not found`)
 
   const endedAt = new Date()
-  const startedAt = new Date(sessionRow.started_at as string)
+  const startedAt = new Date(sessionRow.started_at)
   const durationSeconds = Math.max(0, Math.round((endedAt.getTime() - startedAt.getTime()) / 1000))
 
   // Recompute topics_covered authoritatively from question_log, rather
   // than trusting incremental bookkeeping elsewhere.
-  const { data: logRows, error: logErr } = await admin
-    .from('question_log')
-    .select('topic_id')
-    .eq('session_id', sessionId)
+  const { data: logRows, error: logErr } = await admin.from('question_log').select('topic_id').eq('session_id', sessionId)
 
   if (logErr) throw logErr
 
-  const topicsCovered = Array.from(new Set((logRows ?? []).map((r) => r.topic_id as string)))
+  const topicsCovered = Array.from(new Set((logRows ?? []).map((r) => r.topic_id)))
 
   const { error: updateErr } = await admin
     .from('sessions')
@@ -326,11 +360,7 @@ export async function endSession(params: { sessionId: string; userId: string }):
   if (updateErr) throw updateErr
 
   // Streak bookkeeping.
-  const { data: streakRow, error: streakErr } = await admin
-    .from('streaks')
-    .select('*')
-    .eq('user_id', userId)
-    .maybeSingle()
+  const { data: streakRow, error: streakErr } = await admin.from('streaks').select('*').eq('user_id', userId).maybeSingle()
 
   if (streakErr) throw streakErr
 
@@ -338,9 +368,9 @@ export async function endSession(params: { sessionId: string; userId: string }):
   const yesterday = new Date(endedAt.getTime() - MS_PER_DAY)
   const yesterdayStr = toDateOnly(yesterday)
 
-  let currentStreak: number = streakRow?.current_streak ?? 0
-  let longestStreak: number = streakRow?.longest_streak ?? 0
-  const lastSessionDate: string | null = streakRow?.last_session_date ?? null
+  let currentStreak = streakRow?.current_streak ?? 0
+  let longestStreak = streakRow?.longest_streak ?? 0
+  const lastSessionDate = streakRow?.last_session_date ?? null
 
   if (lastSessionDate === todayStr) {
     // Already counted today — no change.

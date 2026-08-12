@@ -1,5 +1,8 @@
-import type { CoursePack, Unit, Topic } from '../packs/types'
-import type { MasteryRecord, TopicWithState, SessionPlan, SessionMode } from './types'
+// Plain JS — see mastery.js header for why.
+
+/** @typedef {import('../packs/types').CoursePack} CoursePack */
+/** @typedef {import('../packs/types').Unit} Unit */
+/** @typedef {import('../packs/types').Topic} Topic */
 
 const MINUTES_PER_MC = 3
 const MINUTES_PER_FRQ = 8
@@ -16,12 +19,21 @@ const REVIEW_MASTERY_MAX = 0.8
 const REVIEW_MIN_DAYS_SINCE_SEEN = 5
 const MS_PER_DAY = 86_400_000
 
-function daysSince(date: Date | null, now: Date): number {
+/**
+ * @param {Date | null} date
+ * @param {Date} now
+ */
+function daysSince(date, now) {
   if (!date) return Infinity
   return Math.floor((now.getTime() - date.getTime()) / MS_PER_DAY)
 }
 
-function defaultMasteryRecord(packId: string, topicId: string): MasteryRecord {
+/**
+ * @param {string} packId
+ * @param {string} topicId
+ * @returns {import('./types').MasteryRecord}
+ */
+function defaultMasteryRecord(packId, topicId) {
   return {
     topic_id: topicId,
     pack_id: packId,
@@ -38,25 +50,29 @@ function defaultMasteryRecord(packId: string, topicId: string): MasteryRecord {
 // Topics with photo input tend toward FRQ/diagram-heavy questions (slower);
 // typed topics skew toward quicker MC/conceptual questions. This is a
 // rough estimate for sizing a session — actual question generation
-// (a later phase) determines real timing.
-function estimateMinutesPerQuestion(topic: TopicWithState): number {
+// determines real timing.
+/** @param {import('./types').TopicWithState} topic */
+function estimateMinutesPerQuestion(topic) {
   return topic.input_mode === 'photo' ? MINUTES_PER_FRQ : MINUTES_PER_MC
 }
 
-function isFrqCapable(topic: Topic): boolean {
-  // No per-topic FRQ flag exists in the pack schema; conceptual-only
-  // topics are the ones least suited to a full FRQ treatment, so treat
-  // quantitative/mixed topics as the FRQ-capable set.
+// No per-topic FRQ flag exists in the pack schema; conceptual-only
+// topics are the ones least suited to a full FRQ treatment, so treat
+// quantitative/mixed topics as the FRQ-capable set.
+/** @param {Topic} topic */
+function isFrqCapable(topic) {
   return topic.type === 'quantitative' || topic.type === 'mixed'
 }
 
-function pickByDuration(
-  sorted: TopicWithState[],
-  targetMinutes: number,
-  minTopics: number,
-  maxTopics: number
-): TopicWithState[] {
-  const picked: TopicWithState[] = []
+/**
+ * @param {import('./types').TopicWithState[]} sorted
+ * @param {number} targetMinutes
+ * @param {number} minTopics
+ * @param {number} maxTopics
+ * @returns {import('./types').TopicWithState[]}
+ */
+function pickByDuration(sorted, targetMinutes, minTopics, maxTopics) {
+  const picked = []
   let minutesUsed = 0
 
   for (const topic of sorted) {
@@ -71,26 +87,32 @@ function pickByDuration(
 
 // Swaps the lowest-priority selected topic for `candidate` if `candidate`
 // isn't already selected, or appends it when there's room under the cap.
-function ensureIncluded(
-  selected: TopicWithState[],
-  candidate: TopicWithState | undefined,
-  maxTopics: number
-): TopicWithState[] {
+/**
+ * @param {import('./types').TopicWithState[]} selected
+ * @param {import('./types').TopicWithState | undefined} candidate
+ * @param {number} maxTopics
+ * @returns {import('./types').TopicWithState[]}
+ */
+function ensureIncluded(selected, candidate, maxTopics) {
   if (!candidate || selected.some((t) => t.id === candidate.id)) return selected
   if (selected.length < maxTopics) return [...selected, candidate]
   return [...selected.slice(0, -1), candidate]
 }
 
-export function selectTopics(params: {
-  pack: CoursePack
-  masteryRecords: MasteryRecord[]
-  unlockedTopicIds: string[]
-  prioritizedTopicIds: string[]
-  mode: SessionMode
-  quizPrepTopicIds: string[]
-  recentTopicIds: string[]
-  targetDurationMinutes: number
-}): SessionPlan {
+/**
+ * @param {{
+ *   pack: CoursePack,
+ *   masteryRecords: import('./types').MasteryRecord[],
+ *   unlockedTopicIds: string[],
+ *   prioritizedTopicIds: string[],
+ *   mode: import('./types').SessionMode,
+ *   quizPrepTopicIds: string[],
+ *   recentTopicIds: string[],
+ *   targetDurationMinutes: number
+ * }} params
+ * @returns {import('./types').SessionPlan}
+ */
+export function selectTopics(params) {
   const {
     pack,
     masteryRecords,
@@ -103,7 +125,7 @@ export function selectTopics(params: {
   } = params
 
   const now = new Date()
-  const notes: string[] = []
+  const notes = []
 
   const masteryByTopicId = new Map(masteryRecords.map((r) => [r.topic_id, r]))
   const unlockedSet = new Set(unlockedTopicIds)
@@ -111,7 +133,8 @@ export function selectTopics(params: {
   const recentSet = new Set(recentTopicIds)
   const quizPrepSet = new Set(quizPrepTopicIds)
 
-  const unitByTopicId = new Map<string, Unit>()
+  /** @type {Map<string, Unit>} */
+  const unitByTopicId = new Map()
   for (const unit of pack.units) {
     for (const topic of unit.topics) {
       unitByTopicId.set(topic.id, unit)
@@ -120,7 +143,8 @@ export function selectTopics(params: {
 
   // STEP 1 — build the TopicWithState list. Locked topics (not in
   // unlockedTopicIds) are skipped entirely, per spec.
-  const candidates: TopicWithState[] = []
+  /** @type {import('./types').TopicWithState[]} */
+  const candidates = []
   for (const unit of pack.units) {
     for (const topic of unit.topics) {
       if (!unlockedSet.has(topic.id)) continue
@@ -167,7 +191,8 @@ export function selectTopics(params: {
   const sorted = [...candidates].sort((a, b) => b.priority_score - a.priority_score)
 
   // STEP 3 + 4 — mode-specific selection and question-count sizing.
-  let selected: TopicWithState[]
+  /** @type {import('./types').TopicWithState[]} */
+  let selected
 
   if (mode === 'onboarding') {
     selected = sorted.filter((t) => t.difficulty === 1).slice(0, ONBOARDING_MAX_TOPICS)
@@ -229,13 +254,9 @@ export function selectTopics(params: {
     }
   }
 
-  const targetQuestionCount =
-    mode === 'onboarding' ? selected.length : selected.length * QUESTIONS_PER_TOPIC
+  const targetQuestionCount = mode === 'onboarding' ? selected.length : selected.length * QUESTIONS_PER_TOPIC
 
-  const targetDuration =
-    mode === 'onboarding'
-      ? selected.length * MINUTES_PER_MC
-      : targetDurationMinutes
+  const targetDuration = mode === 'onboarding' ? selected.length * MINUTES_PER_MC : targetDurationMinutes
 
   return {
     mode,

@@ -9,8 +9,8 @@
 import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'node:crypto'
-import { startSession, recordQuestionResult, endSession } from '../src/engine/session-orchestrator.ts'
-import { getMasteryLabel } from '../src/engine/mastery.ts'
+import { startSession, recordQuestionResult, endSession } from '../src/engine/session-orchestrator.js'
+import { getMasteryLabel } from '../src/engine/mastery.js'
 
 loadEnv({ path: '.env.local' })
 

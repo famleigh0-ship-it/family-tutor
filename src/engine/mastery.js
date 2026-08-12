@@ -1,24 +1,32 @@
-import type { MasteryRecord, QuestionResult } from './types'
+// Plain JS (not .ts) so this loads identically under Vite, plain Node
+// script execution, AND Vercel's serverless function bundler — which
+// cannot resolve a directly-imported .ts file at runtime. Converted in
+// Phase 6 because api/grading/*.js now import session-orchestrator.js,
+// which imports this. See src/packs/loader.js for the original fix.
 
 const LEARNING_RATE = 0.3
 const DECAY_RATE_PER_WEEK = 0.02
 const DECAY_GRACE_DAYS = 7
 const MS_PER_DAY = 86_400_000
 
-function clamp01(x: number): number {
+function clamp01(x) {
   return Math.max(0, Math.min(1, x))
 }
 
-function daysBetween(earlier: Date, later: Date): number {
+function daysBetween(earlier, later) {
   return Math.floor((later.getTime() - earlier.getTime()) / MS_PER_DAY)
 }
 
-// Exponential-moving-average update: each result pulls the score 30% of
-// the way toward a perfect (1.0) or zero (0.0) result, so no single
-// question can swing mastery drastically either direction.
-export function updateMastery(current: MasteryRecord, result: QuestionResult): MasteryRecord {
-  const resultScore =
-    result.question_type === 'frq' ? (result.frq_score ?? 0) / 4 : result.correct ? 1 : 0
+/**
+ * Exponential-moving-average update: each result pulls the score 30% of
+ * the way toward a perfect (1.0) or zero (0.0) result, so no single
+ * question can swing mastery drastically either direction.
+ * @param {import('./types').MasteryRecord} current
+ * @param {import('./types').QuestionResult} result
+ * @returns {import('./types').MasteryRecord}
+ */
+export function updateMastery(current, result) {
+  const resultScore = result.question_type === 'frq' ? (result.frq_score ?? 0) / 4 : result.correct ? 1 : 0
 
   const newScore = clamp01(current.mastery_score + LEARNING_RATE * (resultScore - current.mastery_score))
   const isFrq = result.question_type === 'frq'
@@ -36,9 +44,13 @@ export function updateMastery(current: MasteryRecord, result: QuestionResult): M
   }
 }
 
-// Topics not practiced in over a week fade slightly (2% per week since
-// last seen), floored at 0. Recently-seen topics (<=7 days) are untouched.
-export function applyDecay(records: MasteryRecord[]): MasteryRecord[] {
+/**
+ * Topics not practiced in over a week fade slightly (2% per week since
+ * last seen), floored at 0. Recently-seen topics (<=7 days) are untouched.
+ * @param {import('./types').MasteryRecord[]} records
+ * @returns {import('./types').MasteryRecord[]}
+ */
+export function applyDecay(records) {
   const now = new Date()
 
   return records.map((record) => {
@@ -72,7 +84,8 @@ export function applyDecay(records: MasteryRecord[]): MasteryRecord[] {
   })
 }
 
-export function getMasteryLabel(score: number): string {
+/** @param {number} score */
+export function getMasteryLabel(score) {
   if (score >= 0.9) return 'Mastered'
   if (score >= 0.8) return 'Solid'
   if (score >= 0.6) return 'Practicing'
