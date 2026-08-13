@@ -30,12 +30,20 @@ function findTopic(pack, topicId) {
 // GET — serve
 // -------------------------------------------------------------------
 
-// key_reasoning and each option's distractor_note are grading aids —
-// stripping them here is what actually enforces "the client never sees
-// the answer key," not just convention.
+// Grading aids — stripping these is what actually enforces "the client
+// never sees the answer key" before submitting, not just convention.
+// Broader than the spec's literal "distractor_notes and key_reasoning"
+// list: correct_answer, explanation, rubric, and common_misconceptions
+// all reveal the answer just as directly, and each option's own
+// is_correct flag is a direct boolean answer key — leaving any of those
+// in the served response would make the "never seen" question selection
+// in handleServe pointless, since the client could just read the answer
+// out of the API response instead of answering.
 function stripGradingAids(question) {
-  const { key_reasoning, options, ...rest } = question
-  const strippedOptions = Array.isArray(options) ? options.map(({ distractor_note, ...opt }) => opt) : options
+  const { key_reasoning, correct_answer, explanation, rubric, common_misconceptions, options, ...rest } = question
+  const strippedOptions = Array.isArray(options)
+    ? options.map(({ distractor_note, is_correct, ...opt }) => opt)
+    : options
   return { ...rest, options: strippedOptions }
 }
 
