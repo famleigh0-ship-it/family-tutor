@@ -1,5 +1,9 @@
 {
   "rewrites": [
     { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ]
+  ],
+  "functions": {
+    "api/bank/index.js": { "maxDuration": 60 },
+    "api/grading/grade.js": { "maxDuration": 60 }
+  }
 }
