@@ -57,11 +57,17 @@ export async function checkBankHealth(packId, userId) {
 
   let seenQuestionIds = new Set()
   if (questionIds.length > 0) {
+    // A pack's full question_bank can run into the thousands of rows —
+    // filtering student_question_history with .in('question_id', ids)
+    // against that many ids builds a URL PostgREST rejects outright
+    // ("Bad Request"), confirmed live once the bank passed ~1500
+    // questions. Scoping via an embedded join on question_bank.pack_id
+    // avoids ever needing an id list in the query at all.
     const { data: historyRows, error: histErr } = await admin
       .from('student_question_history')
-      .select('question_id')
+      .select('question_id, question_bank!inner(pack_id)')
       .eq('user_id', userId)
-      .in('question_id', questionIds)
+      .eq('question_bank.pack_id', packId)
     if (histErr) throw histErr
     seenQuestionIds = new Set((historyRows ?? []).map((r) => r.question_id))
   }
