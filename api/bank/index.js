@@ -161,8 +161,16 @@ function isServiceRoleCaller(req) {
   return typeof key === 'string' && key.length > 0 && key === process.env.SUPABASE_SERVICE_ROLE_KEY
 }
 
+// Confirmed live: for math-heavy content (Calc AB→BC especially), Claude
+// sometimes writes LaTeX commands like \pm, \infty, \Rightarrow directly
+// into the JSON string values. A lone backslash isn't a valid JSON escape
+// sequence, so JSON.parse fails on the whole response. Unicode symbols
+// sidestep the problem entirely — nothing to escape.
+const NOTATION_INSTRUCTION =
+  'Use plain Unicode math symbols in all text (×, ÷, ±, ≤, ≥, ≠, →, ⇒, ∞, √, π, ², ³, etc.), never LaTeX commands like \\frac, \\pm, \\infty, \\cdot, or \\Rightarrow — a literal backslash breaks JSON parsing.'
+
 function buildPrompt(pack, topic, questionType, n) {
-  const personaContext = `${pack.tutor_persona}\n${pack.subject_context}`
+  const personaContext = `${pack.tutor_persona}\n${pack.subject_context}\n${NOTATION_INSTRUCTION}`
 
   if (questionType === 'mc') {
     return {
