@@ -17,6 +17,16 @@ import { recordQuestionResult } from '../../src/engine/session-orchestrator.js'
 // affects the auxiliary counter, not the actual EMA calculation.
 const FRQ_SCORE_CORRECT_THRESHOLD = 3
 
+// Defense in depth: the FRQ generation prompt now constrains parts'
+// points to sum to 4 (matching this 0-4 grading scale), but a prompt
+// instruction alone doesn't guarantee compliance — confirmed live when a
+// pre-fix question with a 9-point rubric got graded as frq_score: 7,
+// which would have distorted the mastery EMA (frq_score/4) well past 1.0.
+function clampFrqScore(value) {
+  if (typeof value !== 'number' || Number.isNaN(value)) return null
+  return Math.max(0, Math.min(4, value))
+}
+
 // Accepts either a raw base64 string or a data: URL and returns the media
 // type + bare base64 payload Claude's image block expects.
 function extractImageParts(imageBase64) {
@@ -84,8 +94,7 @@ async function gradeTyped(admin, user, question, body) {
   const parsed = parseClaudeJson(response.content)
 
   const correct = Boolean(parsed.correct)
-  const frqScore =
-    question.question_type === 'frq' && typeof parsed.frq_score === 'number' ? parsed.frq_score : null
+  const frqScore = question.question_type === 'frq' ? clampFrqScore(parsed.frq_score) : null
 
   await updatePendingHistory(admin, user.id, question.id, {
     student_answer: studentAnswer,
@@ -142,7 +151,7 @@ async function gradePhoto(admin, user, question, body) {
     return { readable: false, feedback: parsed.feedback ?? 'Could not read the photo clearly — please retake with better lighting.' }
   }
 
-  const frqScore = typeof parsed.frq_score === 'number' ? parsed.frq_score : null
+  const frqScore = clampFrqScore(parsed.frq_score)
   const correct = frqScore !== null && frqScore >= FRQ_SCORE_CORRECT_THRESHOLD
 
   await updatePendingHistory(admin, user.id, question.id, {
