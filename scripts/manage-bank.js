@@ -94,6 +94,36 @@ async function cmdFill(options) {
   console.log(`Generated ${result.generated} ${result.question_type} question(s) for ${result.topic_id}.`)
 }
 
+// Even with maxDuration raised to Vercel Hobby's 60s ceiling, some
+// individual FRQ/conceptual generations still occasionally run long
+// enough to hit FUNCTION_INVOCATION_TIMEOUT — confirmed live, and not a
+// concurrency effect (still happened running one pack alone). Since
+// retrying the exact same failed combo usually succeeds on a later
+// attempt, retry in-place a few times before counting it as a real
+// failure, rather than requiring a manual second fill-all pass.
+const MAX_ATTEMPTS = 4
+const RETRY_DELAY_MS = 3000
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms))
+}
+
+async function fillWithRetry(packId, topicId, questionType) {
+  let lastErr
+  for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
+    try {
+      return await postBankFill({ packId, topicId, questionType })
+    } catch (err) {
+      lastErr = err
+      if (attempt < MAX_ATTEMPTS) {
+        console.log(`    retry ${attempt}/${MAX_ATTEMPTS - 1} for ${topicId} (${questionType}): ${err.message}`)
+        await sleep(RETRY_DELAY_MS)
+      }
+    }
+  }
+  throw lastErr
+}
+
 async function cmdFillAll(options) {
   const packId = options.pack
   if (!packId) {
@@ -106,18 +136,18 @@ async function cmdFillAll(options) {
   const needingFill = health.filter((h) => h.needs_fill)
 
   console.log(
-    `Filling ${needingFill.length} topic/type combination(s) for ${pack.name}. This makes that many Claude API calls and can take several minutes — expected.\n`
+    `Filling ${needingFill.length} topic/type combination(s) for ${pack.name}. This makes that many Claude API calls (with automatic retries on transient timeouts) and can take a while — expected.\n`
   )
 
   let succeeded = 0
   let failed = 0
   for (const entry of needingFill) {
     try {
-      const result = await postBankFill({ packId, topicId: entry.topic_id, questionType: entry.question_type })
+      const result = await fillWithRetry(packId, entry.topic_id, entry.question_type)
       console.log(`  ok ${entry.topic_id} (${entry.question_type}): generated ${result.generated}`)
       succeeded++
     } catch (err) {
-      console.error(`  FAILED ${entry.topic_id} (${entry.question_type}): ${err.message}`)
+      console.error(`  FAILED ${entry.topic_id} (${entry.question_type}) after ${MAX_ATTEMPTS} attempts: ${err.message}`)
       failed++
     }
   }
