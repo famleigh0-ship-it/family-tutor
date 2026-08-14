@@ -1,4 +1,6 @@
-// Shared helpers for classroom-log routes that ask Claude to return JSON.
+// Shared helpers for anything that asks Claude to return JSON — used by
+// both api/*.js routes and plain Node scripts (e.g. src/lib/bankFill.js,
+// called directly from scripts/manage-bank.js).
 
 // Claude sometimes wraps JSON in a markdown code fence even when told not
 // to — strip it before parsing.

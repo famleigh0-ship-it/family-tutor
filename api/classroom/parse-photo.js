@@ -1,6 +1,6 @@
 import { getUserFromRequest, getUserProfile } from '../_lib/supabaseAdmin.js'
 import { getAnthropicClient } from '../_lib/anthropicClient.js'
-import { parseClaudeJson, buildTopicList } from '../_lib/claudeJson.js'
+import { parseClaudeJson, buildTopicList } from '../../src/lib/claudeJson.js'
 import { getPack } from '../../src/packs/loader.js'
 
 const SYSTEM_PROMPT = `You are a curriculum mapper for a high school course. Your job is to identify which academic topics appear in a student's handwritten class notes. You must only identify topics from the provided list — do not invent or infer topics not explicitly present in the notes. Be conservative: only flag a topic if there is clear evidence of it in the notes. Return JSON only, no other text.`

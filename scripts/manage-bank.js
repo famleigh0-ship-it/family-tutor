@@ -6,15 +6,18 @@
 //   node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type mc
 //   node scripts/manage-bank.js fill-all --pack ap-physics-1
 //
-// fill/fill-all hit the deployed API (APP_BASE_URL/api/bank/fill), same as
-// scripts/run-pacing-calendar.js and the Phase 5 classroom-log routes —
-// /api/* only runs under Vercel, not plain `npm run dev`.
+// fill/fill-all call src/lib/bankFill.js's fillBank() directly, in-process
+// — not the deployed /api/bank endpoint. That's deliberate: Vercel's
+// serverless functions have a hard 60s timeout even on the fixed
+// maxDuration setting, and some individual FRQ/conceptual generations
+// occasionally run longer than that (confirmed live, not a concurrency
+// effect). Running in this plain Node process has no such ceiling.
 
 import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
 import { getPack } from '../src/packs/loader.js'
 import { checkBankHealth } from '../src/engine/bank-manager.js'
-import { postBankFill } from '../src/lib/triggerBankFill.js'
+import { fillBank } from '../src/lib/bankFill.js'
 
 loadEnv({ path: '.env.local' })
 
@@ -90,19 +93,15 @@ async function cmdFill(options) {
     console.error('Usage: manage-bank.js fill --pack <pack-id> --topic <topic-id> --type <mc|conceptual|frq>')
     process.exit(1)
   }
-  const result = await postBankFill({ packId, topicId, questionType })
+  const result = await fillBank({ packId, topicId, questionType })
   console.log(`Generated ${result.generated} ${result.question_type} question(s) for ${result.topic_id}.`)
 }
 
-// Even with maxDuration raised to Vercel Hobby's 60s ceiling, some
-// individual FRQ/conceptual generations still occasionally run long
-// enough to hit FUNCTION_INVOCATION_TIMEOUT — confirmed live, and not a
-// concurrency effect (still happened running one pack alone). Since
-// retrying the exact same failed combo usually succeeds on a later
-// attempt, retry in-place a few times before counting it as a real
-// failure, rather than requiring a manual second fill-all pass.
-const MAX_ATTEMPTS = 4
-const RETRY_DELAY_MS = 3000
+// A light retry for genuine transient failures (network blips, Claude API
+// rate limits) — no longer specifically about escaping a Vercel timeout,
+// since fillBank now runs directly in this process.
+const MAX_ATTEMPTS = 3
+const RETRY_DELAY_MS = 2000
 
 function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
@@ -112,7 +111,7 @@ async function fillWithRetry(packId, topicId, questionType) {
   let lastErr
   for (let attempt = 1; attempt <= MAX_ATTEMPTS; attempt++) {
     try {
-      return await postBankFill({ packId, topicId, questionType })
+      return await fillBank({ packId, topicId, questionType })
     } catch (err) {
       lastErr = err
       if (attempt < MAX_ATTEMPTS) {

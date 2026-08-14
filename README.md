@@ -93,10 +93,7 @@ git push -u origin main
 2. In **Project Settings → Environment Variables**, add all vars from
    `.env.local.example` with your real values (Production + Preview +
    Development). `SUPABASE_SERVICE_ROLE_KEY` and `ANTHROPIC_API_KEY` must
-   never get a `VITE_` prefix. `APP_BASE_URL` (Phase 6+) should be the
-   deployed site's own origin — a serverless function calling one of its
-   own sibling endpoints has no implicit "call myself" URL, so this makes
-   it explicit.
+   never get a `VITE_` prefix.
 3. Deploy. Every push to `main` auto-deploys.
 
 ## Accounts, roles, and the parent PIN
@@ -293,25 +290,27 @@ returns `{ content, tokens_used }`. Every Phase 6 route builds its own
 prompt text and calls this rather than touching the Anthropic SDK
 directly.
 
-**Bank** (`api/bank/index.js`, `GET` = serve / `POST` = fill — see the
-function-count note below for why they share a file):
+**Bank generation** (`src/lib/bankFill.js`, `fillBank({ packId, topicId,
+questionType })`) is the actual prompt-building + Claude call + Supabase
+insert logic for one batch of questions (MC 10 / conceptual 5 / FRQ 3 per
+call). It's a plain function, not tied to being called over HTTP — it's
+called from three places:
 
-- `POST` generates one batch of questions (MC 10 / conceptual 5 / FRQ 3
-  per call) for a `pack_id` + `topic_id` + `question_type` and inserts
-  them into `question_bank`. It's an internal endpoint — only our own
-  backend calls it, authenticated with the same `SUPABASE_SERVICE_ROLE_KEY`
-  already used everywhere else server-side, sent as an
-  `X-Service-Role-Key` header (there's no separate "service role" concept
-  for our own HTTP API the way there is for Supabase, so the
-  already-guarded key doubles as the shared secret rather than adding a
-  second one).
-- `GET` picks one question for a student: prefers never-seen, falls back
-  to not-seen-in-60-days, and if truly exhausted triggers an async fill
-  while still returning the least-recently-seen question rather than
-  making the student wait. `key_reasoning` and each option's
-  `distractor_note` are stripped before the response ever reaches the
-  client — that's what actually keeps the answer key server-side, not
-  just convention.
+- `api/bank/index.js`'s `POST` handler — a thin wrapper (auth check, then
+  `fillBank`), for a single async fill triggered from a running request.
+- `src/engine/bank-manager.js`'s `triggerBankFill` — fire-and-forget, from
+  `startSession`.
+- `scripts/manage-bank.js`'s `fill`/`fill-all` — called **directly**, not
+  over HTTP. See the note below for why.
+
+**Bank serving** (`api/bank/index.js`'s `GET` handler — combined with the
+`POST` fill handler in one file, see the function-count note below) picks
+one question for a student: prefers never-seen, falls back to
+not-seen-in-60-days, and if truly exhausted triggers an async fill while
+still returning the least-recently-seen question rather than making the
+student wait. `key_reasoning` and each option's `distractor_note` are
+stripped before the response ever reaches the client — that's what
+actually keeps the answer key server-side, not just convention.
 
 **Grading** (`api/grading/grade.js`, one endpoint handling all three
 question types — same function-count reason): MC grading is fully
@@ -366,6 +365,20 @@ merging bank fill+serve into one `api/bank/index.js` (dispatched on
 (dispatched on the loaded question's `question_type` plus which body
 field the client sent), and deleting the unused Phase 1 `api/session`
 stub. That's 9 functions now — some headroom for what Phase 7+ adds.
+
+**Vercel's Hobby plan also hard-caps a function's execution at 60
+seconds**, even with `maxDuration` set to that max (see `vercel.json`).
+Populating the bank at scale (`fill-all`) surfaced this: some individual
+FRQ/conceptual generations occasionally ran long enough to hit
+`FUNCTION_INVOCATION_TIMEOUT`, confirmed not to be a concurrency effect
+(it kept happening running one pack's `fill-all` alone). This is why
+`fillBank` lives in `src/lib/bankFill.js` as a plain function rather than
+being HTTP-only: `scripts/manage-bank.js` calls it directly, in-process,
+so a bulk `fill-all` run has no execution-time ceiling at all. The `POST
+/api/bank` endpoint stays subject to the 60s limit, which is fine for its
+actual real-time use (a single async trigger, not a 100+ item loop).
+`fill-all` also retries each item a few times on transient failures
+before giving up on it.
 
 ## Phase 6 milestone checklist
 

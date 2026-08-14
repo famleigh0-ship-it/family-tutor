@@ -1,12 +1,29 @@
 import Anthropic from '@anthropic-ai/sdk'
 
-// Plain JS (not .ts) so api/bank/fill.js, api/grading/grade-typed.js,
-// api/grading/grade-photo.js, and api/hints/get-hint.js can import this
+// Plain JS (not .ts) so api/bank/index.js, api/grading/grade.js,
+// api/hints/get-hint.js, and src/lib/bankFill.js can import this
 // directly. Vercel's serverless function bundler cannot resolve a
 // directly-imported .ts file at runtime — see src/packs/loader.js
 // (Phase 5) for the original discovery of this limitation.
 
-export const claude = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+// Lazy singleton rather than a top-level `new Anthropic(...)`: this
+// module is now imported by scripts/manage-bank.js (via bankFill.js),
+// where dotenv's loadEnv() call runs *after* all of a script's own
+// imports resolve (standard ESM import ordering) — a top-level
+// construction would read process.env.ANTHROPIC_API_KEY before it's
+// populated. Confirmed live: "Could not resolve authentication method."
+// Vercel functions get env vars injected before any code runs, so this
+// never surfaced there — only once a plain Node script imported this
+// module transitively for the first time.
+/** @type {Anthropic | undefined} */
+let claudeClient
+
+function getClaudeClient() {
+  if (!claudeClient) {
+    claudeClient = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
+  }
+  return claudeClient
+}
 
 export const MODELS = {
   SONNET: 'claude-sonnet-4-6',
@@ -50,7 +67,7 @@ export const MAX_HISTORY_SESSIONS = 5
  */
 export async function callClaude(params) {
   const model = getModel(params.task)
-  const response = await claude.messages.create({
+  const response = await getClaudeClient().messages.create({
     model,
     max_tokens: params.max_tokens ?? 1000,
     system: params.system,

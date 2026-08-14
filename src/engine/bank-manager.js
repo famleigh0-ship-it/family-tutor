@@ -7,7 +7,7 @@
 
 import { createClient } from '@supabase/supabase-js'
 import { getPack } from '../packs/loader.js'
-import { postBankFill } from '../lib/triggerBankFill.js'
+import { fillBank } from '../lib/bankFill.js'
 
 /** @typedef {{ topic_id: string, question_type: string, total_in_bank: number, unseen_by_user: number, needs_fill: boolean }} BankHealthEntry */
 
@@ -98,9 +98,9 @@ export async function checkBankHealth(packId, userId) {
 }
 
 /**
- * Fire-and-forget trigger — posts to /api/bank/fill and logs the result.
- * Never throws, so callers (e.g. startSession) can call this without
- * awaiting it and without risking an unhandled rejection.
+ * Fire-and-forget trigger — calls fillBank in-process and logs the
+ * result. Never throws, so callers (e.g. startSession) can call this
+ * without awaiting it and without risking an unhandled rejection.
  * @param {string} packId
  * @param {string} topicId
  * @param {string} questionType
@@ -108,7 +108,7 @@ export async function checkBankHealth(packId, userId) {
  */
 export async function triggerBankFill(packId, topicId, questionType) {
   try {
-    const result = await postBankFill({ packId, topicId, questionType })
+    const result = await fillBank({ packId, topicId, questionType })
     console.log(`[bank-manager] filled ${topicId} (${questionType}): ${result.generated} generated`)
   } catch (err) {
     console.error(`[bank-manager] fill trigger failed for ${topicId} (${questionType})`, err)

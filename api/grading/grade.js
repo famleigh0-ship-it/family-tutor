@@ -8,7 +8,7 @@ import { getUserFromRequest, getUserProfile, getSupabaseAdmin } from '../_lib/su
 import { loadOwnedSession, updatePendingHistory } from '../_lib/grading.js'
 import { getPack } from '../../src/packs/loader.js'
 import { callClaude } from '../../src/lib/claude.js'
-import { parseClaudeJson } from '../_lib/claudeJson.js'
+import { parseClaudeJson } from '../../src/lib/claudeJson.js'
 import { recordQuestionResult } from '../../src/engine/session-orchestrator.js'
 
 // 3-4 out of 4 counts as "correct" for the mastery_records.correct tally
