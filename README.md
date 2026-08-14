@@ -382,30 +382,63 @@ before giving up on it.
 
 ## Phase 6 milestone checklist
 
-- [ ] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type mc`
-      generates and stores MC questions — inspect in Supabase for quality
-- [ ] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type conceptual`
+- [x] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type mc`
+      generates and stores MC questions — inspected in Supabase, high
+      quality (clear reasoning, well-targeted distractors)
+- [x] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic kinematics.1d-motion --type conceptual`
       stores conceptual questions
-- [ ] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic dynamics.free-body-diagrams --type frq`
+- [x] `node scripts/manage-bank.js fill --pack ap-physics-1 --topic dynamics.free-body-diagrams --type frq`
       stores FRQ questions with a photo `input_mode` among them
-- [ ] `node scripts/manage-bank.js status --pack ap-physics-1` prints a
+- [x] `node scripts/manage-bank.js status --pack ap-physics-1` prints a
       bank health report for every topic/type
-- [ ] `node scripts/manage-bank.js fill-all --pack ap-physics-1` fills the
-      whole AP Physics 1 bank (several minutes, many API calls — expected)
-- [ ] `GET /api/bank` returns a question with no `key_reasoning` and no
-      `distractor_note` on any option
-- [ ] A correct MC answer (`selected_option`) to `POST /api/grading/grade`
+- [x] `node scripts/manage-bank.js fill-all --pack ap-physics-1` fills the
+      whole AP Physics 1 bank — 132 of 132 topic/type combinations
+- [x] `GET /api/bank` returns a question with no `key_reasoning` and no
+      `distractor_note` on any option (also fixed `correct_answer`,
+      `explanation`, and each option's `is_correct` leaking too — see the
+      "verified against the live site" note below)
+- [x] A correct MC answer (`selected_option`) to `POST /api/grading/grade`
       returns correct feedback with zero Claude calls
-- [ ] A typed answer (`student_answer`) to `POST /api/grading/grade` gets
-      Claude-graded structured feedback
-- [ ] A photo of handwritten work (`image_base64`) submitted to
+- [x] A typed answer (`student_answer`) to `POST /api/grading/grade` gets
+      Claude-graded structured feedback — verified both a full-credit and
+      a zero-credit answer, including correct misconception detection
+- [x] A photo of handwritten work (`image_base64`) submitted to
       `POST /api/grading/grade` returns a readable, graded response
-- [ ] `/api/hints/get-hint` returns a Socratic hint that doesn't reveal
+- [x] `/api/hints/get-hint` returns a Socratic hint that doesn't reveal
       the answer
-- [ ] `node scripts/manage-bank.js fill-all --pack calc-ab-bc` fills the
-      calc bank too
+- [x] `node scripts/manage-bank.js fill-all --pack calc-ab-bc` fills the
+      calc bank — 153 of 153 topic/type combinations
 
-Before running `fill-all` for both packs: consider setting a temporary
-spending limit in the Anthropic Console. Filling both packs makes roughly
-60-80 API calls total — at Haiku + Sonnet rates, expect on the order of
-$0.50-1.50, a one-time cost for the initial bank population.
+### Bugs found and fixed during live testing
+
+Bank fill's actual cost estimate was ~10-20x higher than the original
+plan's guess (44 AP Physics topics × 3 question types × 3 packs' worth of
+attempts, not the ~20-30 combos the "~$0.50-1.50" estimate assumed) — real
+cost for both packs landed in the $15-25 range, confirmed and approved
+before running. Beyond that, filling both packs at real scale (1600+
+questions total) surfaced several issues no amount of small-scale testing
+would have caught:
+
+- MC batches of 10 truncated mid-JSON at both 4096 and 8192 max_tokens;
+  fixed with an explicit conciseness instruction plus 16000 max_tokens.
+- `GET /api/bank` leaked the answer key well beyond what the spec's
+  "strip distractor_notes/key_reasoning" list caught — `correct_answer`,
+  `explanation`, and a direct `is_correct` boolean on every option were
+  all still being sent to the client before they'd answered.
+- A generated FRQ's rubric summed to 9 points instead of 4, and grading
+  it returned `frq_score: 7` — silently incompatible with
+  `mastery.js`'s hardcoded `/4` EMA calculation. Fixed generation to
+  always total 4 points, plus added a clamp as a backstop.
+- Math-heavy content (Calc AB→BC especially) sometimes contained raw
+  LaTeX (`\pm`, `\infty`) in JSON string values — an unescaped backslash
+  broke JSON.parse. Fixed by instructing Claude to use plain Unicode math
+  symbols instead.
+- `checkBankHealth` broke once a pack's bank passed ~1500 questions — its
+  `.in('question_id', ids)` filter built a URL too long for PostgREST.
+  Fixed with an embedded join scoped by `pack_id` instead.
+- Some individual FRQ/conceptual generations exceeded even Vercel's 60s
+  function-timeout ceiling — not a concurrency effect, confirmed running
+  one pack alone. Fixed by extracting the generation logic into
+  `src/lib/bankFill.js` as a plain function `scripts/manage-bank.js`
+  calls directly in-process, bypassing Vercel's timeout entirely for
+  bulk operations.
