@@ -97,11 +97,18 @@ export default function MasteryHeatmap({ packId, units, readOnly = false }: Prop
                         onClick={() => setExpandedTopicId(isExpanded ? null : topic.id)}
                         className={`flex min-h-[44px] w-full flex-col gap-1 rounded-lg px-2 py-2 text-left ${cellClasses}`}
                       >
-                        <span className="flex items-center gap-1 text-xs font-medium leading-tight">
+                        {/* Plain inline flow, not flex — topic names vary a lot in
+                            length and wrap to 1-2 lines in this narrow grid column.
+                            A flex row with items-center centers the BC badge against
+                            whatever height the wrapped text ends up, so it landed in a
+                            different vertical spot per card depending on wrap. Inline
+                            flow lets the badge sit right after the last word of the
+                            name, wherever that lands, like any other inline element. */}
+                        <span className="text-xs font-medium leading-tight">
                           {locked && topic.bc_only ? '🔒 ' : ''}
                           {topic.name}
                           {topic.bc_only && (
-                            <span className="rounded-full bg-purple-600 px-1.5 py-0.5 text-[9px] font-semibold text-white">
+                            <span className="ml-1 inline-block whitespace-nowrap rounded-full bg-purple-600 px-1.5 py-0.5 align-middle text-[9px] font-semibold text-white">
                               BC
                             </span>
                           )}
