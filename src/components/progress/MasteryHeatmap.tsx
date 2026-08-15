@@ -13,15 +13,29 @@ interface Props {
 // here); see api/progress/index.js's heatmapTier for why. Classes carry
 // both light and dark-mode pairs since the app's Tailwind darkMode is
 // 'media' (OS-driven, no manual toggle).
+//
+// Phase 11: the original dark-mode fills (*-950, slate-900/slate-600 text)
+// measured at ~1.1-1.3:1 contrast against the page's slate-950 background —
+// tiles were nearly invisible against the page, and locked-tile text came in
+// around 2.4:1 against its own background, well under WCAG AA's 4.5:1 for
+// text. Backgrounds bumped one step lighter, text lightened, and an explicit
+// border added so every cell reads as a distinct element regardless of fill
+// color — confirmed live on a real device during Phase 11 launch testing.
 const TIER_CLASSES: Record<MasteryTier, string> = {
-  none: 'bg-gray-100 text-gray-500 dark:bg-slate-800 dark:text-slate-400',
-  developing: 'bg-red-200 text-red-800 dark:bg-red-950 dark:text-red-300',
-  practicing: 'bg-amber-200 text-amber-800 dark:bg-amber-950 dark:text-amber-300',
-  solid: 'bg-blue-200 text-blue-800 dark:bg-blue-950 dark:text-blue-300',
-  mastered: 'bg-green-200 text-green-800 dark:bg-green-950 dark:text-green-300'
+  none: 'bg-gray-100 text-gray-500 dark:border dark:border-slate-700 dark:bg-slate-800 dark:text-slate-300',
+  developing: 'bg-red-200 text-red-800 dark:border dark:border-red-800 dark:bg-red-900 dark:text-red-200',
+  practicing: 'bg-amber-200 text-amber-800 dark:border dark:border-amber-800 dark:bg-amber-900 dark:text-amber-200',
+  solid: 'bg-blue-200 text-blue-800 dark:border dark:border-blue-800 dark:bg-blue-900 dark:text-blue-200',
+  mastered: 'bg-green-200 text-green-800 dark:border dark:border-green-800 dark:bg-green-900 dark:text-green-200'
 }
 
-const LOCKED_CLASSES = 'bg-slate-100 text-slate-400 opacity-70 dark:bg-slate-900 dark:text-slate-600'
+// dark:opacity-100 overrides the light-mode opacity-70 dimming — at 70%
+// opacity, even a lightened background blends back toward the page's
+// near-black, undermining the contrast fix above. The muted "locked" look
+// instead comes entirely from color choice (darker/less saturated than the
+// other tiers) rather than transparency.
+const LOCKED_CLASSES =
+  'bg-slate-100 text-slate-400 opacity-70 dark:border dark:border-slate-700 dark:bg-slate-900 dark:text-slate-400 dark:opacity-100'
 
 function formatLastPracticed(lastSeen: string | null) {
   if (!lastSeen) return 'Never'
@@ -54,7 +68,7 @@ export default function MasteryHeatmap({ packId, units, readOnly = false }: Prop
       {units.map((unit) => {
         const isCollapsed = collapsed.has(unit.id)
         return (
-          <div key={unit.id} className="rounded-xl border border-slate-200 dark:border-slate-800">
+          <div key={unit.id} className="rounded-xl border border-slate-200 dark:border-slate-800 dark:bg-slate-900">
             <button
               type="button"
               onClick={() => toggleUnit(unit.id)}
