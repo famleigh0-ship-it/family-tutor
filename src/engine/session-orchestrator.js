@@ -103,11 +103,11 @@ export async function getActiveQuizPrepEvent(userId, packId) {
 }
 
 /**
- * @param {{ userId: string, packId: string, targetDurationMinutes: number }} params
+ * @param {{ userId: string, packId: string, targetDurationMinutes: number, forceTopicIds?: string[] }} params
  * @returns {Promise<(import('./types').SessionPlan & { sessionId: string }) | import('./types').RequiresPostQuiz>}
  */
 export async function startSession(params) {
-  const { userId, packId, targetDurationMinutes } = params
+  const { userId, packId, targetDurationMinutes, forceTopicIds } = params
   const admin = getSupabaseAdmin()
   const pack = getPack(packId)
   const now = new Date()
@@ -280,7 +280,8 @@ export async function startSession(params) {
     quizPrepTopicIds,
     recentTopicIds,
     targetDurationMinutes,
-    quizPrepDaysUntilQuiz
+    quizPrepDaysUntilQuiz,
+    forceTopicIds
   })
 
   // 9b. Quiz-prep only: drop any selected topic whose bank is entirely

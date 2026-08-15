@@ -507,21 +507,138 @@ pacing-calendar script, neither of which needs an HTTP route of its own.
 
 ## Phase 8 milestone checklist
 
-- [ ] `/quiz-prep/ap-physics-1` → select 2-3 topics, pick a date 4 days
+- [x] `/quiz-prep/ap-physics-1` → select 2-3 topics, pick a date 4 days
       out, confirm — `quiz_prep_events` row appears in Supabase
-- [ ] `/home` shows `QuizPrepCard` with the selected topics and days until
+- [x] `/home` shows `QuizPrepCard` with the selected topics and days until
       quiz
-- [ ] Starting a session shows `mode: 'quiz-prep'` in the plan, with quiz
+- [x] Starting a session shows `mode: 'quiz-prep'` in the plan, with quiz
       topics filling the first ~70-80% of the question order
-- [ ] Manually setting `quiz_date` to yesterday in Supabase, then starting
+- [x] Manually setting `quiz_date` to yesterday in Supabase, then starting
       a session, shows `PostQuizPrompt` before any session starts
-- [ ] Selecting "Rough" updates `post_quiz_result`, decreases the quiz
+- [x] Selecting "Rough" updates `post_quiz_result`, decreases the quiz
       topics' `mastery_records`, and sets `prioritized_until` ~7 days out
       in `topic_unlock_log`
-- [ ] Selecting "Good" on a different event increases `mastery_records`
-- [ ] Tapping "Skip for now" 3 times auto-dismisses the prompt
+- [x] Selecting "Good" on a different event increases `mastery_records`
+- [x] Tapping "Skip for now" 3 times auto-dismisses the prompt
       (`post_quiz_result` ends up `'skipped'`)
-- [ ] Parent dashboard shows active quiz prep + result history per student
+- [x] Parent dashboard shows active quiz prep + result history per student
       per course
-- [ ] `node scripts/run-pacing-calendar.js` expires stale events and logs
+- [x] `node scripts/run-pacing-calendar.js` expires stale events and logs
       the count
+
+## Progress view and the parent dashboard
+
+`/progress/:packId` (student) and `/parent` → `/parent/:studentId` (parent,
+behind the Phase 2 PIN gate) are the visibility surfaces built on top of
+Phases 4-8's engine and session data: a mastery heatmap per unit, a weak-spot
+callout, session history, and a GitHub-style streak calendar. The parent
+views are the same components in read-only mode (no "Practice this
+topic"/"Practice weak spots" actions) plus per-student aggregation.
+
+**One new API function, not five.** The spec's file structure calls for five
+separate routes (`progress/mastery-summary.js`, `progress/session-history.js`,
+`progress/weak-spots.js`, `parent/students.js`, `parent/student-detail.js`).
+Phase 6 and 7/8 already spent Vercel Hobby's 12-function budget down to 11 —
+five more would have blown well past the cap the same way the original
+per-question-type grading routes and per-endpoint quiz-prep routes would
+have. All five (plus a sixth, `streak-calendar`, that the spec didn't call
+out as its own file but needs the same server-side table access) are one
+function, `api/progress/index.js`, dispatched on `?type=`. That lands the
+deployment at exactly 12 — no headroom left for a future phase without
+merging something else first.
+
+Every type reads through the service role rather than any direct Supabase
+client call, even for the student's own data: `mastery_records`, `sessions`,
+and `question_log` have no RLS policy at all (same reasoning as `sessions`
+in Phase 7 and `quiz_prep_events` in Phase 8), and a parent reading a
+linked student's `streaks` row has no RLS path either (`streaks`' only
+policy is "select own"). `parent-student-detail` verifies the `family_links`
+row before returning anything and 403s otherwise; the frontend treats a 403
+as "not linked" and bounces back to `/parent`.
+
+**Two color/label scales for mastery, deliberately.** `mastery.js`'s
+`getMasteryLabel` (Phase 4) — used throughout the session flow
+(`SessionSummary`, `api/session`'s `leanTopic`) — and the heatmap's color
+scale use different boundaries for the same score (0.4-0.59 is "Developing"
+under `getMasteryLabel` but "Practicing" under the heatmap's scale). This
+isn't a bug: the Phase 9 spec hands the heatmap an explicit five-tier scale
+with its own boundaries and its own "Not started" state driven by
+`attempts === 0` rather than score alone, and changing `getMasteryLabel` to
+match would have altered labels shown throughout the whole app for no
+requested reason. `WeakSpotCard` reuses `getMasteryLabel` (its example
+labels match); `MasteryHeatmap` uses the new scale, computed server-side in
+`api/progress/index.js`'s `heatmapTier` and shipped to the client as a
+`tier` slug plus a display `label`, not raw Tailwind classes.
+
+**"Practice this topic" / "Practice weak spots" forces the session plan.**
+Neither shortcut fit the existing mode system (`onboarding` /
+`adaptive` / `quiz-prep` / `exam-crunch`) — they're not a new mode, just an
+override of which topics get selected while keeping whatever mode would
+otherwise apply. `selectTopics` (`topic-selector.js`) takes an optional
+`forceTopicIds` and, if any of them resolve to a currently-unlocked topic,
+short-circuits straight to that set (sorted weakest-mastery-first, same as
+quiz-prep's forced topics) instead of running the mode-specific branches.
+`startSession` threads it through unchanged; `POST /api/session` accepts an
+optional `topic_ids` body field; `MasteryHeatmap`'s "Practice this topic" and
+`WeakSpotCard`'s "Practice weak spots" both navigate to `/session/:packId`
+with `{ state: { forceTopicIds } }`, and `Session.tsx` reads that once on
+mount, clears any stale resumable session for that pack first (a forced
+request is a deliberate choice — it shouldn't get intercepted by an old
+resume prompt), and sends it as `topic_ids`.
+
+**Streaks are global, not per-course.** The `streaks` table (Phase 1 schema)
+has one row per `user_id`, not per `(user_id, pack_id)` — `endSession`
+(`session-orchestrator.js`) has never scoped it by pack. So the "🔥 N day
+streak" on a single course's Progress page is the same number regardless of
+which course a session happened in; this phase didn't change that, just
+surfaced the existing value. The streak *calendar* (day-by-day activity
+grid), by contrast, is computed fresh per request from `sessions.started_at`
+and does take an optional `pack_id` filter — Progress.tsx passes the current
+course's; the parent detail view omits it for the combined "studied
+anything that day" view the spec asks for.
+
+**The parent dashboard's PIN re-prompt was already correct.** The spec asked
+to confirm the Phase 2 30-minute inactivity re-lock on `/parent` routes and
+fix it if not — `ParentPinGate.jsx`'s activity-listener/interval logic
+already re-locks correctly with no changes needed; both `/parent` and
+`/parent/:studentId` route through it in `App.jsx`.
+
+**File layout vs. the literal spec.** `Progress.jsx` and `ParentDashboard.jsx`
+were Phase 1-era placeholder stubs; this phase replaced them with `.tsx`
+(matching the Phase 7/8 convention of substantial UI pages being TypeScript)
+rather than keeping the `.jsx` extension. `ParentStudentDetail.tsx` stayed a
+separate file from `ParentDashboard.tsx` rather than folding into it (the
+spec's section headers suggest one file for both routes) — the existing
+routing already split `/parent` and `/parent/:studentId` into two page
+components, and merging them would have meant one file rendering two
+meaningfully different layouts behind a runtime branch for no real benefit.
+
+## Phase 9 milestone checklist
+
+- [ ] `/progress/ap-physics-1` as a student shows a mastery heatmap with
+      real data from Phase 7 testing sessions
+- [ ] Heatmap colors match mastery levels: 0-attempt topics show gray "Not
+      started"; practiced topics show the correct tier color
+- [ ] Tapping a topic cell shows attempts, last-practiced date, and (if
+      unlocked) a "Practice this topic" shortcut that forces it into the
+      next session
+- [ ] The weak spot card's top 3 match a manual cross-check against
+      `mastery_records` in Supabase using the spec's scoring formula
+- [ ] Session history shows the last 10 sessions with correct dates,
+      durations, scores, and topics; tapping a row expands per-question
+      results
+- [ ] The streak calendar shows green on days sessions were completed
+- [ ] `/parent` (after PIN) shows all linked students with summary cards
+- [ ] The last-log warning (⚠) appears only when unlogged 3+ days *and*
+      today is a weekday
+- [ ] "View Detail →" shows the full per-student view with every section
+      populated
+- [ ] The parent's mastery heatmap has no "Practice this topic" button
+- [ ] Quiz prep status shows correctly on the parent detail view when an
+      active event exists
+- [ ] Visiting `/parent/:studentId` for an unlinked student 403s and
+      redirects back to `/parent`
+- [ ] Exam countdown shows the correct day count and threshold color
+- [ ] Parent dashboard load time is under 2 seconds (Network tab)
+- [ ] On a 375px viewport: heatmap scrolls smoothly, topic cells are ≥44px
+      tall, and the parent dashboard is readable and navigable

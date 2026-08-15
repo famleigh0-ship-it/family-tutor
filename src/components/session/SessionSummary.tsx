@@ -1,4 +1,5 @@
 import { useEffect, useMemo } from 'react'
+import { Link } from 'react-router-dom'
 import type { AnsweredResult, SessionTopic } from './types'
 
 interface TopicAfter {
@@ -128,6 +129,10 @@ export default function SessionSummary({
       >
         Back to Home
       </button>
+
+      <Link to={`/progress/${packId}`} className="block text-sm text-slate-500 underline dark:text-slate-400">
+        View your progress →
+      </Link>
     </div>
   )
 }

@@ -111,7 +111,8 @@ function ensureIncluded(selected, candidate, maxTopics) {
  *   quizPrepTopicIds: string[],
  *   recentTopicIds: string[],
  *   targetDurationMinutes: number,
- *   quizPrepDaysUntilQuiz?: number
+ *   quizPrepDaysUntilQuiz?: number,
+ *   forceTopicIds?: string[]
  * }} params
  * @returns {import('./types').SessionPlan}
  */
@@ -125,7 +126,8 @@ export function selectTopics(params) {
     quizPrepTopicIds,
     recentTopicIds,
     targetDurationMinutes,
-    quizPrepDaysUntilQuiz
+    quizPrepDaysUntilQuiz,
+    forceTopicIds
   } = params
 
   const now = new Date()
@@ -173,6 +175,29 @@ export function selectTopics(params) {
       target_question_count: 0,
       target_duration_minutes: 0,
       notes: ['No unlocked topics available']
+    }
+  }
+
+  // STEP 1b — forced topics (Progress view's "Practice this topic" /
+  // "Practice weak spots" shortcuts) short-circuit the mode-specific
+  // selection below entirely, the same way quiz-prep's forced topics do,
+  // but for the whole plan rather than just a portion of it. Sorted by
+  // mastery ascending — weakest first — same reasoning as quiz-prep's
+  // forced sort. Falls through to normal mode-based selection if none of
+  // the requested ids are actually unlocked (e.g. stale link, topic
+  // re-locked) rather than returning an empty plan.
+  if (forceTopicIds && forceTopicIds.length > 0) {
+    const forceSet = new Set(forceTopicIds)
+    const forced = candidates.filter((t) => forceSet.has(t.id)).sort((a, b) => a.mastery_score - b.mastery_score).slice(0, MAX_TOPICS)
+
+    if (forced.length > 0) {
+      return {
+        mode,
+        topics: forced,
+        target_question_count: forced.length * QUESTIONS_PER_TOPIC,
+        target_duration_minutes: targetDurationMinutes,
+        notes: [`Focused practice: ${forced.map((t) => t.name).join(', ')}`]
+      }
     }
   }
 

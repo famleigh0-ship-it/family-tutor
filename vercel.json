@@ -5,6 +5,7 @@
   "functions": {
     "api/bank/index.js": { "maxDuration": 60 },
     "api/grading/grade.js": { "maxDuration": 60 },
-    "api/session/index.js": { "maxDuration": 30 }
+    "api/session/index.js": { "maxDuration": 30 },
+    "api/progress/index.js": { "maxDuration": 30 }
   }
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { useNavigate, useParams } from 'react-router-dom'
+import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import SessionShell from '../components/session/SessionShell'
 import QuestionCard from '../components/session/QuestionCard'
@@ -74,6 +74,16 @@ function deriveCorrect(result: GradeResult, questionType: QuestionType): boolean
 export default function Session() {
   const { packId } = useParams<{ packId: string }>()
   const navigate = useNavigate()
+  const location = useLocation()
+  // Set by the Progress view's "Practice this topic" / "Practice weak
+  // spots" shortcuts (src/components/progress) — forces these topics into
+  // the plan instead of normal adaptive selection. Read once on mount;
+  // not re-read on subsequent renders since initSession only ever runs once.
+  const forceTopicIdsRef = useRef<string[] | undefined>(
+    Array.isArray((location.state as { forceTopicIds?: string[] } | null)?.forceTopicIds)
+      ? (location.state as { forceTopicIds: string[] }).forceTopicIds
+      : undefined
+  )
 
   const [phase, setPhase] = useState<Phase>('loading')
   const [plan, setPlan] = useState<SessionPlanResponse | null>(null)
@@ -176,7 +186,10 @@ export default function Session() {
       const res = await fetch('/api/session', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ pack_id: packId })
+        body: JSON.stringify({
+          pack_id: packId,
+          ...(forceTopicIdsRef.current ? { topic_ids: forceTopicIdsRef.current } : {})
+        })
       })
       const body = await res.json()
       if (!res.ok) throw new Error(body.error || 'Failed to start session')
@@ -233,6 +246,16 @@ export default function Session() {
 
   useEffect(() => {
     if (!packId) return
+
+    // A forced-topic request (Practice this topic / Practice weak spots)
+    // is an explicit, deliberate choice — don't let a stale resumable
+    // session for this pack intercept it with the resume prompt instead.
+    if (forceTopicIdsRef.current) {
+      clearStoredSession(packId)
+      initSession()
+      return
+    }
+
     const stored = readStoredSession(packId)
     if (!stored) {
       initSession()

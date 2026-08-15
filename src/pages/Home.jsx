@@ -176,6 +176,10 @@ export default function Home() {
                   </p>
                 </Link>
 
+                <Link to={`/progress/${pack.id}`} className="block text-sm text-slate-500 underline">
+                  My Progress →
+                </Link>
+
                 {sessionCompleteToday[pack.id] && (
                   <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                     Session complete ✓ — {sessionCompleteToday[pack.id].date}

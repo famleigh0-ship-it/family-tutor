@@ -29,9 +29,13 @@ function leanTopic(t) {
 }
 
 async function handleStart(req, res, user) {
-  const { pack_id: packId } = req.body || {}
+  const { pack_id: packId, topic_ids: topicIds } = req.body || {}
   if (typeof packId !== 'string' || !packId) {
     res.status(400).json({ error: 'pack_id is required' })
+    return
+  }
+  if (topicIds !== undefined && (!Array.isArray(topicIds) || topicIds.some((id) => typeof id !== 'string'))) {
+    res.status(400).json({ error: 'topic_ids must be an array of strings' })
     return
   }
 
@@ -44,10 +48,15 @@ async function handleStart(req, res, user) {
   }
 
   try {
+    // topic_ids: set by the Progress view's "Practice this topic" /
+    // "Practice weak spots" shortcuts (src/components/progress) to force
+    // specific topics into the plan regardless of normal adaptive
+    // selection — see selectTopics' forceTopicIds branch.
     const plan = await startSession({
       userId: user.id,
       packId,
-      targetDurationMinutes: DEFAULT_TARGET_DURATION_MINUTES
+      targetDurationMinutes: DEFAULT_TARGET_DURATION_MINUTES,
+      forceTopicIds: topicIds
     })
 
     // Quiz-prep gate: startSession found a quiz_prep_event whose quiz has
