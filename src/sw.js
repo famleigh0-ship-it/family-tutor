@@ -5,10 +5,23 @@
 // default generateSW (that mode writes the whole worker itself, leaving no
 // room for the routing logic below).
 
+import { clientsClaim } from 'workbox-core'
 import { precacheAndRoute, cleanupOutdatedCaches, createHandlerBoundToURL, matchPrecache } from 'workbox-precaching'
 import { registerRoute, NavigationRoute, setCatchHandler } from 'workbox-routing'
 import { NetworkFirst } from 'workbox-strategies'
 import { CacheableResponsePlugin } from 'workbox-cacheable-response'
+
+// Without these two, a newly-installed service worker sits in "waiting"
+// state and the OLD one keeps controlling every open tab — including
+// intercepting navigations and serving the OLD precached index.html/JS/CSS
+// — until every tab for this origin is fully closed and reopened. Confirmed
+// live during Phase 11: pushed a new deploy, Vercel showed it as Ready, but
+// the browser kept serving the previous build indefinitely even across
+// hard-reloads. skipWaiting activates the new worker immediately once
+// installed; clientsClaim hands it control of already-open tabs right away
+// instead of waiting for their next navigation.
+self.skipWaiting()
+clientsClaim()
 
 // "Cache First for shell assets" — precacheAndRoute serves every hashed
 // build asset (JS/CSS/HTML/icons) from cache first, only refetching when
