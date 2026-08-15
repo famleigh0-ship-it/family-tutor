@@ -407,14 +407,16 @@ export default function Session() {
 
   if (!packId) {
     return (
-      <div className="flex h-screen items-center justify-center text-slate-500 dark:text-slate-400">Unknown course.</div>
+      <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-500 dark:bg-slate-950 dark:text-slate-400">
+        Unknown course.
+      </div>
     )
   }
 
   if (phase === 'resume-prompt' && storedForPrompt) {
     return (
-      <div className="mx-auto max-w-sm space-y-4 px-4 py-10 text-center">
-        <p className="text-lg font-medium text-slate-900 dark:text-slate-50">Continue where you left off?</p>
+      <div className="mx-auto min-h-screen max-w-sm animate-[fadeIn_150ms_ease-in] space-y-4 bg-slate-50 px-4 py-10 text-center dark:bg-slate-950">
+        <h1 className="text-lg font-medium text-slate-900 dark:text-slate-50">Continue where you left off?</h1>
         <p className="text-sm text-slate-500 dark:text-slate-400">
           You have a session in progress for {storedForPrompt.packName}.
         </p>
@@ -474,7 +476,11 @@ export default function Session() {
         </div>
       )
     }
-    return <div className="flex h-screen items-center justify-center text-slate-500 dark:text-slate-400">Loading your session...</div>
+    return (
+      <div className="flex h-screen items-center justify-center bg-slate-50 text-slate-500 dark:bg-slate-950 dark:text-slate-400">
+        Loading your session...
+      </div>
+    )
   }
 
   // topic-selector.js pushes a "Quiz today!"/"Quiz prep: ..." line into

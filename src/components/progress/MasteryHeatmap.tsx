@@ -111,7 +111,7 @@ export default function MasteryHeatmap({ packId, units, readOnly = false }: Prop
                             <button
                               type="button"
                               onClick={() => practiceTopic(topic.id)}
-                              className="mt-3 w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"
+                              className="mt-3 min-h-[44px] w-full rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"
                             >
                               Practice this topic
                             </button>

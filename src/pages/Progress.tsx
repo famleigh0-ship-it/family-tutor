@@ -101,7 +101,7 @@ export default function Progress() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <TopBar title="FALP" />
       <main className="mx-auto max-w-sm space-y-6 px-4 py-8">
         <div>

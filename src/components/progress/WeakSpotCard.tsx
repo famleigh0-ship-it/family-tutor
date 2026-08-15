@@ -20,7 +20,8 @@ export default function WeakSpotCard({ packId, weakSpots, readOnly = false }: Pr
   if (weakSpots.length === 0) {
     return (
       <div className="rounded-xl border border-slate-200 p-4 text-sm text-slate-500 dark:border-slate-800 dark:text-slate-400">
-        No focus areas yet — keep practicing to build up mastery data.
+        No focus areas to show right now. Keep practicing to build up mastery data, or great work if you've already
+        mastered everything here!
       </div>
     )
   }
@@ -51,7 +52,7 @@ export default function WeakSpotCard({ packId, weakSpots, readOnly = false }: Pr
           onClick={() =>
             navigate(`/session/${packId}`, { state: { forceTopicIds: weakSpots.map((s) => s.topic_id) } })
           }
-          className="mt-4 w-full rounded-lg bg-amber-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-amber-200 dark:text-amber-950"
+          className="mt-4 min-h-[44px] w-full rounded-lg bg-amber-900 px-4 py-2.5 text-sm font-medium text-white dark:bg-amber-200 dark:text-amber-950"
         >
           Practice weak spots
         </button>

@@ -49,7 +49,11 @@ export default function SessionHistoryList({ packId, sessions, token, expandable
   }
 
   if (sessions.length === 0) {
-    return <p className="text-sm text-slate-500 dark:text-slate-400">No sessions yet.</p>
+    return (
+      <p className="text-sm text-slate-500 dark:text-slate-400">
+        No sessions yet. Start your first session to see your history here.
+      </p>
+    )
   }
 
   return (

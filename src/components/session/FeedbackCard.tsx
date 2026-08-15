@@ -49,7 +49,7 @@ export default function FeedbackCard({ question, result, isLast, onNext, crunchM
   const style = TONE_STYLES[tone]
 
   return (
-    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 dark:border-slate-800">
+    <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 [animation:slideUp_200ms_ease-out] dark:border-slate-800">
       <div className={`px-4 py-3 text-base font-semibold ${style.bar}`}>{style.label}</div>
 
       <div className="max-h-[60vh] space-y-4 overflow-y-auto p-4">

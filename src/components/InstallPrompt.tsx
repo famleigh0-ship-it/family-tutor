@@ -105,14 +105,14 @@ export default function InstallPrompt() {
           <button
             type="button"
             onClick={handleNotNow}
-            className="rounded-lg px-3 py-2 text-sm font-medium text-slate-500 dark:text-slate-400"
+            className="min-h-[44px] rounded-lg px-3 py-2 text-sm font-medium text-slate-500 dark:text-slate-400"
           >
             Not now
           </button>
           <button
             type="button"
             onClick={handleAdd}
-            className="rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"
+            className="min-h-[44px] rounded-lg bg-slate-900 px-3 py-2 text-sm font-medium text-white dark:bg-slate-100 dark:text-slate-900"
           >
             Add
           </button>
@@ -121,7 +121,7 @@ export default function InstallPrompt() {
 
       {showIOSInstructions && (
         <div className="fixed inset-0 z-40 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center">
-          <div className="w-full max-w-sm rounded-xl bg-white p-5 dark:bg-slate-900">
+          <div className="w-full max-w-sm rounded-xl bg-white p-5 [animation:slideUp_200ms_ease-out] dark:bg-slate-900">
             <p className="text-base font-medium text-slate-900 dark:text-slate-50">Add to Home Screen</p>
             <p className="mt-2 text-sm text-slate-600 dark:text-slate-300">
               Tap <span className="font-semibold">Share</span> in Safari's toolbar, then{' '}

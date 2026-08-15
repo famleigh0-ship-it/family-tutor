@@ -5,3 +5,25 @@
 html, body, #root {
   height: 100%;
 }
+
+/* Page-level fade-in on route change (Phase 11 polish) and feedback-card
+   slide-up after answer submit. Kept as plain keyframes rather than a
+   routing-transition library — this app's screens don't unmount/remount
+   in an overlapping way that would need one. */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}

@@ -221,19 +221,23 @@ export default function Home() {
   const packs = getAllPacks()
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <TopBar
         title="FALP"
         rightSlot={
-          <Link to="/settings" aria-label="Settings" className="text-slate-500">
+          <Link
+            to="/settings"
+            aria-label="Settings"
+            className="flex min-h-[44px] min-w-[44px] items-center justify-center text-slate-500 dark:text-slate-400"
+          >
             ⚙️
           </Link>
         }
       />
       <main className="mx-auto max-w-sm px-4 py-8">
-        <h1 className="text-xl font-semibold text-slate-900">Welcome, {profile.name}</h1>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Welcome, {profile.name}</h1>
 
-        <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700">
+        <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700 dark:bg-orange-950 dark:text-orange-300">
           🔥 {streak} day streak
         </div>
 
@@ -267,51 +271,60 @@ export default function Home() {
                 )}
 
                 {primaryState === 'completed' && (
-                  <div className="rounded-lg bg-emerald-50 px-4 py-3">
-                    <p className="text-sm text-emerald-700">
+                  <div className="rounded-lg bg-emerald-50 px-4 py-3 dark:bg-emerald-950/40">
+                    <p className="text-sm text-emerald-700 dark:text-emerald-300">
                       Session complete ✓ — {completedToday.date}
                       {completedToday.topicName && (
-                        <span className="block text-xs text-emerald-600">
+                        <span className="block text-xs text-emerald-600 dark:text-emerald-400">
                           {completedToday.topicName}
                           {completedToday.masteryLabel ? ` — ${completedToday.masteryLabel}` : ''}
                         </span>
                       )}
                     </p>
-                    <Link to={`/session/${pack.id}`} className="mt-2 inline-block text-sm font-medium text-emerald-700 underline">
+                    <Link
+                      to={`/session/${pack.id}`}
+                      className="mt-2 flex min-h-[44px] items-center text-sm font-medium text-emerald-700 underline dark:text-emerald-300"
+                    >
                       Practice more?
                     </Link>
                   </div>
                 )}
 
                 {primaryState === 'default' && (
-                  <Link to={`/session/${pack.id}`} className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5">
-                    <p className="text-base font-medium text-slate-700">{pack.name}</p>
-                    <p className="mt-1 text-sm text-slate-500">{pack.units.length} units</p>
-                    <p className="mt-1 text-sm text-slate-500">
+                  <Link
+                    to={`/session/${pack.id}`}
+                    className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5 dark:border-slate-800 dark:bg-slate-900"
+                  >
+                    <p className="text-base font-medium text-slate-700 dark:text-slate-200">{pack.name}</p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{pack.units.length} units</p>
+                    <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
                       {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
                     </p>
                   </Link>
                 )}
 
-                <Link to={`/progress/${pack.id}`} className="block text-sm text-slate-500 underline">
+                <Link
+                  to={`/progress/${pack.id}`}
+                  className="flex min-h-[44px] items-center text-sm text-slate-500 underline dark:text-slate-400"
+                >
                   My Progress →
                 </Link>
 
                 {!isSchoolYear(pack) ? (
-                  <p className="rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-500">
+                  <p className="rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
                     School starts in {daysUntil(pack.school_year_start)} days. You'll log your classes here.
                   </p>
                 ) : topicsLoggedCount !== undefined ? (
-                  <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                  <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300">
                     Logged ✓ — {topicsLoggedCount} topic{topicsLoggedCount === 1 ? '' : 's'} today
                   </div>
                 ) : (
                   <Link
                     to={`/log/${pack.id}`}
-                    className="block rounded-lg border border-dashed border-slate-300 px-4 py-3"
+                    className="block rounded-lg border border-dashed border-slate-300 px-4 py-3 dark:border-slate-700"
                   >
-                    <span className="text-sm font-medium text-slate-700">{pack.name}</span>
-                    <span className="block text-sm text-slate-500">What did you cover today? 📝</span>
+                    <span className="text-sm font-medium text-slate-700 dark:text-slate-200">{pack.name}</span>
+                    <span className="block text-sm text-slate-500 dark:text-slate-400">What did you cover today? 📝</span>
                   </Link>
                 )}
               </div>

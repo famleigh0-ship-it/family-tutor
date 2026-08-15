@@ -148,30 +148,34 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
 
       {!imageDataUrl ? (
         <div className="space-y-2">
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
           <button
             type="button"
             onClick={handleOpenCamera}
-            className="block w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-10 text-center text-base font-medium text-slate-600"
+            className="block w-full rounded-lg border-2 border-dashed border-slate-300 px-4 py-10 text-center text-base font-medium text-slate-600 dark:border-slate-700 dark:text-slate-300"
           >
             📷 Tap to add a photo of your notes
           </button>
         </div>
       ) : (
         <div className="space-y-3">
-          <img src={imageDataUrl} alt="Your notes" className="w-full rounded-lg border border-slate-200" />
+          <img src={imageDataUrl} alt="Your notes" className="w-full rounded-lg border border-slate-200 dark:border-slate-800" />
 
           {notReadable && (
-            <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+            <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
               <p>I couldn't quite read that. Try better lighting, or:</p>
-              <div className="mt-2 flex gap-2">
-                <button type="button" onClick={handleRetake} className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm">
+              <div className="mt-2 flex flex-wrap gap-2">
+                <button
+                  type="button"
+                  onClick={handleRetake}
+                  className="min-h-[44px] rounded-lg border border-amber-300 px-3 py-1.5 text-sm dark:border-amber-700"
+                >
                   Try again
                 </button>
                 <button
                   type="button"
                   onClick={onSwitchToChecklist}
-                  className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm"
+                  className="min-h-[44px] rounded-lg border border-amber-300 px-3 py-1.5 text-sm dark:border-amber-700"
                 >
                   Switch to checklist
                 </button>
@@ -179,7 +183,7 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
             </div>
           )}
 
-          {error && <p className="text-sm text-red-600">{error}</p>}
+          {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
           {!notReadable && (
             <div className="flex gap-2">
@@ -187,7 +191,7 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
                 type="button"
                 onClick={handleRetake}
                 disabled={loading}
-                className="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-base font-medium text-slate-900 disabled:opacity-50"
+                className="flex-1 rounded-lg border border-slate-300 px-4 py-2.5 text-base font-medium text-slate-900 disabled:opacity-50 dark:border-slate-700 dark:text-slate-100"
               >
                 Retake
               </button>
@@ -195,7 +199,7 @@ export default function PhotoCapture({ packId, onResult, onSwitchToChecklist }: 
                 type="button"
                 onClick={handleAnalyze}
                 disabled={loading}
-                className="flex-1 rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50"
+                className="flex-1 rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
               >
                 {loading ? 'Reading your notes...' : 'Analyze notes'}
               </button>

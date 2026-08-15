@@ -14,8 +14,8 @@ export default function PostOnboardingTransition({ onDone }: Props) {
   }
 
   return (
-    <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center space-y-6 px-4 py-10 text-center">
-      <p className="text-2xl font-semibold text-slate-900 dark:text-slate-50">You're all set! 🎉</p>
+    <div className="mx-auto flex min-h-screen max-w-sm animate-[fadeIn_150ms_ease-in] flex-col justify-center space-y-6 bg-slate-50 px-4 py-10 text-center dark:bg-slate-950">
+      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">You're all set! 🎉</h1>
       <p className="text-base text-slate-600 dark:text-slate-300">
         You've completed your intro sessions. Here's what happens next:
       </p>

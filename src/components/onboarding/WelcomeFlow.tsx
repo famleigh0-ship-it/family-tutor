@@ -26,7 +26,9 @@ export default function WelcomeFlow() {
 
   const shell = (content: React.ReactNode) => (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-50 dark:bg-slate-950">
-      <div className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-10">{content}</div>
+      <div className="mx-auto flex min-h-screen max-w-sm animate-[fadeIn_150ms_ease-in] flex-col justify-center px-6 py-10">
+        {content}
+      </div>
     </div>
   )
 
@@ -34,7 +36,7 @@ export default function WelcomeFlow() {
     return shell(
       <div className="space-y-6 text-center">
         <p className="text-4xl">👋</p>
-        <p className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Welcome!</p>
+        <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Welcome!</h1>
         <p className="text-base text-slate-600 dark:text-slate-300">This is your personal AP exam practice app.</p>
         <p className="text-base text-slate-600 dark:text-slate-300">
           15-30 minutes a day keeps the AP exam stress away.
@@ -56,7 +58,7 @@ export default function WelcomeFlow() {
   if (screen === 'how-it-works') {
     return shell(
       <div className="space-y-6 text-center">
-        <p className="text-xl font-semibold text-slate-900 dark:text-slate-50">Here's how a session works:</p>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Here's how a session works:</h1>
         <div className="space-y-3 text-left">
           <p className="text-base text-slate-700 dark:text-slate-300">📝 You get a question</p>
           <p className="text-base text-slate-700 dark:text-slate-300">✍️ You answer it</p>
@@ -79,9 +81,9 @@ export default function WelcomeFlow() {
 
   return shell(
     <div className="space-y-6">
-      <p className="text-center text-xl font-semibold text-slate-900 dark:text-slate-50">
+      <h1 className="text-center text-xl font-semibold text-slate-900 dark:text-slate-50">
         Which course would you like to try first?
-      </p>
+      </h1>
       <div className="space-y-3">
         {packs.map((pack) => (
           <button

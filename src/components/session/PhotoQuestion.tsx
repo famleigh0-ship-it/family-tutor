@@ -141,7 +141,11 @@ export default function PhotoQuestion({ question, onSubmit, onGraded }: Props) {
               {question.question_text}
             </p>
             {!showFullQuestion && (
-              <button type="button" onClick={() => setShowFullQuestion(true)} className="mt-0.5 text-sm text-slate-500 underline dark:text-slate-400">
+              <button
+                type="button"
+                onClick={() => setShowFullQuestion(true)}
+                className="mt-0.5 flex min-h-[44px] items-center text-sm text-slate-500 underline dark:text-slate-400"
+              >
                 Show more
               </button>
             )}
@@ -155,13 +159,17 @@ export default function PhotoQuestion({ question, onSubmit, onGraded }: Props) {
             <div className="rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
               <p>Couldn't read your handwriting clearly. Try better lighting or write larger.</p>
               <div className="mt-2 flex flex-wrap gap-2">
-                <button type="button" onClick={handleRetake} className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm dark:border-amber-700">
+                <button
+                  type="button"
+                  onClick={handleRetake}
+                  className="min-h-[44px] rounded-lg border border-amber-300 px-3 py-1.5 text-sm dark:border-amber-700"
+                >
                   Retake Photo
                 </button>
                 <button
                   type="button"
                   onClick={() => setTypedFallback(true)}
-                  className="rounded-lg border border-amber-300 px-3 py-1.5 text-sm dark:border-amber-700"
+                  className="min-h-[44px] rounded-lg border border-amber-300 px-3 py-1.5 text-sm dark:border-amber-700"
                 >
                   Type your answer instead
                 </button>

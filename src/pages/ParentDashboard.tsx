@@ -36,7 +36,7 @@ export default function ParentDashboard() {
   }, [session])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <TopBar title="Parent Dashboard" />
       <main className="mx-auto max-w-sm px-4 py-8">
         <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">Family Dashboard</h1>
@@ -52,7 +52,9 @@ export default function ParentDashboard() {
           )}
 
           {students?.length === 0 && (
-            <p className="text-sm text-slate-500 dark:text-slate-400">No students linked to this account yet.</p>
+            <p className="text-sm text-slate-500 dark:text-slate-400">
+              No students linked yet. Ask your administrator to set up student accounts.
+            </p>
           )}
 
           {students?.map((student) => (

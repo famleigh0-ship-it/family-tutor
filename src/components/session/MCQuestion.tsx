@@ -66,7 +66,7 @@ export default function MCQuestion({ question, onSubmit, onGraded }: Props) {
               type="button"
               disabled={locked}
               onClick={() => setSelected(option.label)}
-              className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left ${toneClass}`}
+              className={`flex w-full items-start gap-3 rounded-lg border px-4 py-3 text-left transition-colors duration-100 ${toneClass}`}
             >
               <span
                 className={`mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full border text-xs font-medium ${

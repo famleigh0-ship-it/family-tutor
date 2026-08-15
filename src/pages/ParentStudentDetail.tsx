@@ -50,7 +50,7 @@ export default function ParentStudentDetail() {
   }, [forbidden, navigate])
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <TopBar title="Parent Dashboard" />
       <main className="mx-auto max-w-sm px-4 py-8">
         <Link to="/parent" className="text-sm text-slate-500 underline dark:text-slate-400">

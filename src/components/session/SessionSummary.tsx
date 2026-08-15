@@ -154,8 +154,8 @@ export default function SessionSummary({
   }, [isCrunch, packId])
 
   return (
-    <div className="mx-auto max-w-sm space-y-6 px-4 py-10 text-center">
-      <p className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Session Complete! 🎉</p>
+    <div className="mx-auto min-h-screen max-w-sm space-y-6 bg-slate-50 px-4 py-10 text-center [animation:fadeIn_300ms_ease-in] dark:bg-slate-950">
+      <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-50">Session Complete! 🎉</h1>
 
       <div className="space-y-1.5 text-base text-slate-700 dark:text-slate-300">
         <p>⏱ {Math.round(durationSeconds / 60)} minutes</p>

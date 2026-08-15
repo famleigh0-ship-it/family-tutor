@@ -4,7 +4,7 @@ import TopBar from '../components/TopBar.jsx'
 // Stub for now, per spec — a real settings page isn't in scope for Phase 10.
 export default function Settings() {
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <TopBar title="FALP" />
       <main className="mx-auto max-w-sm space-y-4 px-4 py-8">
         <Link to="/home" className="text-sm text-slate-500 underline dark:text-slate-400">

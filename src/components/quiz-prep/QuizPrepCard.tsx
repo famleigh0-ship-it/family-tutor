@@ -25,13 +25,16 @@ export default function QuizPrepCard({ packId, topicNames, daysUntilQuiz }: Prop
   const urgent = daysUntilQuiz <= URGENT_THRESHOLD_DAYS
 
   return (
-    <div className="rounded-lg bg-indigo-50 px-4 py-3 text-sm">
-      <p className="font-medium text-indigo-800">🎯 Quiz prep active</p>
-      <p className="mt-0.5 line-clamp-2 text-indigo-700">{truncatedTopics(topicNames)}</p>
-      <p className={`mt-1 font-medium ${urgent ? 'text-red-600' : 'text-indigo-700'}`}>
+    <div className="rounded-lg bg-indigo-50 px-4 py-3 text-sm dark:bg-indigo-950/40">
+      <p className="font-medium text-indigo-800 dark:text-indigo-300">🎯 Quiz prep active</p>
+      <p className="mt-0.5 line-clamp-2 text-indigo-700 dark:text-indigo-400">{truncatedTopics(topicNames)}</p>
+      <p className={`mt-1 font-medium ${urgent ? 'text-red-600 dark:text-red-400' : 'text-indigo-700 dark:text-indigo-400'}`}>
         📅 {quizTimingLabel(daysUntilQuiz)}
       </p>
-      <Link to={`/quiz-prep/${packId}`} className="mt-2 inline-block text-xs text-indigo-600 underline">
+      <Link
+        to={`/quiz-prep/${packId}`}
+        className="mt-2 flex min-h-[44px] w-fit items-center text-xs text-indigo-600 underline dark:text-indigo-400"
+      >
         Edit quiz prep
       </Link>
     </div>

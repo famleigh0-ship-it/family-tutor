@@ -70,11 +70,11 @@ export default function PostQuizPrompt({ eventId, topicNames, onDone }: Props) {
 
   return (
     <div className="fixed inset-0 z-20 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center">
-      <div className="w-full max-w-sm rounded-xl bg-white p-5">
-        <p className="text-lg font-medium text-slate-900">How did your quiz go?</p>
-        <p className="mt-1 text-sm text-slate-500">{topicNames.join(', ')}</p>
+      <div className="w-full max-w-sm rounded-xl bg-white p-5 [animation:slideUp_200ms_ease-out] dark:bg-slate-900">
+        <p className="text-lg font-medium text-slate-900 dark:text-slate-50">How did your quiz go?</p>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">{topicNames.join(', ')}</p>
 
-        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         <div className="mt-5 grid grid-cols-3 gap-2">
           {OPTIONS.map((opt) => (
@@ -83,7 +83,7 @@ export default function PostQuizPrompt({ eventId, topicNames, onDone }: Props) {
               type="button"
               disabled={submitting}
               onClick={() => submitResult(opt.result)}
-              className="flex flex-col items-center gap-1 rounded-lg border border-slate-200 py-4 text-sm font-medium text-slate-900 disabled:opacity-50"
+              className="flex min-h-[44px] flex-col items-center gap-1 rounded-lg border border-slate-200 py-4 text-sm font-medium text-slate-900 disabled:opacity-50 dark:border-slate-700 dark:text-slate-100"
             >
               <span className="text-2xl">{opt.emoji}</span>
               {opt.label}
@@ -95,7 +95,7 @@ export default function PostQuizPrompt({ eventId, topicNames, onDone }: Props) {
           type="button"
           disabled={submitting}
           onClick={handleSkip}
-          className="mt-4 w-full text-center text-sm text-slate-500 underline disabled:opacity-50"
+          className="mt-4 flex min-h-[44px] w-full items-center justify-center text-center text-sm text-slate-500 underline disabled:opacity-50 dark:text-slate-400"
         >
           Skip for now
         </button>

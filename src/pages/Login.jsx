@@ -55,19 +55,19 @@ export default function Login() {
   }
 
   return (
-    <div className="flex min-h-screen flex-col justify-center bg-slate-50 px-6 py-12">
+    <div className="flex min-h-screen animate-[fadeIn_150ms_ease-in] flex-col justify-center bg-slate-50 px-6 py-12 dark:bg-slate-950">
       <div className="mx-auto w-full max-w-sm">
-        <h1 className="text-center text-2xl font-semibold text-slate-900">
+        <h1 className="text-center text-2xl font-semibold text-slate-900 dark:text-slate-50">
           Family Adaptive Learning Platform
         </h1>
-        <p className="mt-2 text-center text-sm text-slate-500">
+        <p className="mt-2 text-center text-sm text-slate-500 dark:text-slate-400">
           {mode === 'sign-in' ? 'Sign in to continue' : 'Reset your password'}
         </p>
 
         {mode === 'sign-in' ? (
           <form onSubmit={handleSignIn} className="mt-8 space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Email
               </label>
               <input
@@ -77,12 +77,12 @@ export default function Login() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400"
               />
             </div>
 
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+              <label htmlFor="password" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                 Password
               </label>
               <input
@@ -93,16 +93,16 @@ export default function Login() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400"
               />
             </div>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
             <button
               type="submit"
               disabled={submitting}
-              className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50"
+              className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
             >
               {submitting ? 'Please wait...' : 'Sign in'}
             </button>
@@ -110,13 +110,13 @@ export default function Login() {
         ) : (
           <form onSubmit={handleForgotPassword} className="mt-8 space-y-4">
             {resetSent ? (
-              <p className="text-sm text-slate-600">
+              <p className="text-sm text-slate-600 dark:text-slate-300">
                 If an account exists for that email, a reset link is on its way.
               </p>
             ) : (
               <>
                 <div>
-                  <label htmlFor="reset-email" className="block text-sm font-medium text-slate-700">
+                  <label htmlFor="reset-email" className="block text-sm font-medium text-slate-700 dark:text-slate-300">
                     Email
                   </label>
                   <input
@@ -126,16 +126,16 @@ export default function Login() {
                     autoComplete="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500"
+                    className="mt-1 w-full rounded-lg border border-slate-300 px-3 py-2 text-base focus:border-slate-500 focus:outline-none focus:ring-1 focus:ring-slate-500 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 dark:focus:border-slate-400 dark:focus:ring-slate-400"
                   />
                 </div>
 
-                {error && <p className="text-sm text-red-600">{error}</p>}
+                {error && <p className="text-sm text-red-600 dark:text-red-400">{error}</p>}
 
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50"
+                  className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
                 >
                   {submitting ? 'Sending...' : 'Send reset link'}
                 </button>
@@ -151,7 +151,7 @@ export default function Login() {
             setError(null)
             setResetSent(false)
           }}
-          className="mt-4 w-full text-center text-sm text-slate-500 underline"
+          className="mt-4 flex min-h-[44px] w-full items-center justify-center text-center text-sm text-slate-500 underline dark:text-slate-400"
         >
           {mode === 'sign-in' ? 'Forgot password?' : 'Back to sign in'}
         </button>

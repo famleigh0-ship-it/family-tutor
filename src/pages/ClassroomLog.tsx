@@ -93,26 +93,26 @@ export default function ClassroomLog() {
 
   if (!pack || !packId) {
     return (
-      <div className="min-h-screen bg-slate-50">
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
         <TopBar title="FALP" />
         <main className="mx-auto max-w-sm px-4 py-8">
-          <p className="text-slate-500">Unknown course.</p>
+          <p className="text-slate-500 dark:text-slate-400">Unknown course.</p>
         </main>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <TopBar title="FALP" />
       <main className="mx-auto max-w-sm px-4 py-8">
-        <h1 className="text-xl font-semibold text-slate-900">{pack.name}</h1>
-        <p className="mt-1 text-sm text-slate-500">What did you cover in class today?</p>
+        <h1 className="text-xl font-semibold text-slate-900 dark:text-slate-50">{pack.name}</h1>
+        <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">What did you cover in class today?</p>
 
-        {error && <p className="mt-3 text-sm text-red-600">{error}</p>}
+        {error && <p className="mt-3 text-sm text-red-600 dark:text-red-400">{error}</p>}
 
         {reloadedDuringPhoto && (
-          <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">
+          <div className="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800 dark:bg-amber-950/40 dark:text-amber-200">
             Your browser reloaded while the camera was open — this can happen on some phones. Please try the photo again, or use "Describe what we covered" instead.
           </div>
         )}
@@ -179,11 +179,11 @@ export default function ClassroomLog() {
           )}
 
           {step === 'success' && (
-            <div className="rounded-lg bg-emerald-50 p-4 text-center">
-              <p className="text-base font-medium text-emerald-800">
+            <div className="rounded-lg bg-emerald-50 p-4 text-center [animation:fadeIn_300ms_ease-in] dark:bg-emerald-950/40">
+              <p className="text-base font-medium text-emerald-800 dark:text-emerald-200">
                 Got it! {savedCount} topic{savedCount === 1 ? '' : 's'} added to your practice.
               </p>
-              <p className="mt-1 text-sm text-emerald-700">These will show up prioritized in your next session.</p>
+              <p className="mt-1 text-sm text-emerald-700 dark:text-emerald-300">These will show up prioritized in your next session.</p>
             </div>
           )}
         </div>

@@ -27,7 +27,7 @@ export default function DatePicker({ initialDate, onNext }: Props) {
 
   return (
     <div className="space-y-6">
-      <p className="text-base font-medium text-slate-900">When is the quiz?</p>
+      <p className="text-base font-medium text-slate-900 dark:text-slate-50">When is the quiz?</p>
 
       <input
         type="date"
@@ -35,12 +35,12 @@ export default function DatePicker({ initialDate, onNext }: Props) {
         max={max}
         value={quizDate}
         onChange={(e) => setQuizDate(e.target.value)}
-        className="w-full rounded-lg border border-slate-300 px-4 py-3 text-base text-slate-900"
+        className="w-full rounded-lg border border-slate-300 px-4 py-3 text-base text-slate-900 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-50 [color-scheme:light] dark:[color-scheme:dark]"
       />
 
       {quizDate && (
-        <div className="rounded-lg bg-slate-100 px-4 py-3 text-center">
-          <p className="text-sm font-medium text-slate-900">{formatLabel(quizDate)}</p>
+        <div className="rounded-lg bg-slate-100 px-4 py-3 text-center dark:bg-slate-900">
+          <p className="text-sm font-medium text-slate-900 dark:text-slate-50">{formatLabel(quizDate)}</p>
         </div>
       )}
 
@@ -48,7 +48,7 @@ export default function DatePicker({ initialDate, onNext }: Props) {
         type="button"
         disabled={!quizDate}
         onClick={() => onNext(quizDate)}
-        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50"
+        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
       >
         Set Quiz Prep →
       </button>

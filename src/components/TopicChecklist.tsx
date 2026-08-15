@@ -50,7 +50,7 @@ export default function TopicChecklist({ packId, userId, onSave }: Props) {
   }
 
   if (unlockedIds === null) {
-    return <p className="text-slate-500">Loading topics...</p>
+    return <p className="text-slate-500 dark:text-slate-400">Loading topics...</p>
   }
 
   return (
@@ -64,11 +64,11 @@ export default function TopicChecklist({ packId, userId, onSave }: Props) {
         return (
           <div key={unit.id}>
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-semibold text-slate-700">{unit.name}</h3>
+              <h3 className="text-sm font-semibold text-slate-700 dark:text-slate-300">{unit.name}</h3>
               <button
                 type="button"
                 onClick={() => toggleUnit(topics.map((t) => t.id))}
-                className="text-xs text-slate-500 underline"
+                className="flex min-h-[44px] items-center text-xs text-slate-500 underline dark:text-slate-400"
               >
                 Select all
               </button>
@@ -77,18 +77,20 @@ export default function TopicChecklist({ packId, userId, onSave }: Props) {
               {topics.map((topic) => (
                 <label
                   key={topic.id}
-                  className="flex items-center gap-3 rounded-lg border border-slate-200 px-3 py-2.5"
+                  className="flex min-h-[44px] items-center gap-3 rounded-lg border border-slate-200 px-3 py-3 dark:border-slate-800"
                 >
                   <input
                     type="checkbox"
                     checked={selected.has(topic.id)}
                     onChange={() => toggle(topic.id)}
-                    className="h-4 w-4"
+                    className="h-5 w-5 shrink-0"
                   />
-                  <span className="flex-1 text-sm text-slate-900">{topic.name}</span>
+                  <span className="flex-1 text-sm text-slate-900 dark:text-slate-50">{topic.name}</span>
                   <span
                     className={`shrink-0 rounded-full px-2 py-0.5 text-xs font-medium ${
-                      unlockedIds.has(topic.id) ? 'bg-slate-100 text-slate-600' : 'bg-emerald-100 text-emerald-700'
+                      unlockedIds.has(topic.id)
+                        ? 'bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300'
+                        : 'bg-emerald-100 text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300'
                     }`}
                   >
                     {unlockedIds.has(topic.id) ? 'Review' : 'New'}
@@ -104,7 +106,7 @@ export default function TopicChecklist({ packId, userId, onSave }: Props) {
         type="button"
         disabled={selected.size === 0}
         onClick={() => onSave(Array.from(selected))}
-        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50"
+        className="w-full rounded-lg bg-slate-900 px-4 py-2.5 text-base font-medium text-white disabled:opacity-50 dark:bg-slate-100 dark:text-slate-900"
       >
         Save{selected.size > 0 ? ` (${selected.size})` : ''}
       </button>

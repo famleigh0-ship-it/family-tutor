@@ -51,7 +51,7 @@ export default function SessionShell({
   const progressPercent = totalQuestions > 0 ? Math.min(100, Math.round((completedQuestions / totalQuestions) * 100)) : 0
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+    <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
       <header
         className={`sticky top-0 z-10 border-b px-4 py-3 ${
           urgent
@@ -77,7 +77,7 @@ export default function SessionShell({
         <div className="mt-3 flex items-center gap-3">
           <div className={`h-2 flex-1 overflow-hidden rounded-full ${urgent ? 'bg-red-900/50' : 'bg-slate-200 dark:bg-slate-800'}`}>
             <div
-              className={`h-full rounded-full transition-all ${urgent ? 'bg-white' : 'bg-slate-900 dark:bg-slate-100'}`}
+              className={`h-full rounded-full transition-[width] duration-500 ease-out ${urgent ? 'bg-white' : 'bg-slate-900 dark:bg-slate-100'}`}
               style={{ width: `${progressPercent}%` }}
             />
           </div>
@@ -104,7 +104,7 @@ export default function SessionShell({
 
       {confirmingLeave && (
         <div className="fixed inset-0 z-20 flex items-end justify-center bg-slate-900/40 p-4 sm:items-center">
-          <div className="w-full max-w-sm rounded-xl bg-white p-5 dark:bg-slate-900">
+          <div className="w-full max-w-sm rounded-xl bg-white p-5 [animation:slideUp_200ms_ease-out] dark:bg-slate-900">
             <p className="text-base font-medium text-slate-900 dark:text-slate-50">Leave session?</p>
             <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">Progress will be saved.</p>
             <div className="mt-4 flex gap-2">
