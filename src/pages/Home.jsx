@@ -16,6 +16,7 @@ export default function Home() {
   const { session, profile } = useAuth()
   const [streak, setStreak] = useState(0)
   const [loggedToday, setLoggedToday] = useState({}) // pack_id -> topics_confirmed count
+  const [sessionCompleteToday, setSessionCompleteToday] = useState({}) // pack_id -> { date, topicName, masteryLabel }
 
   useEffect(() => {
     let cancelled = false
@@ -61,6 +62,26 @@ export default function Home() {
   }, [session.user.id])
 
   useEffect(() => {
+    // Written by SessionSummary.tsx when a session finishes — read here
+    // rather than from Supabase since sessions/mastery_records have no RLS
+    // policy yet (see migrations/002 and 003), so the frontend never
+    // queries them directly with the anon key.
+    const todayStr = new Date().toISOString().slice(0, 10)
+    const result = {}
+    for (const pack of getAllPacks()) {
+      try {
+        const raw = localStorage.getItem(`falp:sessionComplete:${pack.id}`)
+        if (!raw) continue
+        const parsed = JSON.parse(raw)
+        if (parsed.date === todayStr) result[pack.id] = parsed
+      } catch {
+        // Malformed entry — skip it rather than breaking the page.
+      }
+    }
+    setSessionCompleteToday(result)
+  }, [])
+
+  useEffect(() => {
     if (!import.meta.env.DEV) return
     // Exposed for manual testing per the Phase 3 milestone, e.g.
     // getPack('ap-physics-1') or getUnlockedTopics('ap-physics-1', '2026-08-11')
@@ -101,6 +122,18 @@ export default function Home() {
                     {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
                   </p>
                 </Link>
+
+                {sessionCompleteToday[pack.id] && (
+                  <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                    Session complete ✓ — {sessionCompleteToday[pack.id].date}
+                    {sessionCompleteToday[pack.id].topicName && (
+                      <span className="block text-xs text-emerald-600">
+                        {sessionCompleteToday[pack.id].topicName}
+                        {sessionCompleteToday[pack.id].masteryLabel ? ` — ${sessionCompleteToday[pack.id].masteryLabel}` : ''}
+                      </span>
+                    )}
+                  </div>
+                )}
 
                 {topicsLoggedCount !== undefined ? (
                   <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
