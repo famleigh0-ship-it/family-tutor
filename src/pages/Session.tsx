@@ -181,6 +181,18 @@ export default function Session() {
       const body = await res.json()
       if (!res.ok) throw new Error(body.error || 'Failed to start session')
 
+      // startSession found a quiz_prep_event whose quiz passed with no
+      // post_quiz_result yet and returned early without creating a
+      // session row (see session-orchestrator.js). Bounce back to Home,
+      // which shows PostQuizPrompt overlaid — no session ever starts here.
+      if (body.requires_post_quiz) {
+        navigate('/home', {
+          replace: true,
+          state: { postQuizPrompt: { eventId: body.event_id, topicNames: body.topic_names } }
+        })
+        return
+      }
+
       startedAtMsRef.current = Date.now()
       setElapsedSeconds(0)
       await beginPlan(body as SessionPlanResponse, 0, [])
@@ -418,6 +430,11 @@ export default function Session() {
     return <div className="flex h-screen items-center justify-center text-slate-500 dark:text-slate-400">Loading your session...</div>
   }
 
+  // topic-selector.js pushes a "Quiz today!"/"Quiz prep: ..." line into
+  // plan.notes for quiz-prep mode (see selectTopics) — surface it as a
+  // banner rather than requiring the student to read the notes array.
+  const quizPrepBanner = plan.mode === 'quiz-prep' ? (plan.notes.find((n) => n.startsWith('Quiz')) ?? null) : null
+
   return (
     <SessionShell
       packName={plan.pack_name}
@@ -427,6 +444,7 @@ export default function Session() {
       completedQuestions={answeredResults.length}
       topicName={currentTopic?.name ?? ''}
       onLeave={goHome}
+      banner={quizPrepBanner}
     >
       {phase === 'loading' && (
         <div className="animate-pulse space-y-3">

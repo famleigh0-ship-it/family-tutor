@@ -50,6 +50,20 @@ async function handleStart(req, res, user) {
       targetDurationMinutes: DEFAULT_TARGET_DURATION_MINUTES
     })
 
+    // Quiz-prep gate: startSession found a quiz_prep_event whose quiz has
+    // passed with no post_quiz_result yet, and returned early without
+    // creating a session row — see session-orchestrator.js's startSession.
+    // The client (Session.tsx) bounces back to /home and shows
+    // PostQuizPrompt instead of entering a session.
+    if (plan.requires_post_quiz) {
+      res.status(200).json({
+        requires_post_quiz: true,
+        event_id: plan.event_id,
+        topic_names: plan.topic_names
+      })
+      return
+    }
+
     res.status(200).json({
       session_id: plan.sessionId,
       pack_name: pack.name,

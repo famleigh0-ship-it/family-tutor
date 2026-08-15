@@ -13,7 +13,9 @@ const MIN_TOPICS = 2
 const MAX_TOPICS = 4
 const ONBOARDING_MAX_TOPICS = 3
 const QUIZ_PREP_FILLER_FRACTION = 0.25 // "remaining 20-30% of session"
-const QUESTIONS_PER_TOPIC = 2 // rough estimate used to size target_question_count
+// Exported so session-orchestrator.js can reuse the same sizing formula
+// after dropping a quiz-prep topic whose bank is entirely empty.
+export const QUESTIONS_PER_TOPIC = 2 // rough estimate used to size target_question_count
 const REVIEW_MASTERY_MIN = 0.6
 const REVIEW_MASTERY_MAX = 0.8
 const REVIEW_MIN_DAYS_SINCE_SEEN = 5
@@ -108,7 +110,8 @@ function ensureIncluded(selected, candidate, maxTopics) {
  *   mode: import('./types').SessionMode,
  *   quizPrepTopicIds: string[],
  *   recentTopicIds: string[],
- *   targetDurationMinutes: number
+ *   targetDurationMinutes: number,
+ *   quizPrepDaysUntilQuiz?: number
  * }} params
  * @returns {import('./types').SessionPlan}
  */
@@ -121,7 +124,8 @@ export function selectTopics(params) {
     mode,
     quizPrepTopicIds,
     recentTopicIds,
-    targetDurationMinutes
+    targetDurationMinutes,
+    quizPrepDaysUntilQuiz
   } = params
 
   const now = new Date()
@@ -198,14 +202,28 @@ export function selectTopics(params) {
     selected = sorted.filter((t) => t.difficulty === 1).slice(0, ONBOARDING_MAX_TOPICS)
     notes.push('Onboarding mode — diagnostic questions only')
   } else if (mode === 'quiz-prep') {
-    const forced = sorted.filter((t) => quizPrepSet.has(t.id)).slice(0, MAX_TOPICS)
+    // Forced topics sort by mastery ascending (lowest first, not the
+    // shared priority_score) — she needs the most practice on her weakest
+    // quiz topics, per spec. Filler still comes from the priority-sorted
+    // list.
+    const forced = candidates
+      .filter((t) => quizPrepSet.has(t.id))
+      .sort((a, b) => a.mastery_score - b.mastery_score)
+      .slice(0, MAX_TOPICS)
     const nonForced = sorted.filter((t) => !quizPrepSet.has(t.id))
     const fillerBudget = targetDurationMinutes * QUIZ_PREP_FILLER_FRACTION
     const filler = pickByDuration(nonForced, fillerBudget, 0, Math.max(0, MAX_TOPICS - forced.length))
     selected = [...forced, ...filler]
 
     if (forced.length > 0) {
-      notes.push(`Quiz prep mode active for ${forced.map((t) => t.name).join(', ')}`)
+      const topicNames = forced.map((t) => t.name).join(', ')
+      if (quizPrepDaysUntilQuiz === 0) {
+        notes.push(`Quiz today! Focused practice on ${topicNames}`)
+      } else if (typeof quizPrepDaysUntilQuiz === 'number') {
+        notes.push(`Quiz prep: ${topicNames} — ${quizPrepDaysUntilQuiz} day${quizPrepDaysUntilQuiz === 1 ? '' : 's'} until quiz`)
+      } else {
+        notes.push(`Quiz prep mode active for ${topicNames}`)
+      }
     }
   } else if (mode === 'exam-crunch') {
     selected = pickByDuration(sorted, targetDurationMinutes, MIN_TOPICS, MAX_TOPICS)

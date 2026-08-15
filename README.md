@@ -442,3 +442,86 @@ would have caught:
   `src/lib/bankFill.js` as a plain function `scripts/manage-bank.js`
   calls directly in-process, bypassing Vercel's timeout entirely for
   bulk operations.
+
+## Quiz prep mode
+
+Students can front-load specific topics ahead of a quiz or test via
+`/quiz-prep/:packId` (entry points: "Quiz coming up?" on a course's Home
+card, or tapping an active `QuizPrepCard` to edit it). The 3-step wizard
+(`src/pages/QuizPrep.tsx`) — pick topics (`TopicSelector.tsx`, grouped by
+unit, unlocked topics only, `bc_only` included since a quiz can cover
+anything unlocked), pick a date 1-30 days out (`DatePicker.tsx`), confirm —
+posts to `api/quiz-prep`, which upserts the student's one active event per
+pack (replacing an existing one in place rather than creating a second row).
+
+Quiz-prep mode itself was actually wired into the engine back in Phase 4
+(`session-mode.js`'s `detectSessionMode`, `topic-selector.js`'s `quiz-prep`
+branch) — this phase finished the rest: the setup UI, forcing quiz topics to
+sort by mastery ascending (weakest first, not the general priority score),
+threading `days_until_quiz` into the session notes ("Quiz today!" / "Quiz
+prep: ... — N days until quiz", surfaced as a banner in the session UI via
+`SessionShell`'s `banner` prop), and dropping any quiz-prep topic whose bank
+is entirely empty for this session only (still triggers the same async fill
+as a normal thin bank).
+
+**Auto-expiry and the post-quiz prompt.** `startSession`
+(`session-orchestrator.js`) expires any `quiz_prep_events` row whose
+`quiz_date` has passed for that user + pack every time it runs — the same
+sweep also runs on a schedule via `scripts/run-pacing-calendar.js`'s
+`expireStaleQuizPrepEvents()`, so a stale event doesn't wait on the student
+opening the app. If an event just expired with no `post_quiz_result` yet,
+`startSession` returns early (`{ requires_post_quiz: true, ... }`) instead
+of creating a session — `api/session`'s `POST` handler passes that straight
+through, and `Session.tsx` redirects to `/home` with it in navigation state
+rather than ever starting a session. `Home.jsx` reads that state and shows
+`PostQuizPrompt` overlaid, so the student ends up back on Home instead of
+inside a session. Submitting a result (`PATCH /api/quiz-prep`) adjusts
+`mastery_records` for the quiz's topics (+0.15 good / +0.05 okay / -0.10
+rough, clamped 0-1) and, for `'rough'`, re-prioritizes those topics for 7
+days via `prioritizeTopics` (now takes an optional `days` param — 5 by
+default for the classroom-log path, 7 here).
+
+A prompt can also be dismissed without a real result — `'skipped'` (added
+to `post_quiz_result`'s allowed values by `migrations/006`) covers both a
+3rd "Skip for now" tap (`PostQuizPrompt.tsx` tracks a per-event skip count
+in `localStorage`, then calls the PATCH endpoint on the 3rd) and a prompt
+that would otherwise surface more than 14 days after the quiz (too stale to
+be useful — auto-dismissed by the same `startSession`/pacing-calendar sweep
+that expires the event). Either way it's a real database write, not just a
+client-side flag — `startSession`'s gate is driven entirely by
+`post_quiz_result IS NULL`, so nothing client-only would actually clear it.
+
+### Notes on file layout vs. the literal spec
+
+Same reasoning as Phase 6: `api/quiz-prep/index.js` handles create (`POST`),
+read (`GET`, both the student's own active event and, for a parent caller,
+every linked student's active events + last-5 result history across all
+packs in one call), and post-quiz result (`PATCH`, including `'skipped'`)
+in one function rather than the separate `create.js`/`active.js`/
+`expire.js`/`post-result.js` files a literal reading of the spec would
+suggest — four more files would have pushed `api/` from 10 functions to 14,
+over Vercel Hobby's 12-function cap the exact way Phase 6's original
+per-question-type grading routes did. There's no standalone `expire.js` at
+all: auto-expiry only ever needs to run from inside `startSession` or the
+pacing-calendar script, neither of which needs an HTTP route of its own.
+
+## Phase 8 milestone checklist
+
+- [ ] `/quiz-prep/ap-physics-1` → select 2-3 topics, pick a date 4 days
+      out, confirm — `quiz_prep_events` row appears in Supabase
+- [ ] `/home` shows `QuizPrepCard` with the selected topics and days until
+      quiz
+- [ ] Starting a session shows `mode: 'quiz-prep'` in the plan, with quiz
+      topics filling the first ~70-80% of the question order
+- [ ] Manually setting `quiz_date` to yesterday in Supabase, then starting
+      a session, shows `PostQuizPrompt` before any session starts
+- [ ] Selecting "Rough" updates `post_quiz_result`, decreases the quiz
+      topics' `mastery_records`, and sets `prioritized_until` ~7 days out
+      in `topic_unlock_log`
+- [ ] Selecting "Good" on a different event increases `mastery_records`
+- [ ] Tapping "Skip for now" 3 times auto-dismisses the prompt
+      (`post_quiz_result` ends up `'skipped'`)
+- [ ] Parent dashboard shows active quiz prep + result history per student
+      per course
+- [ ] `node scripts/run-pacing-calendar.js` expires stale events and logs
+      the count

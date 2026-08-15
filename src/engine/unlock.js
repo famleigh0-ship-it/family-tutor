@@ -69,17 +69,20 @@ export async function unlockTopics(params) {
 }
 
 /**
- * Sets prioritized_until = now + 5 days on existing topic_unlock_log rows.
- * Call after unlockTopics so the rows are guaranteed to exist.
- * @param {{ userId: string, packId: string, topicIds: string[] }} params
+ * Sets prioritized_until = now + `days` (default 5) on existing
+ * topic_unlock_log rows. Call after unlockTopics so the rows are
+ * guaranteed to exist. Quiz prep's post-quiz "rough" result
+ * (api/quiz-prep/index.js) passes days: 7 to re-prioritize weak topics
+ * longer than a normal classroom-log boost.
+ * @param {{ userId: string, packId: string, topicIds: string[], days?: number }} params
  * @returns {Promise<void>}
  */
 export async function prioritizeTopics(params) {
-  const { userId, packId, topicIds } = params
+  const { userId, packId, topicIds, days = PRIORITIZED_DAYS } = params
   if (topicIds.length === 0) return
 
   const admin = getSupabaseAdmin()
-  const prioritizedUntil = new Date(Date.now() + PRIORITIZED_DAYS * MS_PER_DAY).toISOString()
+  const prioritizedUntil = new Date(Date.now() + days * MS_PER_DAY).toISOString()
 
   const { error } = await admin
     .from('topic_unlock_log')

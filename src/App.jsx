@@ -7,6 +7,7 @@ import Progress from './pages/Progress.jsx'
 import ParentDashboard from './pages/ParentDashboard.jsx'
 import ParentStudentDetail from './pages/ParentStudentDetail.jsx'
 import ClassroomLog from './pages/ClassroomLog.tsx'
+import QuizPrep from './pages/QuizPrep.tsx'
 import RoleProtectedRoute from './components/RoleProtectedRoute.jsx'
 import RootRedirect from './components/RootRedirect.jsx'
 import ParentPinGate from './components/ParentPinGate.jsx'
@@ -48,6 +49,14 @@ export default function App() {
         element={
           <RoleProtectedRoute allowedRole="student">
             <ClassroomLog />
+          </RoleProtectedRoute>
+        }
+      />
+      <Route
+        path="/quiz-prep/:packId"
+        element={
+          <RoleProtectedRoute allowedRole="student">
+            <QuizPrep />
           </RoleProtectedRoute>
         }
       />

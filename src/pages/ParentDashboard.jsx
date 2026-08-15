@@ -5,10 +5,14 @@ import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
 import { getAllPacks } from '../packs/loader'
 
+const RESULT_EMOJI = { good: '😊', okay: '😐', rough: '😟' }
+
 export default function ParentDashboard() {
   const { session } = useAuth()
   const [students, setStudents] = useState(null) // null = loading
   const [lastLogByStudentPack, setLastLogByStudentPack] = useState({})
+  // student_id -> { active: { pack_id: EventSummary }, history: { pack_id: ResultSummary[] } }
+  const [quizPrepByStudent, setQuizPrepByStudent] = useState({})
 
   useEffect(() => {
     let cancelled = false
@@ -49,6 +53,23 @@ export default function ParentDashboard() {
         if (!lastLogMap[key]) lastLogMap[key] = log.logged_at
       }
       setLastLogByStudentPack(lastLogMap)
+
+      // quiz_prep_events has no RLS policy — read through the API (which
+      // verifies the family_links row itself), never Supabase directly.
+      const quizPrepEntries = await Promise.all(
+        studentIds.map(async (studentId) => {
+          try {
+            const res = await fetch(`/api/quiz-prep?student_id=${studentId}`, {
+              headers: { Authorization: `Bearer ${session.access_token}` }
+            })
+            const body = await res.json()
+            return [studentId, res.ok ? body : { active: {}, history: {} }]
+          } catch {
+            return [studentId, { active: {}, history: {} }]
+          }
+        })
+      )
+      if (!cancelled) setQuizPrepByStudent(Object.fromEntries(quizPrepEntries))
     }
 
     load()
@@ -78,13 +99,30 @@ export default function ParentDashboard() {
               className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-4 text-slate-700"
             >
               <p className="font-medium">{student.name}</p>
-              <div className="mt-1 space-y-0.5">
+              <div className="mt-1 space-y-1.5">
                 {packs.map((pack) => {
                   const lastLog = lastLogByStudentPack[`${student.id}:${pack.id}`]
+                  const activeQuizPrep = quizPrepByStudent[student.id]?.active?.[pack.id]
+                  const resultHistory = quizPrepByStudent[student.id]?.history?.[pack.id] ?? []
+
                   return (
-                    <p key={pack.id} className="text-xs text-slate-500">
-                      {pack.name}: {lastLog ? `logged ${new Date(lastLog).toLocaleDateString()}` : 'no log yet'}
-                    </p>
+                    <div key={pack.id}>
+                      <p className="text-xs text-slate-500">
+                        {pack.name}: {lastLog ? `logged ${new Date(lastLog).toLocaleDateString()}` : 'no log yet'}
+                      </p>
+                      <p className="text-xs text-indigo-600">
+                        {activeQuizPrep
+                          ? `🎯 Quiz prep: ${activeQuizPrep.topic_names.join(', ')} — quiz ${activeQuizPrep.quiz_date}`
+                          : 'No active quiz prep'}
+                      </p>
+                      {resultHistory.length > 0 && (
+                        <p className="text-xs text-slate-400">
+                          {resultHistory
+                            .map((r) => `${RESULT_EMOJI[r.post_quiz_result] ?? '·'} ${r.quiz_date}`)
+                            .join('  ')}
+                        </p>
+                      )}
+                    </div>
                   )
                 })}
               </div>

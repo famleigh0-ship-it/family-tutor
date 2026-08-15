@@ -23,6 +23,12 @@ const admin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false }
 })
 
+// Same threshold and 'skipped' rule as session-orchestrator.js's
+// startSession auto-expiry step — this script is the scheduled sweep,
+// startSession is the on-demand one (a student opening the app the day
+// after a quiz shouldn't have to wait for this to next run).
+const POST_QUIZ_STALE_DAYS = 14
+
 function currentWeekNumber(schoolYearStart, today) {
   const start = new Date(schoolYearStart)
   const diffDays = Math.floor((today.getTime() - start.getTime()) / 86_400_000)
@@ -40,6 +46,34 @@ function topicIdsThroughWeek(pack, currentWeek) {
     }
   }
   return Array.from(ids)
+}
+
+// Expires any quiz_prep_events whose quiz date has passed, across all
+// users/packs — the scheduled counterpart to the per-user check
+// session-orchestrator.js's startSession also runs on every session start.
+async function expireStaleQuizPrepEvents() {
+  const now = new Date()
+  const todayStr = now.toISOString().slice(0, 10)
+
+  const { data: staleRows, error } = await admin
+    .from('quiz_prep_events')
+    .select('id, quiz_date, post_quiz_result')
+    .lt('quiz_date', todayStr)
+    .is('expired_at', null)
+  if (error) throw error
+
+  for (const row of staleRows ?? []) {
+    const daysSinceQuiz = Math.floor((now.getTime() - new Date(row.quiz_date).getTime()) / 86_400_000)
+    const update = { expired_at: now.toISOString() }
+    if (row.post_quiz_result === null && daysSinceQuiz > POST_QUIZ_STALE_DAYS) {
+      update.post_quiz_result = 'skipped'
+    }
+
+    const { error: updateErr } = await admin.from('quiz_prep_events').update(update).eq('id', row.id)
+    if (updateErr) throw updateErr
+  }
+
+  console.log(`Expired ${(staleRows ?? []).length} quiz prep events`)
 }
 
 async function main() {
@@ -90,6 +124,8 @@ async function main() {
       `${enrollment.user_id} / ${enrollment.pack_id}: week ${currentWeek}, unlocked ${newTopicIds.length} new topic(s) (${scheduledTopicIds.length} scheduled total)`
     )
   }
+
+  await expireStaleQuizPrepEvents()
 }
 
 main().catch((err) => {

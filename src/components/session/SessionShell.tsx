@@ -9,6 +9,7 @@ interface Props {
   topicName: string
   onLeave: () => void
   children: React.ReactNode
+  banner?: string | null
 }
 
 const AMBER_THRESHOLD_SECONDS = 25 * 60
@@ -28,7 +29,8 @@ export default function SessionShell({
   completedQuestions,
   topicName,
   onLeave,
-  children
+  children,
+  banner
 }: Props) {
   const [confirmingLeave, setConfirmingLeave] = useState(false)
 
@@ -68,6 +70,12 @@ export default function SessionShell({
 
         <p className="mt-1.5 truncate text-sm text-slate-500 dark:text-slate-400">Topic: {topicName}</p>
       </header>
+
+      {banner && (
+        <div className="border-b border-indigo-100 bg-indigo-50 px-4 py-2 text-center text-sm font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
+          {banner}
+        </div>
+      )}
 
       <main className="mx-auto max-w-sm px-4 py-6">{children}</main>
 

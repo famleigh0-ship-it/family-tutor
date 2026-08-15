@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
+import QuizPrepCard from '../components/quiz-prep/QuizPrepCard.tsx'
+import PostQuizPrompt from '../components/quiz-prep/PostQuizPrompt.tsx'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
 import { getAllPacks, getPack, getUnit, getTopic, getTopicsForWeek, getUnlockedTopics } from '../packs/loader'
@@ -14,9 +16,17 @@ function daysUntil(dateStr) {
 
 export default function Home() {
   const { session, profile } = useAuth()
+  const location = useLocation()
+  const navigate = useNavigate()
   const [streak, setStreak] = useState(0)
   const [loggedToday, setLoggedToday] = useState({}) // pack_id -> topics_confirmed count
   const [sessionCompleteToday, setSessionCompleteToday] = useState({}) // pack_id -> { date, topicName, masteryLabel }
+  const [activeQuizPrep, setActiveQuizPrep] = useState({}) // pack_id -> active event summary | null
+  // Session.tsx bounces back here with this in location.state when
+  // startSession finds an unanswered post-quiz prompt (see api/session's
+  // requires_post_quiz branch) — "overlaid on Home, not blocking
+  // navigation" per the Phase 8 spec.
+  const [postQuizPrompt, setPostQuizPrompt] = useState(location.state?.postQuizPrompt ?? null)
 
   useEffect(() => {
     let cancelled = false
@@ -82,6 +92,49 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    // Consume location.state.postQuizPrompt once so a page refresh or
+    // navigating back here later doesn't resurface it.
+    if (location.state?.postQuizPrompt) {
+      navigate(location.pathname, { replace: true, state: {} })
+    }
+    // Only ever needs to run once, on mount.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    // quiz_prep_events has no RLS policy (same reasoning as the
+    // sessionCompleteToday comment above) — read through the API, not
+    // Supabase directly.
+    let cancelled = false
+
+    async function loadActiveQuizPrep() {
+      const token = session?.access_token
+      if (!token) return
+
+      const entries = await Promise.all(
+        getAllPacks().map(async (pack) => {
+          try {
+            const res = await fetch(`/api/quiz-prep?pack_id=${pack.id}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            const body = await res.json()
+            return [pack.id, res.ok ? body.active : null]
+          } catch {
+            return [pack.id, null]
+          }
+        })
+      )
+
+      if (!cancelled) setActiveQuizPrep(Object.fromEntries(entries))
+    }
+
+    loadActiveQuizPrep()
+    return () => {
+      cancelled = true
+    }
+  }, [session?.access_token])
+
+  useEffect(() => {
     if (!import.meta.env.DEV) return
     // Exposed for manual testing per the Phase 3 milestone, e.g.
     // getPack('ap-physics-1') or getUnlockedTopics('ap-physics-1', '2026-08-11')
@@ -135,6 +188,21 @@ export default function Home() {
                   </div>
                 )}
 
+                {activeQuizPrep[pack.id] ? (
+                  <QuizPrepCard
+                    packId={pack.id}
+                    topicNames={activeQuizPrep[pack.id].topic_names}
+                    daysUntilQuiz={activeQuizPrep[pack.id].days_until_quiz}
+                  />
+                ) : (
+                  <Link
+                    to={`/quiz-prep/${pack.id}`}
+                    className="block rounded-lg border border-dashed border-slate-300 px-4 py-3"
+                  >
+                    <span className="text-sm font-medium text-slate-700">Quiz coming up?</span>
+                  </Link>
+                )}
+
                 {topicsLoggedCount !== undefined ? (
                   <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                     Logged ✓ — {topicsLoggedCount} topic{topicsLoggedCount === 1 ? '' : 's'} today
@@ -153,6 +221,14 @@ export default function Home() {
           })}
         </div>
       </main>
+
+      {postQuizPrompt && (
+        <PostQuizPrompt
+          eventId={postQuizPrompt.eventId}
+          topicNames={postQuizPrompt.topicNames}
+          onDone={() => setPostQuizPrompt(null)}
+        />
+      )}
     </div>
   )
 }

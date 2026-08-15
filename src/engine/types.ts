@@ -45,7 +45,11 @@ export interface QuestionResult {
   question_id?: string
 }
 
-// Mirrors the `quiz_prep_events` table (migrations/001_initial_schema.sql).
+// Mirrors the `quiz_prep_events` table (migrations/001_initial_schema.sql,
+// widened by migrations/006_quiz_prep_skip_result.sql). 'skipped' covers
+// both a 3rd post-quiz-prompt skip and an auto-dismiss when the prompt
+// would surface more than 14 days after the quiz — see
+// session-orchestrator.js's startSession and api/quiz-prep/index.js.
 export interface QuizPrepEvent {
   id: string
   user_id: string
@@ -54,5 +58,15 @@ export interface QuizPrepEvent {
   quiz_date: string // ISO date
   created_at: string
   expired_at: string | null
-  post_quiz_result: 'good' | 'okay' | 'rough' | null
+  post_quiz_result: 'good' | 'okay' | 'rough' | 'skipped' | null
+}
+
+// Returned by startSession instead of a SessionPlan when an expired quiz
+// prep event still needs a post-quiz result — the client shows
+// PostQuizPrompt instead of starting a session (see Session.tsx).
+export interface RequiresPostQuiz {
+  requires_post_quiz: true
+  event_id: string
+  topic_names: string[]
+  days_since_quiz: number
 }

@@ -14,12 +14,15 @@ import { createClient } from '@supabase/supabase-js'
 import { getPack } from '../packs/loader.js'
 import { applyDecay, updateMastery } from './mastery.js'
 import { detectSessionMode } from './session-mode.js'
-import { selectTopics } from './topic-selector.js'
+import { selectTopics, QUESTIONS_PER_TOPIC } from './topic-selector.js'
 import { getPrioritizedTopicIds } from './unlock.js'
 import { checkBankHealth, triggerBankFill } from './bank-manager.js'
 
 const RECENT_SESSIONS_FOR_TOPICS = 2 // "topics from last 2 sessions"
 const MS_PER_DAY = 86_400_000
+// A post-quiz prompt older than this is "too stale to be useful" — see
+// the startSession auto-expiry step below and api/quiz-prep/index.js.
+const POST_QUIZ_STALE_DAYS = 14
 
 /** @type {import('@supabase/supabase-js').SupabaseClient | undefined} */
 let client
@@ -64,14 +67,124 @@ function toDateOnly(date) {
 }
 
 /**
+ * The nearest not-expired, not-yet-passed quiz_prep_event for this user +
+ * pack, or null. Fetches all matches rather than `.limit(1)` so a "shouldn't
+ * happen but handle it" duplicate-active-event state can be logged instead
+ * of silently picked. Used by startSession (step 5 below) and by
+ * api/quiz-prep/index.js's GET handler (the client never queries
+ * quiz_prep_events directly — no RLS policy exists for it, same as
+ * sessions/mastery_records).
+ * @param {string} userId
+ * @param {string} packId
+ * @returns {Promise<import('./types').QuizPrepEvent | null>}
+ */
+export async function getActiveQuizPrepEvent(userId, packId) {
+  const admin = getSupabaseAdmin()
+  const todayStr = toDateOnly(new Date())
+
+  const { data, error } = await admin
+    .from('quiz_prep_events')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('pack_id', packId)
+    .is('expired_at', null)
+    .gte('quiz_date', todayStr)
+
+  if (error) throw error
+  if (!data || data.length === 0) return null
+
+  if (data.length > 1) {
+    console.warn(
+      `[session-orchestrator] ${data.length} active quiz_prep_events for ${userId}/${packId} — using the nearest quiz_date`
+    )
+  }
+
+  return [...data].sort((a, b) => new Date(a.quiz_date).getTime() - new Date(b.quiz_date).getTime())[0]
+}
+
+/**
  * @param {{ userId: string, packId: string, targetDurationMinutes: number }} params
- * @returns {Promise<import('./types').SessionPlan & { sessionId: string }>}
+ * @returns {Promise<(import('./types').SessionPlan & { sessionId: string }) | import('./types').RequiresPostQuiz>}
  */
 export async function startSession(params) {
   const { userId, packId, targetDurationMinutes } = params
   const admin = getSupabaseAdmin()
   const pack = getPack(packId)
   const now = new Date()
+
+  // 0. Auto-expire any quiz_prep_events whose quiz date has passed for
+  // this user + pack, and find any still-unanswered one to gate on.
+  // scripts/run-pacing-calendar.js runs the same expiry sweep on a
+  // schedule, so this isn't the only place stale events get cleaned up —
+  // it just also has to happen here so a student who opens the app the
+  // day after a quiz gets gated on the post-quiz prompt immediately, not
+  // only after the next scheduled run.
+  //
+  // Keyed off post_quiz_result IS NULL, not expired_at IS NULL: expired_at
+  // gets set the *first* time this row is seen (below), but "Skip for
+  // now" (PostQuizPrompt.tsx, skips 1-2) only dismisses the modal
+  // client-side — it never touches the row. Filtering on expired_at would
+  // mean this query stops finding the row after that first pass, so the
+  // gate would never fire again on a later session-start attempt even
+  // though the spec wants it to ("prompt returns next session if still
+  // unanswered"). post_quiz_result stays a reliable "still needs an
+  // answer" signal across any number of visits.
+  const todayStrForExpiry = toDateOnly(now)
+  const { data: unresolvedQuizPrepRows, error: unresolvedQuizPrepErr } = await admin
+    .from('quiz_prep_events')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('pack_id', packId)
+    .lt('quiz_date', todayStrForExpiry)
+    .is('post_quiz_result', null)
+
+  if (unresolvedQuizPrepErr) throw unresolvedQuizPrepErr
+
+  const needsPostQuizPrompt = []
+  for (const row of unresolvedQuizPrepRows ?? []) {
+    const daysSinceQuiz = Math.floor((now.getTime() - new Date(row.quiz_date).getTime()) / MS_PER_DAY)
+    const tooStaleForPrompt = daysSinceQuiz > POST_QUIZ_STALE_DAYS
+
+    if (tooStaleForPrompt) {
+      const { error: expireErr } = await admin
+        .from('quiz_prep_events')
+        .update({ expired_at: row.expired_at ?? now.toISOString(), post_quiz_result: 'skipped' })
+        .eq('id', row.id)
+      if (expireErr) throw expireErr
+      continue
+    }
+
+    // Idempotent: only write expired_at the first time it's seen, but
+    // still surface the prompt on every subsequent unanswered visit.
+    if (row.expired_at === null) {
+      const { error: expireErr } = await admin
+        .from('quiz_prep_events')
+        .update({ expired_at: now.toISOString() })
+        .eq('id', row.id)
+      if (expireErr) throw expireErr
+    }
+
+    needsPostQuizPrompt.push({ ...row, daysSinceQuiz })
+  }
+
+  if (needsPostQuizPrompt.length > 0) {
+    if (needsPostQuizPrompt.length > 1) {
+      console.warn(
+        `[session-orchestrator] ${needsPostQuizPrompt.length} quiz_prep_events need a post-quiz prompt for ${userId}/${packId} — using the most recent`
+      )
+    }
+    const toPrompt = needsPostQuizPrompt.sort(
+      (a, b) => new Date(b.quiz_date).getTime() - new Date(a.quiz_date).getTime()
+    )[0]
+    const topicNameById = new Map(pack.units.flatMap((u) => u.topics.map((t) => [t.id, t.name])))
+
+    return {
+      requires_post_quiz: true,
+      event_id: toPrompt.id,
+      topic_names: (toPrompt.topic_ids ?? []).map((id) => topicNameById.get(id) ?? id),
+      days_since_quiz: toPrompt.daysSinceQuiz
+    }
+  }
 
   // 1. Load mastery records for this user + pack.
   const { data: masteryRows, error: masteryErr } = await admin
@@ -117,22 +230,11 @@ export async function startSession(params) {
   const prioritizedTopicIds = await getPrioritizedTopicIds(userId, packId)
 
   // 5. Active quiz prep event: quiz_date >= today, not expired.
-  const todayStr = toDateOnly(now)
-  const { data: quizPrepRows, error: quizPrepErr } = await admin
-    .from('quiz_prep_events')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('pack_id', packId)
-    .is('expired_at', null)
-    .gte('quiz_date', todayStr)
-    .order('quiz_date', { ascending: true })
-    .limit(1)
-
-  if (quizPrepErr) throw quizPrepErr
-
-  /** @type {import('./types').QuizPrepEvent | null} */
-  const activeQuizPrepEvent = quizPrepRows && quizPrepRows.length > 0 ? quizPrepRows[0] : null
+  const activeQuizPrepEvent = await getActiveQuizPrepEvent(userId, packId)
   const quizPrepTopicIds = activeQuizPrepEvent?.topic_ids ?? []
+  const quizPrepDaysUntilQuiz = activeQuizPrepEvent
+    ? Math.ceil((new Date(activeQuizPrepEvent.quiz_date).getTime() - now.getTime()) / MS_PER_DAY)
+    : undefined
 
   // 6. Session count for this user + pack (before creating this session).
   const { count: sessionCount, error: countErr } = await admin
@@ -177,8 +279,37 @@ export async function startSession(params) {
     mode,
     quizPrepTopicIds,
     recentTopicIds,
-    targetDurationMinutes
+    targetDurationMinutes,
+    quizPrepDaysUntilQuiz
   })
+
+  // 9b. Quiz-prep only: drop any selected topic whose bank is entirely
+  // empty (all three question types) rather than serving her a topic
+  // /api/bank can't actually fill a question for. Still triggers the same
+  // async fill checkAndTriggerBankFills (step 11) would have — done here
+  // directly since the topic no longer appears in plan.topics for that
+  // step to find.
+  if (plan.mode === 'quiz-prep' && plan.topics.length > 0) {
+    const quizPrepBankHealth = await checkBankHealth(packId, userId)
+    const totalInBankByTopic = new Map()
+    for (const h of quizPrepBankHealth) {
+      totalInBankByTopic.set(h.topic_id, (totalInBankByTopic.get(h.topic_id) ?? 0) + h.total_in_bank)
+    }
+
+    const emptyTopics = plan.topics.filter((t) => (totalInBankByTopic.get(t.id) ?? 0) === 0)
+    if (emptyTopics.length > 0) {
+      const emptyIds = new Set(emptyTopics.map((t) => t.id))
+      plan.topics = plan.topics.filter((t) => !emptyIds.has(t.id))
+      plan.target_question_count = plan.topics.length * QUESTIONS_PER_TOPIC
+
+      for (const t of emptyTopics) {
+        plan.notes.push(`Bank filling for ${t.name}`)
+        for (const questionType of ['mc', 'conceptual', 'frq']) {
+          triggerBankFill(packId, t.id, questionType)
+        }
+      }
+    }
+  }
 
   // 10. Create the session row.
   const { data: sessionRow, error: sessionErr } = await admin
