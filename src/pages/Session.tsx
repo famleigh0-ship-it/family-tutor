@@ -5,6 +5,7 @@ import SessionShell from '../components/session/SessionShell'
 import QuestionCard from '../components/session/QuestionCard'
 import FeedbackCard from '../components/session/FeedbackCard'
 import SessionSummary from '../components/session/SessionSummary'
+import PostOnboardingTransition from '../components/onboarding/PostOnboardingTransition'
 import SessionError, { BankLoadingNotice } from '../components/session/SessionError'
 import type { SessionErrorKind } from '../components/session/SessionError'
 import type {
@@ -18,7 +19,7 @@ import type {
   StoredSessionState
 } from '../components/session/types'
 
-type Phase = 'loading' | 'resume-prompt' | 'question' | 'feedback' | 'summary' | 'error'
+type Phase = 'loading' | 'resume-prompt' | 'question' | 'feedback' | 'summary' | 'post-onboarding' | 'error'
 
 interface ErrorInfo {
   kind: SessionErrorKind
@@ -29,10 +30,15 @@ interface ErrorInfo {
 }
 
 const QUESTION_TYPE_CYCLE: QuestionType[] = ['mc', 'conceptual', 'frq']
+// Onboarding never serves FRQ ("too intimidating to start" per spec) — a
+// 3-question onboarding session cycling the normal 3-type list would hit
+// FRQ on question 3, so onboarding gets its own fixed cycle.
+const ONBOARDING_QUESTION_TYPE_CYCLE: QuestionType[] = ['mc', 'conceptual', 'mc']
 const BANK_EMPTY_MAX_RETRIES = 3
 const BANK_EMPTY_RETRY_DELAY_MS = 5000
 const GRADING_TIMEOUT_MS = 15000
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
+const CRUNCH_ENCOURAGEMENT_SECONDS = 20 * 60
 
 function storageKey(packId: string) {
   return `falp:activeSession:${packId}`
@@ -123,7 +129,8 @@ export default function Session() {
   async function serveQuestionAt(forPlan: SessionPlanResponse, index: number) {
     setPhase('loading')
     const topic = forPlan.topics[index % forPlan.topics.length]
-    const questionType = QUESTION_TYPE_CYCLE[index % QUESTION_TYPE_CYCLE.length]
+    const cycle = forPlan.mode === 'onboarding' ? ONBOARDING_QUESTION_TYPE_CYCLE : QUESTION_TYPE_CYCLE
+    const questionType = cycle[index % cycle.length]
 
     try {
       const token = await authToken()
@@ -205,6 +212,12 @@ export default function Session() {
         })
         return
       }
+
+      // A real session actually started (not the requires_post_quiz early
+      // return above) — used by Home.jsx's onboarding-welcome gate so a
+      // page refresh or navigating away mid-first-session never re-shows
+      // WelcomeFlow.
+      localStorage.setItem('falp:hasStartedFirstSession', 'true')
 
       startedAtMsRef.current = Date.now()
       setElapsedSeconds(0)
@@ -426,10 +439,21 @@ export default function Session() {
     )
   }
 
+  // session-orchestrator.js appends this exact note only on the 2nd
+  // onboarding session (see the "Onboarding session N of 2" note) — used
+  // to route to PostOnboardingTransition instead of straight back to
+  // /home once the summary is dismissed.
+  const isSecondOnboardingSession = plan?.mode === 'onboarding' && (plan?.notes.some((n) => n.includes('2 of 2')) ?? false)
+
+  if (phase === 'post-onboarding') {
+    return <PostOnboardingTransition onDone={() => navigate('/home', { replace: true })} />
+  }
+
   if (phase === 'summary' && summary && plan) {
     return (
       <SessionSummary
         packId={packId}
+        mode={plan.mode}
         durationSeconds={summary.duration_seconds}
         questionsAttempted={summary.questions_attempted}
         questionsCorrect={summary.questions_correct}
@@ -437,7 +461,7 @@ export default function Session() {
         topicsBefore={plan.topics}
         topicsAfter={summary.topics}
         answeredResults={answeredResults}
-        onBackHome={() => navigate('/home', { replace: true })}
+        onBackHome={() => (isSecondOnboardingSession ? setPhase('post-onboarding') : navigate('/home', { replace: true }))}
       />
     )
   }
@@ -458,6 +482,13 @@ export default function Session() {
   // banner rather than requiring the student to read the notes array.
   const quizPrepBanner = plan.mode === 'quiz-prep' ? (plan.notes.find((n) => n.startsWith('Quiz')) ?? null) : null
 
+  const isCrunch = plan.mode === 'exam-crunch'
+  const crunchNote = isCrunch ? plan.notes.find((n) => n.startsWith('EXAM CRUNCH:')) : undefined
+  const crunchDaysMatch = crunchNote?.match(/(\d+) days/)
+  const crunchBanner = isCrunch ? `🔴 Crunch mode — ${crunchDaysMatch ? crunchDaysMatch[1] : '?'} days to exam` : null
+
+  const showCrunchEncouragement = isCrunch && phase === 'question' && elapsedSeconds >= CRUNCH_ENCOURAGEMENT_SECONDS
+
   return (
     <SessionShell
       packName={plan.pack_name}
@@ -467,8 +498,15 @@ export default function Session() {
       completedQuestions={answeredResults.length}
       topicName={currentTopic?.name ?? ''}
       onLeave={goHome}
-      banner={quizPrepBanner}
+      banner={isCrunch ? crunchBanner : quizPrepBanner}
+      urgent={isCrunch}
     >
+      {showCrunchEncouragement && (
+        <div className="mb-3 rounded-lg bg-red-50 px-3 py-2 text-center text-sm font-medium text-red-700 dark:bg-red-950/40 dark:text-red-300">
+          Good progress — keep going if you can 💪
+        </div>
+      )}
+
       {phase === 'loading' && (
         <div className="animate-pulse space-y-3">
           <div className="h-4 w-3/4 rounded bg-slate-200 dark:bg-slate-800" />
@@ -487,6 +525,7 @@ export default function Session() {
           result={gradeResult}
           isLast={questionIndex + 1 >= plan.target_question_count}
           onNext={handleNext}
+          crunchMode={isCrunch}
         />
       )}
 

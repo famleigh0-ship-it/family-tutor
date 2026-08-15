@@ -44,10 +44,13 @@ function getSupabaseAdmin() {
 }
 
 /**
+ * Exported (Phase 10) so the daily-maintenance mastery-decay sweep
+ * (api/progress/index.js) can reuse the same row-shaping logic instead of
+ * duplicating it.
  * @param {any} row
  * @returns {import('./types').MasteryRecord}
  */
-function rowToMasteryRecord(row) {
+export function rowToMasteryRecord(row) {
   return {
     topic_id: row.topic_id,
     pack_id: row.pack_id,
@@ -100,6 +103,42 @@ export async function getActiveQuizPrepEvent(userId, packId) {
   }
 
   return [...data].sort((a, b) => new Date(a.quiz_date).getTime() - new Date(b.quiz_date).getTime())[0]
+}
+
+/**
+ * Global sweep across every user/pack, expiring any quiz_prep_events whose
+ * quiz_date has passed. Phase 10: extracted from
+ * scripts/run-pacing-calendar.js's expireStaleQuizPrepEvents so the
+ * api/progress/index.js daily-maintenance cron handler can call the same
+ * logic — startSession's step 0 above still does the equivalent check
+ * scoped to one user/pack on every session start; this is the scheduled,
+ * all-users counterpart (same POST_QUIZ_STALE_DAYS/'skipped' rule as both).
+ * @param {import('@supabase/supabase-js').SupabaseClient} admin
+ * @returns {Promise<{ expired: number }>}
+ */
+export async function expireAllStaleQuizPrepEvents(admin) {
+  const now = new Date()
+  const todayStr = toDateOnly(now)
+
+  const { data: staleRows, error } = await admin
+    .from('quiz_prep_events')
+    .select('id, quiz_date, post_quiz_result')
+    .lt('quiz_date', todayStr)
+    .is('expired_at', null)
+  if (error) throw error
+
+  for (const row of staleRows ?? []) {
+    const daysSinceQuiz = Math.floor((now.getTime() - new Date(row.quiz_date).getTime()) / MS_PER_DAY)
+    const update = { expired_at: now.toISOString() }
+    if (row.post_quiz_result === null && daysSinceQuiz > POST_QUIZ_STALE_DAYS) {
+      update.post_quiz_result = 'skipped'
+    }
+
+    const { error: updateErr } = await admin.from('quiz_prep_events').update(update).eq('id', row.id)
+    if (updateErr) throw updateErr
+  }
+
+  return { expired: (staleRows ?? []).length }
 }
 
 /**
@@ -283,6 +322,15 @@ export async function startSession(params) {
     quizPrepDaysUntilQuiz,
     forceTopicIds
   })
+
+  // 9a. Onboarding session numbering — needs sessionCount (step 6 above),
+  // which selectTopics doesn't receive, so it's appended here rather than
+  // inside topic-selector.js. sessionCount is the count *before* this
+  // session's row is created (step 10 below), so session 1 has
+  // sessionCount === 0.
+  if (plan.mode === 'onboarding') {
+    plan.notes.push(`Onboarding session ${(sessionCount ?? 0) + 1} of 2`)
+  }
 
   // 9b. Quiz-prep only: drop any selected topic whose bank is entirely
   // empty (all three question types) rather than serving her a topic

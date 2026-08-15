@@ -10,6 +10,11 @@ interface Props {
   onLeave: () => void
   children: React.ReactNode
   banner?: string | null
+  // Phase 10 exam-crunch mode: red header instead of the default
+  // white/slate, red banner instead of indigo, and no amber/red timer
+  // escalation (the mode itself is already visually urgent — the spec is
+  // explicit about not doubling that up).
+  urgent?: boolean
 }
 
 const AMBER_THRESHOLD_SECONDS = 25 * 60
@@ -30,12 +35,14 @@ export default function SessionShell({
   topicName,
   onLeave,
   children,
-  banner
+  banner,
+  urgent
 }: Props) {
   const [confirmingLeave, setConfirmingLeave] = useState(false)
 
-  const timerColor =
-    elapsedSeconds >= RED_THRESHOLD_SECONDS
+  const timerColor = urgent
+    ? 'text-white'
+    : elapsedSeconds >= RED_THRESHOLD_SECONDS
       ? 'text-red-600 dark:text-red-400'
       : elapsedSeconds >= AMBER_THRESHOLD_SECONDS
         ? 'text-amber-600 dark:text-amber-400'
@@ -45,37 +52,53 @@ export default function SessionShell({
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
-      <header className="sticky top-0 z-10 border-b border-slate-200 bg-white px-4 py-3 dark:border-slate-800 dark:bg-slate-900">
+      <header
+        className={`sticky top-0 z-10 border-b px-4 py-3 ${
+          urgent
+            ? 'border-red-800 bg-red-700 dark:border-red-950 dark:bg-red-900'
+            : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900'
+        }`}
+      >
         <div className="flex items-center justify-between">
           <button
             type="button"
             onClick={() => setConfirmingLeave(true)}
             aria-label="Leave session"
-            className="-ml-2 flex h-11 w-11 items-center justify-center text-xl text-slate-700 dark:text-slate-200"
+            className={`-ml-2 flex h-11 w-11 items-center justify-center text-xl ${urgent ? 'text-white' : 'text-slate-700 dark:text-slate-200'}`}
           >
             ←
           </button>
-          <p className="flex-1 truncate px-2 text-center text-base font-semibold text-slate-900 dark:text-slate-50">{packName}</p>
+          <p className={`flex-1 truncate px-2 text-center text-base font-semibold ${urgent ? 'text-white' : 'text-slate-900 dark:text-slate-50'}`}>
+            {packName}
+          </p>
           <p className={`w-14 text-right text-sm font-medium tabular-nums ${timerColor}`}>⏱ {formatTimer(elapsedSeconds)}</p>
         </div>
 
         <div className="mt-3 flex items-center gap-3">
-          <div className="h-2 flex-1 overflow-hidden rounded-full bg-slate-200 dark:bg-slate-800">
-            <div className="h-full rounded-full bg-slate-900 transition-all dark:bg-slate-100" style={{ width: `${progressPercent}%` }} />
+          <div className={`h-2 flex-1 overflow-hidden rounded-full ${urgent ? 'bg-red-900/50' : 'bg-slate-200 dark:bg-slate-800'}`}>
+            <div
+              className={`h-full rounded-full transition-all ${urgent ? 'bg-white' : 'bg-slate-900 dark:bg-slate-100'}`}
+              style={{ width: `${progressPercent}%` }}
+            />
           </div>
-          <p className="whitespace-nowrap text-sm text-slate-500 dark:text-slate-400">
+          <p className={`whitespace-nowrap text-sm ${urgent ? 'text-red-100' : 'text-slate-500 dark:text-slate-400'}`}>
             {currentQuestionNumber} of {totalQuestions}
           </p>
         </div>
 
-        <p className="mt-1.5 truncate text-sm text-slate-500 dark:text-slate-400">Topic: {topicName}</p>
+        <p className={`mt-1.5 truncate text-sm ${urgent ? 'text-red-100' : 'text-slate-500 dark:text-slate-400'}`}>Topic: {topicName}</p>
       </header>
 
-      {banner && (
-        <div className="border-b border-indigo-100 bg-indigo-50 px-4 py-2 text-center text-sm font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
-          {banner}
-        </div>
-      )}
+      {banner &&
+        (urgent ? (
+          <div className="border-b border-red-900 bg-red-800 px-4 py-2 text-center text-sm font-medium text-white dark:border-red-950 dark:bg-red-950">
+            {banner}
+          </div>
+        ) : (
+          <div className="border-b border-indigo-100 bg-indigo-50 px-4 py-2 text-center text-sm font-medium text-indigo-800 dark:border-indigo-900 dark:bg-indigo-950 dark:text-indigo-200">
+            {banner}
+          </div>
+        ))}
 
       <main className="mx-auto max-w-sm px-4 py-6">{children}</main>
 

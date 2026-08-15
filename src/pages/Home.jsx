@@ -3,6 +3,9 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import TopBar from '../components/TopBar.jsx'
 import QuizPrepCard from '../components/quiz-prep/QuizPrepCard.tsx'
 import PostQuizPrompt from '../components/quiz-prep/PostQuizPrompt.tsx'
+import CrunchCard from '../components/crunch/CrunchCard.tsx'
+import WelcomeFlow from '../components/onboarding/WelcomeFlow.tsx'
+import InstallPrompt from '../components/InstallPrompt.tsx'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
 import { getAllPacks, getPack, getUnit, getTopic, getTopicsForWeek, getUnlockedTopics } from '../packs/loader'
@@ -14,6 +17,20 @@ function daysUntil(dateStr) {
   return Math.ceil((target - today) / 86_400_000)
 }
 
+// Phase 10: same condition session-mode.js's detectSessionMode uses for
+// exam-crunch — computed here from pack data alone (no engine/API call
+// needed) so Home can decide which card to show before a session ever
+// starts.
+function isCrunchActive(pack) {
+  return daysUntil(pack.exam_date) <= pack.exam_crunch_weeks * 7
+}
+
+function isSchoolYear(pack) {
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  return today >= new Date(pack.school_year_start)
+}
+
 export default function Home() {
   const { session, profile } = useAuth()
   const location = useLocation()
@@ -22,11 +39,25 @@ export default function Home() {
   const [loggedToday, setLoggedToday] = useState({}) // pack_id -> topics_confirmed count
   const [sessionCompleteToday, setSessionCompleteToday] = useState({}) // pack_id -> { date, topicName, masteryLabel }
   const [activeQuizPrep, setActiveQuizPrep] = useState({}) // pack_id -> active event summary | null
+  const [crunchPriorities, setCrunchPriorities] = useState({}) // pack_id -> [{ topic_name, mastery_label }]
   // Session.tsx bounces back here with this in location.state when
   // startSession finds an unanswered post-quiz prompt (see api/session's
   // requires_post_quiz branch) — "overlaid on Home, not blocking
   // navigation" per the Phase 8 spec.
   const [postQuizPrompt, setPostQuizPrompt] = useState(location.state?.postQuizPrompt ?? null)
+
+  // Phase 10 summer onboarding gate: shown full-screen in place of the
+  // normal Home body when this student has neither started a session
+  // (falp:hasStartedFirstSession, set by Session.tsx's initSession) nor
+  // finished the 2-session onboarding flow (falp:onboarding_complete, set
+  // by PostOnboardingTransition). Read once — a session starting or
+  // onboarding completing navigates away from /home anyway, so this never
+  // needs to re-evaluate mid-mount.
+  const [showWelcome] = useState(
+    () =>
+      localStorage.getItem('falp:hasStartedFirstSession') !== 'true' &&
+      localStorage.getItem('falp:onboarding_complete') !== 'true'
+  )
 
   useEffect(() => {
     let cancelled = false
@@ -135,6 +166,43 @@ export default function Home() {
   }, [session?.access_token])
 
   useEffect(() => {
+    // Crunch priorities (top 3, exam-weight-aware) — only fetched for
+    // packs actually in crunch, reusing the existing weak-spots endpoint
+    // Progress.tsx already calls rather than adding a new one.
+    let cancelled = false
+
+    async function loadCrunchPriorities() {
+      const token = session?.access_token
+      if (!token) return
+
+      const crunchPacks = getAllPacks().filter(isCrunchActive)
+      if (crunchPacks.length === 0) return
+
+      const entries = await Promise.all(
+        crunchPacks.map(async (pack) => {
+          try {
+            const res = await fetch(`/api/progress?type=weak-spots&pack_id=${pack.id}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            const body = await res.json()
+            const top3 = res.ok ? (body.weak_spots ?? []).slice(0, 3) : []
+            return [pack.id, top3.map((w) => ({ topic_name: w.topic_name, mastery_label: w.mastery_label }))]
+          } catch {
+            return [pack.id, []]
+          }
+        })
+      )
+
+      if (!cancelled) setCrunchPriorities(Object.fromEntries(entries))
+    }
+
+    loadCrunchPriorities()
+    return () => {
+      cancelled = true
+    }
+  }, [session?.access_token])
+
+  useEffect(() => {
     if (!import.meta.env.DEV) return
     // Exposed for manual testing per the Phase 3 milestone, e.g.
     // getPack('ap-physics-1') or getUnlockedTopics('ap-physics-1', '2026-08-11')
@@ -146,11 +214,22 @@ export default function Home() {
     window.getUnlockedTopics = getUnlockedTopics
   }, [])
 
+  if (showWelcome) {
+    return <WelcomeFlow />
+  }
+
   const packs = getAllPacks()
 
   return (
     <div className="min-h-screen bg-slate-50">
-      <TopBar title="FALP" />
+      <TopBar
+        title="FALP"
+        rightSlot={
+          <Link to="/settings" aria-label="Settings" className="text-slate-500">
+            ⚙️
+          </Link>
+        }
+      />
       <main className="mx-auto max-w-sm px-4 py-8">
         <h1 className="text-xl font-semibold text-slate-900">Welcome, {profile.name}</h1>
 
@@ -162,52 +241,67 @@ export default function Home() {
           {packs.map((pack) => {
             const days = daysUntil(pack.exam_date)
             const topicsLoggedCount = loggedToday[pack.id]
+            const crunch = isCrunchActive(pack)
+            const quizPrep = activeQuizPrep[pack.id]
+            const completedToday = sessionCompleteToday[pack.id]
+
+            // Home Screen Final Polish — exactly one primary card state
+            // per course, in priority order: crunch > quiz-prep >
+            // completed-today > default.
+            const primaryState = crunch ? 'crunch' : quizPrep ? 'quiz-prep' : completedToday ? 'completed' : 'default'
 
             return (
               <div key={pack.id} className="space-y-2">
-                <Link
-                  to={`/session/${pack.id}`}
-                  className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5"
-                >
-                  <p className="text-base font-medium text-slate-700">{pack.name}</p>
-                  <p className="mt-1 text-sm text-slate-500">{pack.units.length} units</p>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
-                  </p>
-                </Link>
+                {primaryState === 'crunch' && (
+                  <CrunchCard
+                    packId={pack.id}
+                    packName={pack.name}
+                    daysUntilExam={days}
+                    examCrunchWeeks={pack.exam_crunch_weeks}
+                    priorities={crunchPriorities[pack.id] ?? []}
+                  />
+                )}
+
+                {primaryState === 'quiz-prep' && (
+                  <QuizPrepCard packId={pack.id} topicNames={quizPrep.topic_names} daysUntilQuiz={quizPrep.days_until_quiz} />
+                )}
+
+                {primaryState === 'completed' && (
+                  <div className="rounded-lg bg-emerald-50 px-4 py-3">
+                    <p className="text-sm text-emerald-700">
+                      Session complete ✓ — {completedToday.date}
+                      {completedToday.topicName && (
+                        <span className="block text-xs text-emerald-600">
+                          {completedToday.topicName}
+                          {completedToday.masteryLabel ? ` — ${completedToday.masteryLabel}` : ''}
+                        </span>
+                      )}
+                    </p>
+                    <Link to={`/session/${pack.id}`} className="mt-2 inline-block text-sm font-medium text-emerald-700 underline">
+                      Practice more?
+                    </Link>
+                  </div>
+                )}
+
+                {primaryState === 'default' && (
+                  <Link to={`/session/${pack.id}`} className="block rounded-lg border border-slate-200 bg-slate-100 px-4 py-5">
+                    <p className="text-base font-medium text-slate-700">{pack.name}</p>
+                    <p className="mt-1 text-sm text-slate-500">{pack.units.length} units</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {days >= 0 ? `${days} days until exam` : 'Exam date passed'}
+                    </p>
+                  </Link>
+                )}
 
                 <Link to={`/progress/${pack.id}`} className="block text-sm text-slate-500 underline">
                   My Progress →
                 </Link>
 
-                {sessionCompleteToday[pack.id] && (
-                  <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                    Session complete ✓ — {sessionCompleteToday[pack.id].date}
-                    {sessionCompleteToday[pack.id].topicName && (
-                      <span className="block text-xs text-emerald-600">
-                        {sessionCompleteToday[pack.id].topicName}
-                        {sessionCompleteToday[pack.id].masteryLabel ? ` — ${sessionCompleteToday[pack.id].masteryLabel}` : ''}
-                      </span>
-                    )}
-                  </div>
-                )}
-
-                {activeQuizPrep[pack.id] ? (
-                  <QuizPrepCard
-                    packId={pack.id}
-                    topicNames={activeQuizPrep[pack.id].topic_names}
-                    daysUntilQuiz={activeQuizPrep[pack.id].days_until_quiz}
-                  />
-                ) : (
-                  <Link
-                    to={`/quiz-prep/${pack.id}`}
-                    className="block rounded-lg border border-dashed border-slate-300 px-4 py-3"
-                  >
-                    <span className="text-sm font-medium text-slate-700">Quiz coming up?</span>
-                  </Link>
-                )}
-
-                {topicsLoggedCount !== undefined ? (
+                {!isSchoolYear(pack) ? (
+                  <p className="rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-500">
+                    School starts in {daysUntil(pack.school_year_start)} days. You'll log your classes here.
+                  </p>
+                ) : topicsLoggedCount !== undefined ? (
                   <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                     Logged ✓ — {topicsLoggedCount} topic{topicsLoggedCount === 1 ? '' : 's'} today
                   </div>
@@ -233,6 +327,8 @@ export default function Home() {
           onDone={() => setPostQuizPrompt(null)}
         />
       )}
+
+      <InstallPrompt />
     </div>
   )
 }

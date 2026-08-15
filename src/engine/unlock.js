@@ -8,6 +8,7 @@
 // unlock.ts). See src/packs/loader.js for the same fix, applied first.
 
 import { createClient } from '@supabase/supabase-js'
+import { getPack } from '../packs/loader.js'
 
 const PRIORITIZED_DAYS = 5
 const MS_PER_DAY = 86_400_000
@@ -92,6 +93,82 @@ export async function prioritizeTopics(params) {
     .in('topic_id', topicIds)
 
   if (error) throw error
+}
+
+function currentWeekNumber(schoolYearStart, today) {
+  const start = new Date(schoolYearStart)
+  const diffDays = Math.floor((today.getTime() - start.getTime()) / MS_PER_DAY)
+  return Math.max(1, Math.floor(diffDays / 7) + 1)
+}
+
+// Only the raw pacing_calendar entries — deliberately not the loader's
+// getUnlockedTopics(), which also unlocks BC-only topics via prerequisite
+// units. This unlocks strictly what the AB calendar schedules.
+function topicIdsThroughWeek(pack, currentWeek) {
+  const ids = new Set()
+  for (const week of pack.pacing_calendar) {
+    if (week.week <= currentWeek) {
+      for (const id of week.topic_ids) ids.add(id)
+    }
+  }
+  return Array.from(ids)
+}
+
+/**
+ * Walks every user_course_packs enrollment and unlocks any pacing-calendar
+ * topics scheduled for a week that's already started. Phase 10: extracted
+ * from scripts/run-pacing-calendar.js's main() so it can be shared with
+ * the api/progress/index.js daily-maintenance cron handler — both already
+ * have their own already-constructed admin client, so this takes one as a
+ * parameter rather than building its own.
+ * @param {import('@supabase/supabase-js').SupabaseClient} admin
+ * @returns {Promise<{ enrollmentsProcessed: number, topicsUnlocked: number }>}
+ */
+export async function runPacingCalendarSweep(admin) {
+  const { data: enrollments, error } = await admin.from('user_course_packs').select('user_id, pack_id')
+  if (error) throw error
+
+  if (!enrollments || enrollments.length === 0) {
+    return { enrollmentsProcessed: 0, topicsUnlocked: 0 }
+  }
+
+  const today = new Date()
+  let topicsUnlocked = 0
+
+  for (const enrollment of enrollments) {
+    let pack
+    try {
+      pack = getPack(enrollment.pack_id)
+    } catch {
+      continue // stale/unknown pack id — skip rather than fail the sweep
+    }
+
+    const currentWeek = currentWeekNumber(pack.school_year_start, today)
+    const scheduledTopicIds = topicIdsThroughWeek(pack, currentWeek)
+
+    const { data: existing, error: existingErr } = await admin
+      .from('topic_unlock_log')
+      .select('topic_id')
+      .eq('user_id', enrollment.user_id)
+      .eq('pack_id', enrollment.pack_id)
+      .in('topic_id', scheduledTopicIds)
+    if (existingErr) throw existingErr
+
+    const alreadyUnlocked = new Set((existing ?? []).map((r) => r.topic_id))
+    const newTopicIds = scheduledTopicIds.filter((id) => !alreadyUnlocked.has(id))
+
+    if (newTopicIds.length > 0) {
+      await unlockTopics({
+        userId: enrollment.user_id,
+        packId: enrollment.pack_id,
+        topicIds: newTopicIds,
+        source: 'pacing_calendar'
+      })
+      topicsUnlocked += newTopicIds.length
+    }
+  }
+
+  return { enrollmentsProcessed: enrollments.length, topicsUnlocked }
 }
 
 /**

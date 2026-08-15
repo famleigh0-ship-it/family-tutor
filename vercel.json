@@ -7,5 +7,8 @@
     "api/grading/grade.js": { "maxDuration": 60 },
     "api/session/index.js": { "maxDuration": 30 },
     "api/progress/index.js": { "maxDuration": 30 }
-  }
+  },
+  "crons": [
+    { "path": "/api/progress?type=daily-maintenance", "schedule": "0 6 * * *" }
+  ]
 }

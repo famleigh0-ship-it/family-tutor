@@ -8,10 +8,21 @@ const MINUTES_PER_MC = 3
 const MINUTES_PER_FRQ = 8
 const CRITICAL_MASTERY_THRESHOLD = 0.4
 const DECAY_BOOST_DAYS = 14
-const EXAM_CRUNCH_WEIGHT_MULTIPLIER = 2.0
+const EXAM_CRUNCH_WEIGHT_MULTIPLIER = 2.5 // Phase 10: was 2.0
+// Phase 10 exam-crunch-only scoring boosts, layered on top of the
+// all-mode boosts above (recencyPenalty/prioritizedBoost/criticalBoost/
+// decayBoost) — same multiplicative-stacking style, just gated to
+// mode === 'exam-crunch' so every other mode's scoring is untouched.
+const CRUNCH_MASTERY_BOOST_THRESHOLD = 0.6
+const CRUNCH_MASTERY_BOOST = 1.5
+const CRUNCH_STALE_BOOST_DAYS = 7
+const CRUNCH_STALE_BOOST = 1.4
+const CRUNCH_BC_ONLY_BOOST = 2.0
+const CRUNCH_MIN_DURATION_MINUTES = 25 // "nudge toward longer sessions during crunch"
 const MIN_TOPICS = 2
 const MAX_TOPICS = 4
 const ONBOARDING_MAX_TOPICS = 3
+const ONBOARDING_QUESTION_COUNT = 3 // Phase 10: always exactly 3 questions, regardless of topic count
 const QUIZ_PREP_FILLER_FRACTION = 0.25 // "remaining 20-30% of session"
 // Exported so session-orchestrator.js can reuse the same sizing formula
 // after dropping a quiz-prep topic whose bank is entirely empty.
@@ -214,7 +225,16 @@ export function selectTopics(params) {
     const criticalBoost = t.mastery_score < CRITICAL_MASTERY_THRESHOLD ? 1.5 : 1.0
     const decayBoost = t.days_since_seen > DECAY_BOOST_DAYS ? 1.3 : 1.0
 
-    t.priority_score = base * recencyPenalty * prioritizedBoost * criticalBoost * decayBoost
+    // Crunch-only boosts (see constants above) — no-op multiplication by
+    // 1.0 outside exam-crunch mode.
+    const crunchMasteryBoost =
+      mode === 'exam-crunch' && t.mastery_score < CRUNCH_MASTERY_BOOST_THRESHOLD ? CRUNCH_MASTERY_BOOST : 1.0
+    const crunchStaleBoost =
+      mode === 'exam-crunch' && t.days_since_seen >= CRUNCH_STALE_BOOST_DAYS ? CRUNCH_STALE_BOOST : 1.0
+    const crunchBcOnlyBoost = mode === 'exam-crunch' && t.bc_only ? CRUNCH_BC_ONLY_BOOST : 1.0
+
+    t.priority_score =
+      base * recencyPenalty * prioritizedBoost * criticalBoost * decayBoost * crunchMasteryBoost * crunchStaleBoost * crunchBcOnlyBoost
   }
 
   const sorted = [...candidates].sort((a, b) => b.priority_score - a.priority_score)
@@ -222,9 +242,26 @@ export function selectTopics(params) {
   // STEP 3 + 4 — mode-specific selection and question-count sizing.
   /** @type {import('./types').TopicWithState[]} */
   let selected
+  // Set inside the exam-crunch branch below (duration nudge) and read by
+  // the target_duration_minutes calc at the bottom.
+  let crunchEffectiveTargetMinutes = targetDurationMinutes
 
   if (mode === 'onboarding') {
-    selected = sorted.filter((t) => t.difficulty === 1).slice(0, ONBOARDING_MAX_TOPICS)
+    // Phase 10: unit diversity, not just top-N by priority_score — walk
+    // pack.units in order and take the first unlocked difficulty-1 topic
+    // from each of the first 2 units that have one. ONBOARDING_MAX_TOPICS
+    // stays as a hard cap in case a unit has none and a 3rd ends up needed.
+    selected = []
+    for (const unit of pack.units) {
+      if (selected.length >= 2) break
+      const topicInUnit = candidates.find((t) => t.difficulty === 1 && unitByTopicId.get(t.id)?.id === unit.id)
+      if (topicInUnit) selected.push(topicInUnit)
+    }
+    if (selected.length === 0) {
+      // No unit had an unlocked difficulty-1 topic at all — fall back to
+      // the old top-N behavior rather than returning an empty plan.
+      selected = sorted.filter((t) => t.difficulty === 1).slice(0, ONBOARDING_MAX_TOPICS)
+    }
     notes.push('Onboarding mode — diagnostic questions only')
   } else if (mode === 'quiz-prep') {
     // Forced topics sort by mastery ascending (lowest first, not the
@@ -251,16 +288,28 @@ export function selectTopics(params) {
       }
     }
   } else if (mode === 'exam-crunch') {
-    selected = pickByDuration(sorted, targetDurationMinutes, MIN_TOPICS, MAX_TOPICS)
+    // "Never serve difficulty 1 questions in crunch" — difficulty is a
+    // fixed attribute of a topic (not a per-question range), so this has
+    // to mean excluding difficulty-1 topics from the candidate pool
+    // itself. Falls back to the unfiltered pool if that leaves nothing
+    // (e.g. right after unlock, before anything harder is available yet).
+    const aboveDifficultyOne = sorted.filter((t) => t.difficulty > 1)
+    const crunchPool = aboveDifficultyOne.length > 0 ? aboveDifficultyOne : sorted
+
+    crunchEffectiveTargetMinutes = Math.max(targetDurationMinutes, CRUNCH_MIN_DURATION_MINUTES)
+    selected = pickByDuration(crunchPool, crunchEffectiveTargetMinutes, MIN_TOPICS, MAX_TOPICS)
 
     if (!selected.some(isFrqCapable)) {
-      const frqCandidate = sorted.find((t) => isFrqCapable(t) && !selected.some((s) => s.id === t.id))
+      const frqCandidate = crunchPool.find((t) => isFrqCapable(t) && !selected.some((s) => s.id === t.id))
       selected = ensureIncluded(selected, frqCandidate, MAX_TOPICS)
     }
 
     const examDate = new Date(pack.exam_date)
     const daysUntilExam = Math.ceil((examDate.getTime() - now.getTime()) / MS_PER_DAY)
-    notes.push(`Exam crunch mode — ${daysUntilExam} days until exam`)
+    const priorityTopicNames = selected.slice(0, 3).map((t) => t.name).join(', ')
+    notes.push(`EXAM CRUNCH: ${daysUntilExam} days until ${pack.name}`)
+    notes.push(`Priority topics: ${priorityTopicNames}`)
+    notes.push('FRQ required this session')
   } else {
     // adaptive (default)
     selected = pickByDuration(sorted, targetDurationMinutes, MIN_TOPICS, MAX_TOPICS)
@@ -297,9 +346,18 @@ export function selectTopics(params) {
     }
   }
 
-  const targetQuestionCount = mode === 'onboarding' ? selected.length : selected.length * QUESTIONS_PER_TOPIC
+  // Phase 10: onboarding is always exactly 3 questions (1 MC, 1
+  // conceptual, 1 MC — see Session.tsx's mode-aware question-type cycle)
+  // regardless of how many topics (1 or 2) were actually selected above.
+  const targetQuestionCount =
+    mode === 'onboarding' ? ONBOARDING_QUESTION_COUNT : selected.length * QUESTIONS_PER_TOPIC
 
-  const targetDuration = mode === 'onboarding' ? selected.length * MINUTES_PER_MC : targetDurationMinutes
+  const targetDuration =
+    mode === 'onboarding'
+      ? ONBOARDING_QUESTION_COUNT * MINUTES_PER_MC
+      : mode === 'exam-crunch'
+        ? crunchEffectiveTargetMinutes
+        : targetDurationMinutes
 
   return {
     mode,

@@ -27,6 +27,20 @@ export default function StudentCard({ student }: Props) {
       </div>
       <p className="mt-1.5 text-sm text-slate-500 dark:text-slate-400">Last session: {formatLastSession(student.last_session_at)}</p>
       <LastLogStatus lastLogAt={student.last_log_at} />
+
+      {student.crunch_courses.length > 0 && (
+        <div className="mt-2 space-y-1">
+          {student.crunch_courses.map((c) => (
+            <p
+              key={c.pack_name}
+              className="inline-block rounded-full bg-red-100 px-2.5 py-1 text-xs font-medium text-red-700 dark:bg-red-950 dark:text-red-300"
+            >
+              ⚠ {c.pack_name} crunch: {c.days_until_exam} day{c.days_until_exam === 1 ? '' : 's'}
+            </p>
+          ))}
+        </div>
+      )}
+
       <span className="mt-2 inline-block text-sm font-medium text-slate-700 underline dark:text-slate-300">View Detail →</span>
     </Link>
   )

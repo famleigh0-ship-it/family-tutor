@@ -1,13 +1,13 @@
 {
-  "name": "Family Adaptive Learning Platform",
-  "short_name": "FALP",
+  "name": "Family Tutor",
+  "short_name": "Tutor",
   "description": "Adaptive tutoring for AP Physics 1 and Calculus AB→BC",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "orientation": "portrait",
-  "background_color": "#f8fafc",
-  "theme_color": "#0f172a",
+  "background_color": "#ffffff",
+  "theme_color": "#1e40af",
   "icons": [
     {
       "src": "/icons/icon-192.png",

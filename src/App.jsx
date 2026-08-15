@@ -8,6 +8,7 @@ import ParentDashboard from './pages/ParentDashboard.tsx'
 import ParentStudentDetail from './pages/ParentStudentDetail.tsx'
 import ClassroomLog from './pages/ClassroomLog.tsx'
 import QuizPrep from './pages/QuizPrep.tsx'
+import Settings from './pages/Settings.tsx'
 import RoleProtectedRoute from './components/RoleProtectedRoute.jsx'
 import RootRedirect from './components/RootRedirect.jsx'
 import ParentPinGate from './components/ParentPinGate.jsx'
@@ -57,6 +58,14 @@ export default function App() {
         element={
           <RoleProtectedRoute allowedRole="student">
             <QuizPrep />
+          </RoleProtectedRoute>
+        }
+      />
+      <Route
+        path="/settings"
+        element={
+          <RoleProtectedRoute allowedRole="student">
+            <Settings />
           </RoleProtectedRoute>
         }
       />

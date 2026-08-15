@@ -15,8 +15,11 @@
 // the service role here rather than any direct Supabase client read.
 
 import { getUserFromRequest, getUserProfile, getSupabaseAdmin } from '../_lib/supabaseAdmin.js'
-import { getPack } from '../../src/packs/loader.js'
-import { getMasteryLabel } from '../../src/engine/mastery.js'
+import { getPack, getAllPacks } from '../../src/packs/loader.js'
+import { getMasteryLabel, applyDecay } from '../../src/engine/mastery.js'
+import { runPacingCalendarSweep } from '../../src/engine/unlock.js'
+import { expireAllStaleQuizPrepEvents, rowToMasteryRecord } from '../../src/engine/session-orchestrator.js'
+import { checkBankHealth, triggerBankFill } from '../../src/engine/bank-manager.js'
 
 const MS_PER_DAY = 86_400_000
 const STREAK_CALENDAR_DAYS = 84 // 12 weeks
@@ -24,6 +27,13 @@ const SESSION_HISTORY_DEFAULT_LIMIT = 10
 const SESSION_HISTORY_MAX_LIMIT = 50
 const WEAK_SPOT_COUNT = 3
 const QUIZ_PREP_HISTORY_LIMIT = 5
+// Phase 10 daily-maintenance job constants.
+const DECAY_GRACE_DAYS = 7 // matches src/engine/mastery.js's DECAY_GRACE_DAYS
+// checkBankHealth's "unseen" counts are inherently per-student — for a
+// pack-wide daily report with no specific student in mind, this reuses the
+// same reference account scripts/manage-bank.js's status/fill-all commands
+// already use, so all three share one well-known reference point.
+const BANK_HEALTH_REFERENCE_EMAIL = 'engine-test@family-tutor.local'
 
 function todayStr() {
   return new Date().toISOString().slice(0, 10)
@@ -366,6 +376,25 @@ async function handleParentStudents(req, res, user, admin) {
   const courseCountByUser = new Map()
   for (const e of enrollments ?? []) courseCountByUser.set(e.user_id, (courseCountByUser.get(e.user_id) ?? 0) + 1)
 
+  // Phase 10 crunch badge — same daysUntilExam <= examCrunchWeeks*7
+  // condition session-mode.js's detectSessionMode uses, computed here
+  // (not fetched from the engine) since this is just a date comparison
+  // against pack data, no session/mastery state needed.
+  const crunchCoursesByUser = new Map()
+  for (const e of enrollments ?? []) {
+    let pack
+    try {
+      pack = getPack(e.pack_id)
+    } catch {
+      continue // stale/unknown pack id — skip rather than 500 the dashboard
+    }
+    const daysUntilExam = Math.ceil((new Date(pack.exam_date).getTime() - Date.now()) / MS_PER_DAY)
+    if (daysUntilExam > pack.exam_crunch_weeks * 7) continue
+
+    if (!crunchCoursesByUser.has(e.user_id)) crunchCoursesByUser.set(e.user_id, [])
+    crunchCoursesByUser.get(e.user_id).push({ pack_name: pack.name, days_until_exam: daysUntilExam })
+  }
+
   // Rows are ordered descending, so the first occurrence per user is the
   // most recent — same "keep only the first" trick the pre-Phase-9
   // ParentDashboard.jsx used for classroom_logs.
@@ -384,7 +413,8 @@ async function handleParentStudents(req, res, user, admin) {
     current_streak: streakByUser.get(u.id)?.current_streak ?? 0,
     course_count: courseCountByUser.get(u.id) ?? 0,
     last_session_at: lastSessionByUser.get(u.id) ?? null,
-    last_log_at: lastLogByUser.get(u.id) ?? null
+    last_log_at: lastLogByUser.get(u.id) ?? null,
+    crunch_courses: crunchCoursesByUser.get(u.id) ?? []
   }))
 
   res.status(200).json({ students })
@@ -542,6 +572,108 @@ async function handleParentStudentDetail(req, res, user, admin) {
   })
 }
 
+// ---- cron: daily maintenance ---------------------------------------------
+//
+// Phase 10. No dedicated api/jobs/daily-maintenance.js file — the app is
+// already at Vercel Hobby's 12-function cap (see README's Phase 6/8/9
+// notes on this same constraint), so this is a new `type=` branch on the
+// existing GET dispatcher instead. vercel.json's cron `path` points at
+// `/api/progress?type=daily-maintenance` directly. Auth is a CRON_SECRET
+// bearer check, not the normal Supabase-JWT flow below (a Vercel Cron
+// request carries no user session) — dispatched before getUserFromRequest
+// runs at all, see handler() below.
+
+async function getBankHealthReferenceUserId(admin) {
+  const { data, error } = await admin.auth.admin.listUsers({ perPage: 200 })
+  if (error) throw error
+  return data.users.find((u) => u.email === BANK_HEALTH_REFERENCE_EMAIL)?.id ?? null
+}
+
+// Batch counterpart to startSession's per-user decay step
+// (session-orchestrator.js) — same pure applyDecay() function, just run
+// across every stale mastery_records row in one sweep instead of one
+// user/pack at a time.
+async function runMasteryDecaySweep(admin) {
+  const cutoffIso = new Date(Date.now() - DECAY_GRACE_DAYS * MS_PER_DAY).toISOString()
+
+  const { data: rows, error } = await admin.from('mastery_records').select('*').lt('last_seen', cutoffIso)
+  if (error) throw error
+
+  // rowToMasteryRecord's shape has no user_id (session-orchestrator.js only
+  // ever calls it already scoped to one user/pack) — added back here since
+  // this sweep spans every user.
+  const records = (rows ?? []).map((row) => ({ ...rowToMasteryRecord(row), user_id: row.user_id }))
+  const decayed = applyDecay(records)
+
+  let changed = 0
+  for (let i = 0; i < decayed.length; i++) {
+    if (decayed[i].mastery_score === records[i].mastery_score) continue
+    const { error: updateErr } = await admin
+      .from('mastery_records')
+      .update({ mastery_score: decayed[i].mastery_score, updated_at: decayed[i].updated_at.toISOString() })
+      .eq('user_id', decayed[i].user_id)
+      .eq('pack_id', decayed[i].pack_id)
+      .eq('topic_id', decayed[i].topic_id)
+    if (updateErr) throw updateErr
+    changed++
+  }
+
+  return { changed }
+}
+
+async function runBankHealthSweep(admin) {
+  const referenceUserId = await getBankHealthReferenceUserId(admin)
+  if (!referenceUserId) {
+    return { triggered: 0, note: `${BANK_HEALTH_REFERENCE_EMAIL} not found — run scripts/test-engine.js once first` }
+  }
+
+  let triggered = 0
+  for (const pack of getAllPacks()) {
+    const health = await checkBankHealth(pack.id, referenceUserId)
+    for (const entry of health.filter((h) => h.needs_fill)) {
+      triggerBankFill(pack.id, entry.topic_id, entry.question_type)
+      triggered++
+    }
+  }
+  return { triggered }
+}
+
+async function runStreakStatsLog(admin) {
+  const { data, error } = await admin.from('streaks').select('current_streak')
+  if (error) throw error
+  const rows = data ?? []
+  const active = rows.filter((r) => r.current_streak > 0).length
+  const longestCurrent = rows.reduce((max, r) => Math.max(max, r.current_streak), 0)
+  return { total_students: rows.length, active_streaks: active, longest_current_streak: longestCurrent }
+}
+
+async function runStep(steps, name, fn) {
+  try {
+    const detail = await fn()
+    steps.push({ name, ok: true, detail })
+    console.log(`[daily-maintenance] ${name} ok:`, detail)
+  } catch (err) {
+    steps.push({ name, ok: false, error: err.message })
+    console.error(`[daily-maintenance] ${name} failed:`, err)
+  }
+}
+
+async function handleDailyMaintenance(req, res) {
+  const admin = getSupabaseAdmin()
+  const steps = []
+
+  await runStep(steps, 'pacing_calendar_unlock', () => runPacingCalendarSweep(admin))
+  await runStep(steps, 'mastery_decay', () => runMasteryDecaySweep(admin))
+  await runStep(steps, 'quiz_prep_expiry', () => expireAllStaleQuizPrepEvents(admin))
+  await runStep(steps, 'bank_health_check', () => runBankHealthSweep(admin))
+  await runStep(steps, 'streak_stats', () => runStreakStatsLog(admin))
+
+  const ok = steps.every((s) => s.ok)
+  res.status(ok ? 200 : 207).json({ ok, steps })
+}
+
+// ---- dispatch --------------------------------------------------------
+
 const STUDENT_TYPES = {
   'mastery-summary': handleMasterySummary,
   'weak-spots': handleWeakSpots,
@@ -554,9 +686,32 @@ const PARENT_TYPES = {
   'parent-student-detail': handleParentStudentDetail
 }
 
+function isCronCaller(req) {
+  const secret = process.env.CRON_SECRET
+  if (!secret) return false
+  return req.headers.authorization === `Bearer ${secret}`
+}
+
 export default async function handler(req, res) {
   if (req.method !== 'GET') {
     res.status(405).json({ error: 'Method not allowed' })
+    return
+  }
+
+  const type = typeof req.query.type === 'string' ? req.query.type : null
+
+  // Cron dispatch happens before any Supabase-JWT auth — a Vercel Cron
+  // request has no user session, only the CRON_SECRET bearer header.
+  if (type === 'daily-maintenance') {
+    if (!isCronCaller(req)) {
+      res.status(401).json({ error: 'Unauthorized' })
+      return
+    }
+    try {
+      await handleDailyMaintenance(req, res)
+    } catch (err) {
+      res.status(500).json({ error: 'Daily maintenance failed', detail: err.message })
+    }
     return
   }
 
@@ -572,7 +727,6 @@ export default async function handler(req, res) {
     return
   }
 
-  const type = typeof req.query.type === 'string' ? req.query.type : null
   const admin = getSupabaseAdmin()
 
   try {

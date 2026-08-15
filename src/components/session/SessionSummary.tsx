@@ -1,5 +1,6 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { supabase } from '../../lib/supabaseClient'
 import type { AnsweredResult, SessionTopic } from './types'
 
 interface TopicAfter {
@@ -11,6 +12,7 @@ interface TopicAfter {
 
 interface Props {
   packId: string
+  mode: string
   durationSeconds: number
   questionsAttempted: number
   questionsCorrect: number
@@ -21,6 +23,20 @@ interface Props {
   onBackHome: () => void
 }
 
+// mastery-summary's unit shape — see api/progress/index.js's
+// buildMasterySummaryUnits (same endpoint Progress.tsx already uses).
+interface MasterySummaryTopic {
+  unlocked: boolean
+  mastery_score: number
+}
+interface MasterySummaryUnit {
+  ap_exam_weight_min: number
+  ap_exam_weight_max: number
+  topics: MasterySummaryTopic[]
+}
+
+const EXAM_READY_THRESHOLD = 0.8 // "Solid" tier, matches getMasteryLabel
+
 function movementArrow(before: number, after: number) {
   if (after > before + 0.001) return '↑'
   if (after < before - 0.001) return '↓'
@@ -29,6 +45,7 @@ function movementArrow(before: number, after: number) {
 
 export default function SessionSummary({
   packId,
+  mode,
   durationSeconds,
   questionsAttempted,
   questionsCorrect,
@@ -38,6 +55,9 @@ export default function SessionSummary({
   answeredResults,
   onBackHome
 }: Props) {
+  const isCrunch = mode === 'exam-crunch'
+  const [examReadiness, setExamReadiness] = useState<{ percent: number; needsWork: number } | null>(null)
+
   const beforeById = useMemo(() => new Map(topicsBefore.map((t) => [t.id, t])), [topicsBefore])
 
   const niceWorkOn = useMemo(() => {
@@ -72,9 +92,66 @@ export default function SessionSummary({
         masteryLabel: topicsAfter[0]?.mastery_label ?? null
       })
     )
+    // InstallPrompt.tsx's "2+ sessions" gate — sessions/mastery_records
+    // have no RLS policy for the client to read a real count directly
+    // (same reasoning as the falp:sessionComplete write above).
+    const priorCount = Number(localStorage.getItem('falp:totalSessionsCompleted') ?? '0')
+    localStorage.setItem('falp:totalSessionsCompleted', String(priorCount + 1))
     // Only ever needs to run once, when the summary first mounts.
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
+
+  // Phase 10 exam-crunch: "AP exam readiness" replaces "Nice work on" —
+  // weighted average of mastery_score across all unlocked topics (weight =
+  // each topic's unit ap_exam_weight_mid, so high-weight units naturally
+  // dominate without an arbitrary cutoff), plus a count of unlocked topics
+  // still below the "Solid" tier. Fetches the same mastery-summary endpoint
+  // Progress.tsx already uses.
+  useEffect(() => {
+    if (!isCrunch) return
+    let cancelled = false
+
+    async function loadReadiness() {
+      const { data } = await supabase.auth.getSession()
+      const token = data.session?.access_token
+      if (!token) return
+
+      try {
+        const res = await fetch(`/api/progress?type=mastery-summary&pack_id=${packId}`, {
+          headers: { Authorization: `Bearer ${token}` }
+        })
+        const body = await res.json()
+        if (cancelled || !res.ok) return
+
+        const units = (body.units ?? []) as MasterySummaryUnit[]
+        let weightedTotal = 0
+        let weightSum = 0
+        let needsWork = 0
+
+        for (const unit of units) {
+          const weight = (unit.ap_exam_weight_min + unit.ap_exam_weight_max) / 2
+          for (const topic of unit.topics) {
+            if (!topic.unlocked) continue
+            weightedTotal += topic.mastery_score * weight
+            weightSum += weight
+            if (topic.mastery_score < EXAM_READY_THRESHOLD) needsWork++
+          }
+        }
+
+        if (weightSum > 0) {
+          setExamReadiness({ percent: Math.round((weightedTotal / weightSum) * 100), needsWork })
+        }
+      } catch {
+        // Readiness is a nice-to-have on this screen — a failed fetch just
+        // means the normal "Nice work on" block stays visible instead.
+      }
+    }
+
+    loadReadiness()
+    return () => {
+      cancelled = true
+    }
+  }, [isCrunch, packId])
 
   return (
     <div className="mx-auto max-w-sm space-y-6 px-4 py-10 text-center">
@@ -108,11 +185,21 @@ export default function SessionSummary({
         </div>
       )}
 
-      {niceWorkOn && (
-        <div className="text-left">
-          <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Nice work on</p>
-          <p className="mt-1 text-base text-slate-900 dark:text-slate-50">{niceWorkOn.name}</p>
+      {isCrunch && examReadiness ? (
+        <div className="rounded-xl border border-red-200 bg-red-50 p-4 text-left dark:border-red-900 dark:bg-red-950/30">
+          <p className="text-sm font-semibold text-red-700 dark:text-red-300">AP exam readiness</p>
+          <p className="mt-1 text-2xl font-semibold text-red-800 dark:text-red-200">{examReadiness.percent}%</p>
+          <p className="mt-2 text-sm text-red-700 dark:text-red-300">
+            Topics still needing work before exam: {examReadiness.needsWork}
+          </p>
         </div>
+      ) : (
+        niceWorkOn && (
+          <div className="text-left">
+            <p className="text-sm font-semibold text-slate-500 dark:text-slate-400">Nice work on</p>
+            <p className="mt-1 text-base text-slate-900 dark:text-slate-50">{niceWorkOn.name}</p>
+          </div>
+        )
       )}
 
       {focusNextTime && (

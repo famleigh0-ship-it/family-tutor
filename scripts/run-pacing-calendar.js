@@ -1,13 +1,15 @@
 #!/usr/bin/env node
-// Pacing-calendar-based topic unlocking. Manual for now — will become a
-// scheduled job in a later phase.
+// Pacing-calendar-based topic unlocking. Phase 10 added a real scheduled
+// job (api/progress/index.js's daily-maintenance cron handler, which calls
+// the same runPacingCalendarSweep/expireAllStaleQuizPrepEvents functions
+// this script does) — this stays around for manual/on-demand runs.
 //
 // Run with: node scripts/run-pacing-calendar.js
 
 import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
-import { getPack } from '../src/packs/loader.js'
-import { unlockTopics } from '../src/engine/unlock.js'
+import { runPacingCalendarSweep } from '../src/engine/unlock.js'
+import { expireAllStaleQuizPrepEvents } from '../src/engine/session-orchestrator.js'
 
 loadEnv({ path: '.env.local' })
 
@@ -23,109 +25,22 @@ const admin = createClient(url, serviceRoleKey, {
   auth: { autoRefreshToken: false, persistSession: false }
 })
 
-// Same threshold and 'skipped' rule as session-orchestrator.js's
-// startSession auto-expiry step — this script is the scheduled sweep,
-// startSession is the on-demand one (a student opening the app the day
-// after a quiz shouldn't have to wait for this to next run).
-const POST_QUIZ_STALE_DAYS = 14
-
-function currentWeekNumber(schoolYearStart, today) {
-  const start = new Date(schoolYearStart)
-  const diffDays = Math.floor((today.getTime() - start.getTime()) / 86_400_000)
-  return Math.max(1, Math.floor(diffDays / 7) + 1)
-}
-
-// Only the raw pacing_calendar entries — deliberately not the loader's
-// getUnlockedTopics(), which also unlocks BC-only topics via prerequisite
-// units. This job unlocks strictly what the AB calendar schedules.
-function topicIdsThroughWeek(pack, currentWeek) {
-  const ids = new Set()
-  for (const week of pack.pacing_calendar) {
-    if (week.week <= currentWeek) {
-      for (const id of week.topic_ids) ids.add(id)
-    }
-  }
-  return Array.from(ids)
-}
-
-// Expires any quiz_prep_events whose quiz date has passed, across all
-// users/packs — the scheduled counterpart to the per-user check
-// session-orchestrator.js's startSession also runs on every session start.
-async function expireStaleQuizPrepEvents() {
-  const now = new Date()
-  const todayStr = now.toISOString().slice(0, 10)
-
-  const { data: staleRows, error } = await admin
-    .from('quiz_prep_events')
-    .select('id, quiz_date, post_quiz_result')
-    .lt('quiz_date', todayStr)
-    .is('expired_at', null)
-  if (error) throw error
-
-  for (const row of staleRows ?? []) {
-    const daysSinceQuiz = Math.floor((now.getTime() - new Date(row.quiz_date).getTime()) / 86_400_000)
-    const update = { expired_at: now.toISOString() }
-    if (row.post_quiz_result === null && daysSinceQuiz > POST_QUIZ_STALE_DAYS) {
-      update.post_quiz_result = 'skipped'
-    }
-
-    const { error: updateErr } = await admin.from('quiz_prep_events').update(update).eq('id', row.id)
-    if (updateErr) throw updateErr
-  }
-
-  console.log(`Expired ${(staleRows ?? []).length} quiz prep events`)
-}
-
+// Phase 10: the pacing-calendar unlock loop and the quiz-prep expiry sweep
+// both moved into src/engine/ (runPacingCalendarSweep in unlock.js,
+// expireAllStaleQuizPrepEvents in session-orchestrator.js) so the new
+// api/progress/index.js daily-maintenance cron handler can call the exact
+// same logic instead of duplicating it. This script is now a thin wrapper
+// — same behavior and log output as before.
 async function main() {
-  const { data: enrollments, error } = await admin.from('user_course_packs').select('user_id, pack_id')
-  if (error) throw error
-
-  if (!enrollments || enrollments.length === 0) {
+  const { enrollmentsProcessed, topicsUnlocked } = await runPacingCalendarSweep(admin)
+  if (enrollmentsProcessed === 0) {
     console.log('No enrollments found in user_course_packs.')
-    return
+  } else {
+    console.log(`Processed ${enrollmentsProcessed} enrollment(s), unlocked ${topicsUnlocked} new topic(s) total.`)
   }
 
-  const today = new Date()
-
-  for (const enrollment of enrollments) {
-    let pack
-    try {
-      pack = getPack(enrollment.pack_id)
-    } catch {
-      console.warn(`Unknown pack "${enrollment.pack_id}" for user ${enrollment.user_id}, skipping.`)
-      continue
-    }
-
-    const currentWeek = currentWeekNumber(pack.school_year_start, today)
-    const scheduledTopicIds = topicIdsThroughWeek(pack, currentWeek)
-
-    const { data: existing, error: existingErr } = await admin
-      .from('topic_unlock_log')
-      .select('topic_id')
-      .eq('user_id', enrollment.user_id)
-      .eq('pack_id', enrollment.pack_id)
-      .in('topic_id', scheduledTopicIds)
-
-    if (existingErr) throw existingErr
-
-    const alreadyUnlocked = new Set((existing ?? []).map((r) => r.topic_id))
-    const newTopicIds = scheduledTopicIds.filter((id) => !alreadyUnlocked.has(id))
-
-    if (newTopicIds.length > 0) {
-      await unlockTopics({
-        userId: enrollment.user_id,
-        packId: enrollment.pack_id,
-        topicIds: newTopicIds,
-        source: 'pacing_calendar'
-      })
-    }
-
-    console.log(
-      `${enrollment.user_id} / ${enrollment.pack_id}: week ${currentWeek}, unlocked ${newTopicIds.length} new topic(s) (${scheduledTopicIds.length} scheduled total)`
-    )
-  }
-
-  await expireStaleQuizPrepEvents()
+  const { expired } = await expireAllStaleQuizPrepEvents(admin)
+  console.log(`Expired ${expired} quiz prep events`)
 }
 
 main().catch((err) => {

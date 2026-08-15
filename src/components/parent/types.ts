@@ -11,6 +11,8 @@ export interface ParentStudentSummary {
   course_count: number
   last_session_at: string | null
   last_log_at: string | null
+  // Phase 10: courses currently within exam_crunch_weeks of their exam.
+  crunch_courses: { pack_name: string; days_until_exam: number }[]
 }
 
 export interface ParentCourse {

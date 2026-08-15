@@ -5,6 +5,9 @@ interface Props {
   result: GradeResult
   isLast: boolean
   onNext: () => void
+  // Phase 10 exam-crunch: show the explicit AP-exam point value alongside
+  // the score for FRQs, per spec.
+  crunchMode?: boolean
 }
 
 type Tone = 'correct' | 'partial' | 'wrong'
@@ -41,7 +44,7 @@ const TONE_STYLES: Record<Tone, { bar: string; label: string }> = {
   wrong: { bar: 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300', label: '✗ Not quite' }
 }
 
-export default function FeedbackCard({ question, result, isLast, onNext }: Props) {
+export default function FeedbackCard({ question, result, isLast, onNext, crunchMode }: Props) {
   const tone = getTone(question, result)
   const style = TONE_STYLES[tone]
 
@@ -50,7 +53,13 @@ export default function FeedbackCard({ question, result, isLast, onNext }: Props
       <div className={`px-4 py-3 text-base font-semibold ${style.bar}`}>{style.label}</div>
 
       <div className="max-h-[60vh] space-y-4 overflow-y-auto p-4">
-        {hasFrqScore(result) && result.frq_score !== null && (
+        {hasFrqScore(result) && result.frq_score !== null && question.question_type === 'frq' && crunchMode && (
+          <p className="text-sm font-medium text-red-700 dark:text-red-300">
+            This question is worth up to 4 points on the AP exam. You scored {result.frq_score}/4.
+          </p>
+        )}
+
+        {hasFrqScore(result) && result.frq_score !== null && !(crunchMode && question.question_type === 'frq') && (
           <p className="text-sm font-medium text-slate-700 dark:text-slate-300">Score: {result.frq_score}/4</p>
         )}
 

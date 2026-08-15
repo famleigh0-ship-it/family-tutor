@@ -642,3 +642,152 @@ meaningfully different layouts behind a runtime branch for no real benefit.
 - [ ] Parent dashboard load time is under 2 seconds (Network tab)
 - [ ] On a 375px viewport: heatmap scrolls smoothly, topic cells are ≥44px
       tall, and the parent dashboard is readable and navigable
+
+## Exam crunch mode, PWA, summer onboarding, and scheduled jobs
+
+Phase 10 is the last feature phase, bundling four pieces: an automatic
+higher-pressure session mode in the final weeks before each exam, real PWA
+installability, a 2-session onboarding flow for a brand-new student account
+(the family started using the app mid-summer, ahead of the school year), and
+a daily scheduled-maintenance job — plus a "home screen final polish" pass
+so exactly one course-card state shows per course, unambiguously.
+
+**Exam crunch.** `session-mode.js`'s `detectSessionMode` already flipped a
+course into `'exam-crunch'` once `daysUntilExam <= exam_crunch_weeks * 7`
+(Phase 4) — this phase built the actual crunch *behavior* on top of that
+existing trigger. `topic-selector.js`'s exam-crunch branch now: multiplies
+exam weight by 2.5 (was 2.0), layers three crunch-only priority-score boosts
+(mastery < 0.6 → ×1.5, not seen in 7+ days → ×1.4, BC-only topics → ×2.0,
+all stacking multiplicatively with the existing all-mode boosts), excludes
+difficulty-1 topics from the candidate pool, and nudges the session-length
+target up to 25 minutes minimum. Session.tsx gets a red `SessionShell`
+(`urgent` prop — also suppresses the normal amber/red timer-color
+escalation, since the mode itself is already visually urgent), a crunch
+countdown banner, a "good progress" nudge past 20 minutes, explicit
+AP-rubric-point framing on FRQ feedback, and a session summary that swaps
+"Nice work on ..." for an "AP exam readiness %" (weighted by each topic's
+unit exam weight) plus a "topics still needing work" count. Home shows a red
+`CrunchCard` (countdown bar, top-3 priorities from the existing
+`weak-spots` endpoint, pulsing under 14 days) in place of the normal course
+card, and the parent dashboard shows a `⚠ <course> crunch: N days` badge per
+affected student.
+
+**"Never serve difficulty 1 in crunch" is implemented at topic selection,
+not question serving.** The spec's crunch bank-priority section assumes a
+topic can have multiple question difficulties to choose between. In the real
+schema, difficulty is a fixed attribute of the topic itself (`pack.json`'s
+`topic.difficulty`) — `Session.tsx` always requests exactly
+`topic.difficulty`, and every `question_bank` row for that topic is
+generated at that one difficulty. There's no "harder version of the same
+topic" for `api/bank/index.js`'s `GET` handler to prefer, so the coherent
+place to apply this is `topic-selector.js`'s crunch candidate pool
+(excluding difficulty-1 topics, falling back to the full pool only if that
+empties it) — `api/bank/index.js` itself is unchanged.
+
+**Onboarding threshold bug fix.** `session-mode.js` previously used
+`sessionCount < 3`, which put sessions 0, 1, *and* 2 all into onboarding —
+three sessions, not the two this phase's welcome flow, "Onboarding session N
+of 2" notes, and post-session-2 transition screen all assume. Fixed to
+`< 2`. Relatedly, `Session.tsx`'s question-type cycle was global
+(`['mc','conceptual','frq'][index % 3]`) regardless of mode, so a
+3-question onboarding session would have served an FRQ as question 3 —
+directly against "no FRQ in onboarding." Onboarding now cycles its own
+`['mc','conceptual','mc']` list. `topic-selector.js`'s onboarding branch
+also now picks one difficulty-1 topic from each of the first 2 units that
+have one (unit diversity) instead of the top-N by priority score, and always
+targets exactly 3 questions regardless of whether 1 or 2 topics were found.
+
+**Onboarding gate is client-local (`localStorage`), not a new endpoint.**
+`WelcomeFlow` shows on `/home` when neither `falp:hasStartedFirstSession`
+(set by `Session.tsx` the moment any session actually starts) nor
+`falp:onboarding_complete` (set by `PostOnboardingTransition`) is present.
+This mirrors how `falp:sessionComplete:<packId>` and the quiz-prep skip
+counter already work in this codebase — `sessions`/`mastery_records` have no
+RLS policy for the client to read a true session count directly (same
+reasoning documented under Phase 9 above), and a dedicated endpoint just for
+this gate would be disproportionate. `InstallPrompt`'s "2+ sessions" gate
+uses the same pattern (`falp:totalSessionsCompleted`, incremented by
+`SessionSummary.tsx`).
+
+**PWA: `vite-plugin-pwa` switched from `generateSW` to `injectManifest`.**
+The project already had `vite-plugin-pwa` scaffolded in `generateSW` mode
+since Phase 1 (confirmed: `dist/sw.js`/`dist/workbox-*.js` were plugin-
+generated build output) — in that mode the plugin writes the whole service
+worker itself, leaving no room for real Network-First-for-`/api/*`-plus-
+offline-fallback logic. `injectManifest` mode keeps the plugin's precaching
+(it injects the hashed, cache-busted build-asset list into `src/sw.js` at
+build time — "Cache First for shell assets," essentially for free) while
+letting that file contain real routing: `NetworkFirst` for `/api/*`, a
+`NavigationRoute` falling back to the precached `index.html` for SPA
+routing (so the actual app — not just a static page — works offline,
+"your progress is saved" being literally true since an in-progress session
+already persists to `sessionStorage`), and `public/offline.html` (plain
+HTML, not React) registered as a last-resort `setCatchHandler` fallback.
+Added `workbox-precaching`/`workbox-routing`/`workbox-strategies`/
+`workbox-cacheable-response` as explicit devDependencies (previously only
+present transitively via `workbox-build`) since `src/sw.js` now imports from
+them directly.
+
+**Icons are generated by a pure-Node script, not `canvas`.** The spec's
+`scripts/generate-icons.js` calls for the `canvas` npm package, which needs
+a native build (node-gyp/Cairo) — a real reliability risk on Windows and not
+a dependency this project otherwise needs. `scripts/generate-icons.js`
+instead hand-encodes a minimal RGBA PNG (IHDR/IDAT/IEND chunks, `zlib`-
+deflated pixel data, no dependency beyond Node's built-in `zlib`) — solid
+`#1e40af` background with a centered white circle kept inside the maskable
+safe zone. No literal "FT" text (not practical without a canvas/font
+library); replace `public/icons/icon-192.png`/`icon-512.png` directly with
+real artwork whenever it's available, no script involved.
+
+**No `api/jobs/daily-maintenance.js` file.** The app was already at exactly
+12 `api/` functions — Vercel Hobby's hard cap, which past phases (see the
+Phase 6/8/9 notes above) discovered fails *silently* on deploy past that
+limit. Daily maintenance is a new `type=daily-maintenance` branch on the
+existing `api/progress/index.js` GET dispatcher instead, authenticated by a
+`CRON_SECRET` bearer check (Vercel's documented convention: it auto-attaches
+`Authorization: Bearer <CRON_SECRET>` to its own cron requests once that env
+var is set) rather than the normal Supabase-JWT flow — dispatched *before*
+that flow runs at all, since a cron request carries no user session.
+`vercel.json`'s cron `path` points at `/api/progress?type=daily-maintenance`
+directly (Vercel cron paths support query strings), so this is a
+config-only redirect, not a new function. The job's 5 steps reuse existing
+engine logic rather than reimplementing it: `runPacingCalendarSweep`
+(extracted from `scripts/run-pacing-calendar.js` into `unlock.js`) and
+`expireAllStaleQuizPrepEvents` (extracted into `session-orchestrator.js`,
+which also now exports its `rowToMasteryRecord` row-shaping helper) are
+shared by both the script and the cron handler; mastery decay reuses the
+existing pure `applyDecay` (`mastery.js`) across a fresh batch query instead
+of `startSession`'s per-user scoping; bank health reuses
+`checkBankHealth`/`triggerBankFill` against the same
+`engine-test@family-tutor.local` reference account `scripts/manage-bank.js`
+already uses for pack-wide (not per-real-student) reporting.
+
+### Phase 10 milestone checklist
+
+- [ ] Temporarily setting `ap-physics-1/pack.json`'s `exam_date` to ~30 days
+      out shows `CrunchCard` on Home with red styling and top priorities
+      (restore the real date after testing)
+- [ ] Starting a session in that state shows `mode: 'exam-crunch'` with an
+      FRQ among the questions and the red `SessionShell`/banner
+- [ ] The session summary shows "AP exam readiness: X%" instead of "Nice
+      work on ..."
+- [ ] The parent dashboard shows a crunch badge for the affected student
+- [ ] `npm run build` succeeds and produces `dist/sw.js` via `injectManifest`
+- [ ] DevTools → Application → Manifest shows "Family Tutor" with both icons
+      loading; → Service Workers shows it registered (production build only)
+- [ ] Throttling the network to offline and reloading shows the cached app
+      shell (or `offline.html` as a last resort), not a blank page
+- [ ] The install banner appears on a mobile viewport after 2 completed
+      sessions, and "Add"/iOS instructions work
+- [ ] A brand-new student account shows `WelcomeFlow` on first login, not
+      the normal home screen
+- [ ] The first onboarding session serves exactly 3 questions (MC,
+      conceptual, MC — no FRQ), notes "Onboarding session 1 of 2"
+- [ ] The second onboarding session ends with `PostOnboardingTransition`,
+      after which the normal home screen shows permanently
+- [ ] Before `school_year_start`, Home shows "School starts in N days"
+      instead of the classroom-log prompt
+- [ ] `GET /api/progress?type=daily-maintenance` with the correct
+      `CRON_SECRET` bearer header runs and logs all 5 steps
+- [ ] The Vercel dashboard (Settings → Cron Jobs) accepts the cron config
+      after deploy, and function logs confirm it ran on schedule
