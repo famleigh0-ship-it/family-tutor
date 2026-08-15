@@ -245,6 +245,26 @@ export async function recordQuestionResult(params) {
   if (sessionErr || !sessionRow) throw sessionErr ?? new Error(`Session ${sessionId} not found`)
   const packId = sessionRow.pack_id
 
+  // Guards against a real failure mode from the Phase 7 session UI: a
+  // client-side grading timeout (AbortController) only stops the client
+  // from waiting — it doesn't stop this serverless function from
+  // finishing, since recordQuestionResult already runs before the HTTP
+  // response is sent. If the student then hits Retry, the timed-out first
+  // attempt can still land here a second time for the same question,
+  // double-counting it in mastery_records/question_log/sessions. Confirmed
+  // live: two POSTs to /api/grading/grade for one on-screen submission,
+  // one aborted client-side, both completing server-side.
+  if (result.question_id) {
+    const { data: existingLog, error: existingLogErr } = await admin
+      .from('question_log')
+      .select('id')
+      .eq('session_id', sessionId)
+      .eq('question_id', result.question_id)
+      .maybeSingle()
+    if (existingLogErr) throw existingLogErr
+    if (existingLog) return
+  }
+
   // 1. Load current mastery record (or default if this is the first
   // attempt at this topic).
   const { data: existing, error: existingErr } = await admin
@@ -300,6 +320,7 @@ export async function recordQuestionResult(params) {
     user_id: userId,
     pack_id: packId,
     topic_id: result.topic_id,
+    question_id: result.question_id ?? null,
     question_type: result.question_type,
     correct: result.correct,
     frq_score: result.frq_score ?? null,

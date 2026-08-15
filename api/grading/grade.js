@@ -66,6 +66,7 @@ async function gradeMc(admin, user, question, body) {
     sessionId,
     userId: user.id,
     result: {
+      question_id: question.id,
       topic_id: question.topic_id,
       question_type: 'mc',
       correct,
@@ -108,6 +109,7 @@ async function gradeTyped(admin, user, question, body) {
     sessionId,
     userId: user.id,
     result: {
+      question_id: question.id,
       topic_id: question.topic_id,
       question_type: question.question_type,
       correct,
@@ -166,6 +168,7 @@ async function gradePhoto(admin, user, question, body) {
     sessionId,
     userId: user.id,
     result: {
+      question_id: question.id,
       topic_id: question.topic_id,
       question_type: 'frq',
       correct,

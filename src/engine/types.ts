@@ -38,6 +38,11 @@ export interface QuestionResult {
   correct: boolean
   frq_score?: number // 0–4, frq only
   time_spent_seconds: number
+  // Optional: when present, recordQuestionResult uses it to skip a
+  // duplicate write if this question was already recorded for this
+  // session (see session-orchestrator.js). Omitted by scripts/test-engine.js's
+  // synthetic results, which have no real question_bank row to reference.
+  question_id?: string
 }
 
 // Mirrors the `quiz_prep_events` table (migrations/001_initial_schema.sql).
