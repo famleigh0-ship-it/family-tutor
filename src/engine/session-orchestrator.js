@@ -276,11 +276,22 @@ export async function startSession(params) {
     : undefined
 
   // 6. Session count for this user + pack (before creating this session).
+  // Only counts sessions that actually finished (ended_at set) — an
+  // abandoned session (started, left via SessionShell's "Leave" without
+  // ever reaching finishSession) still leaves a row here, and counting
+  // those toward the onboarding threshold let a student burn through both
+  // onboarding sessions without ever completing one: two quick
+  // start-then-leave attempts silently flipped detectSessionMode to
+  // 'adaptive' before a real onboarding session ever ran. Confirmed live
+  // during Phase 11 testing — a 3rd attempt landed in adaptive mode with
+  // only 2 questions (1 topic × QUESTIONS_PER_TOPIC) instead of onboarding's
+  // fixed 3, with no "Onboarding session N of 2" note.
   const { count: sessionCount, error: countErr } = await admin
     .from('sessions')
     .select('id', { count: 'exact', head: true })
     .eq('user_id', userId)
     .eq('pack_id', packId)
+    .not('ended_at', 'is', null)
 
   if (countErr) throw countErr
 
