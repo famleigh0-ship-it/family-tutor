@@ -303,29 +303,35 @@ export default function Home() {
                   </Link>
                 )}
 
-                <Link
-                  to={`/progress/${pack.id}`}
-                  className="flex min-h-[44px] items-center text-sm text-slate-500 underline dark:text-slate-400"
-                >
-                  My Progress →
-                </Link>
-
-                {/* Missing entry point, found during Phase 11 launch testing:
-                    the README documented a "Quiz coming up?" link on every
-                    course card, but no card state ever rendered one. The
-                    quiz-prep state's own card has its own "Edit quiz prep"
-                    link for an already-active event, so this only needs to
-                    cover the states that don't have any quiz-prep UI at all —
-                    without it there was no way to start quiz prep at all
-                    short of typing the URL directly. */}
-                {(primaryState === 'default' || primaryState === 'completed') && (
+                {/* Real buttons, not underlined text links — small text
+                    links met the 44px tap-target minimum but didn't read as
+                    tappable on a phone screen even so. Feedback from Phase
+                    11 launch testing. */}
+                <div className="flex gap-2">
                   <Link
-                    to={`/quiz-prep/${pack.id}`}
-                    className="flex min-h-[44px] items-center text-sm text-slate-500 underline dark:text-slate-400"
+                    to={`/progress/${pack.id}`}
+                    className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
                   >
-                    Quiz coming up?
+                    My Progress →
                   </Link>
-                )}
+
+                  {/* Missing entry point, found during Phase 11 launch testing:
+                      the README documented a "Quiz coming up?" link on every
+                      course card, but no card state ever rendered one. The
+                      quiz-prep state's own card has its own "Edit quiz prep"
+                      link for an already-active event, so this only needs to
+                      cover the states that don't have any quiz-prep UI at all —
+                      without it there was no way to start quiz prep at all
+                      short of typing the URL directly. */}
+                  {(primaryState === 'default' || primaryState === 'completed') && (
+                    <Link
+                      to={`/quiz-prep/${pack.id}`}
+                      className="flex min-h-[44px] flex-1 items-center justify-center rounded-lg border border-slate-200 bg-white px-3 text-sm font-medium text-slate-700 dark:border-slate-800 dark:bg-slate-900 dark:text-slate-200"
+                    >
+                      Quiz coming up?
+                    </Link>
+                  )}
+                </div>
 
                 {!isSchoolYear(pack) ? (
                   <p className="rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
