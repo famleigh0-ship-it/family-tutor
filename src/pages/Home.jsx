@@ -310,6 +310,23 @@ export default function Home() {
                   My Progress →
                 </Link>
 
+                {/* Missing entry point, found during Phase 11 launch testing:
+                    the README documented a "Quiz coming up?" link on every
+                    course card, but no card state ever rendered one. The
+                    quiz-prep state's own card has its own "Edit quiz prep"
+                    link for an already-active event, so this only needs to
+                    cover the states that don't have any quiz-prep UI at all —
+                    without it there was no way to start quiz prep at all
+                    short of typing the URL directly. */}
+                {(primaryState === 'default' || primaryState === 'completed') && (
+                  <Link
+                    to={`/quiz-prep/${pack.id}`}
+                    className="flex min-h-[44px] items-center text-sm text-slate-500 underline dark:text-slate-400"
+                  >
+                    Quiz coming up?
+                  </Link>
+                )}
+
                 {!isSchoolYear(pack) ? (
                   <p className="rounded-lg border border-dashed border-slate-300 px-4 py-3 text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
                     School starts in {daysUntil(pack.school_year_start)} days. You'll log your classes here.
