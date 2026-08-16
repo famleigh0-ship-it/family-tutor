@@ -35,7 +35,13 @@ export default async function handler(req, res) {
   }
 
   const pack = getPack(question.pack_id)
-  const keyReasoning = question.key_reasoning ?? question.rubric ?? question.correct_answer ?? ''
+  // Deliberately stops at rubric, never falls back to correct_answer — the
+  // rubric describes what a full-credit answer needs without spelling out
+  // the actual worked solution, so even a fully-compliant hint response
+  // has nothing more than that to draw on. Handing an LLM the literal
+  // answer and just asking it not to reveal it is fragile; not giving it
+  // the answer at all is the actual guarantee.
+  const keyReasoning = question.key_reasoning ?? question.rubric ?? ''
 
   const system = `${pack.tutor_persona}\nYou provide Socratic hints — you guide the student toward the answer without giving it away. Ask a question that helps them think through the next step. Never state the answer directly. Never show the full solution. Be encouraging.`
   const userMessage = `Question: ${question.question_text}\nCorrect answer/key reasoning: ${JSON.stringify(
