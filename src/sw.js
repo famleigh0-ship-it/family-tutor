@@ -51,13 +51,27 @@ registerRoute(
   })
 )
 
+// Absolute last resort — only reached if even offline.html isn't in the
+// precache. Response.error() here previously meant a fully blank, silent
+// failure in standalone mode (no browser chrome to show its own network-
+// error page against). A hand-written inline response can never fail the
+// same way, since it doesn't depend on any cache lookup succeeding.
+const HARD_FALLBACK_HTML = `<!DOCTYPE html>
+<html><head><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Family Tutor</title></head>
+<body style="font-family: sans-serif; display: flex; min-height: 100vh; align-items: center; justify-content: center; text-align: center; padding: 24px; background: #f8fafc; color: #0f172a;">
+<div><p style="font-size: 16px; font-weight: 500;">You're offline.</p>
+<p style="font-size: 14px; color: #64748b;">Reconnect and reopen the app to continue.</p></div>
+</body></html>`
+
 // Last-resort fallback, only reached if even the precache can't serve
 // index.html (e.g. storage was evicted between install and this request).
 // offline.html is a plain static page (not React — see public/offline.html)
 // so it renders even if the app shell itself is unavailable.
 setCatchHandler(async ({ event }) => {
   if (event.request.destination === 'document') {
-    return (await matchPrecache('/offline.html')) ?? Response.error()
+    const precached = await matchPrecache('/offline.html')
+    return precached ?? new Response(HARD_FALLBACK_HTML, { headers: { 'Content-Type': 'text/html' } })
   }
   return Response.error()
 })
