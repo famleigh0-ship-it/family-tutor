@@ -12,6 +12,16 @@ export default function ResetPassword() {
   const [submitting, setSubmitting] = useState(false)
   const navigate = useNavigate()
 
+  // See Login.jsx's friendlyAuthError for why — showing the raw browser
+  // error ("Failed to fetch") verbatim is unhelpful; this needs the network
+  // the same way signing in does.
+  function friendlyAuthError(error) {
+    if (!navigator.onLine || /fetch|network/i.test(error.message)) {
+      return "You're offline. Check your connection and try again."
+    }
+    return error.message
+  }
+
   async function handleSubmit(e) {
     e.preventDefault()
     setError(null)
@@ -21,7 +31,7 @@ export default function ResetPassword() {
 
     setSubmitting(false)
     if (error) {
-      setError(error.message)
+      setError(friendlyAuthError(error))
       return
     }
     setDone(true)

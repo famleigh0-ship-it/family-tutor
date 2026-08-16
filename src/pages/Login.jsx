@@ -24,6 +24,20 @@ export default function Login() {
 
   if (session) return null
 
+  // Signing in always needs the network (there's no offline path for a
+  // first-ever authentication) — but showing the raw browser error
+  // ("Failed to fetch") verbatim is exactly the technical, unhelpful
+  // message the Phase 11 error-message audit exists to catch. Confirmed
+  // live: opening the installed PWA while offline and signed out correctly
+  // lands on this screen with no network call needed, but attempting to
+  // sign in then surfaced this raw text.
+  function friendlyAuthError(error) {
+    if (!navigator.onLine || /fetch|network/i.test(error.message)) {
+      return "You're offline. Check your connection and try again."
+    }
+    return error.message
+  }
+
   async function handleSignIn(e) {
     e.preventDefault()
     setError(null)
@@ -32,7 +46,7 @@ export default function Login() {
     const { error } = await supabase.auth.signInWithPassword({ email, password })
 
     setSubmitting(false)
-    if (error) setError(error.message)
+    if (error) setError(friendlyAuthError(error))
     // On success, AuthContext picks up the new session and RootRedirect
     // sends the user to /home or /parent based on their role.
   }
@@ -48,7 +62,7 @@ export default function Login() {
 
     setSubmitting(false)
     if (error) {
-      setError(error.message)
+      setError(friendlyAuthError(error))
       return
     }
     setResetSent(true)
