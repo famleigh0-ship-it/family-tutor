@@ -1,0 +1,961 @@
+{
+  "id": "ap-human-geography",
+  "name": "AP Human Geography",
+  "school_year_start": "2026-08-11",
+  "exam_date": "2027-05-03",
+  "exam_crunch_weeks": 6,
+  "tutor_persona": "You are an experienced AP Human Geography tutor. You connect abstract geographic concepts to real-world examples — specific countries, cities, and regions — rather than keeping explanations purely theoretical. You expect students to use precise geographic terminology and to apply models correctly to unfamiliar scenarios, not just recite definitions. You push students to think at multiple scales (local, regional, global) and to consider how processes interact across space.",
+  "subject_context": "AP Human Geography is vocabulary-intensive and model-heavy. The hardest part for most students is not memorizing definitions but applying models (Demographic Transition Model, Von Thünen, Central Place Theory, Rostow's Stages, etc.) to new scenarios they haven't seen before. FRQs require specific real-world examples — a generic answer with no named country, city, or region earns partial credit at best. Common failure modes: confusing similar diffusion types, misapplying DTM stages, describing a model without explaining the underlying process, and answering what rather than why.",
+  "units": [
+    {
+      "id": "thinking-geographically",
+      "name": "Thinking Geographically",
+      "ap_exam_weight_min": 8,
+      "ap_exam_weight_max": 10,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "thinking-geographically.maps-and-spatial-data",
+          "name": "Maps and Spatial Data",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Distinguish between absolute location (coordinates) and relative location (in relation to other places)",
+            "Have the student explain what a map projection distorts — area, shape, distance, or direction — and why no flat map can preserve all four",
+            "Push them to interpret choropleth, dot density, and graduated symbol maps as different ways of representing the same underlying data"
+          ],
+          "common_errors": [
+            "Confuses absolute location with relative location when describing a place",
+            "Assumes all map projections are equally accurate, not recognizing the area-shape-distance-direction tradeoff (e.g. Mercator distorts area at high latitudes)",
+            "Misreads choropleth map shading as showing raw counts rather than rates or densities"
+          ]
+        },
+        {
+          "id": "thinking-geographically.geographic-scales",
+          "name": "Geographic Scale",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["thinking-geographically.maps-and-spatial-data"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to explain how a pattern visible at the global scale (e.g. population density) can look completely different at the local scale",
+            "Push them to identify the scale of analysis implied by a given question before answering",
+            "Have them connect scale to the modifiable areal unit problem — how boundaries drawn for data collection can change the apparent pattern"
+          ],
+          "common_errors": [
+            "Assumes a trend true at one scale (e.g. national) automatically holds at another scale (e.g. local)",
+            "Confuses a 'large-scale map' (zoomed in, small area, more detail) with covering a 'large area' — cartographic scale terminology runs opposite to everyday intuition",
+            "Ignores that a scale of analysis was specified in a question and answers at the wrong scale"
+          ]
+        },
+        {
+          "id": "thinking-geographically.regional-analysis",
+          "name": "Regional Analysis",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["thinking-geographically.geographic-scales"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish formal (uniform), functional (nodal), and perceptual (vernacular) regions with a real example of each",
+            "Ask them to justify why a region's boundary is often a zone of transition rather than a hard line",
+            "Push them to identify what makes a region functional — flows and connections to a central node, not shared characteristics"
+          ],
+          "common_errors": [
+            "Confuses a functional region (organized around a node, e.g. a metro area's commuting zone) with a formal region (uniform characteristic, e.g. the Corn Belt)",
+            "Treats a perceptual region (e.g. 'the South', 'the Midwest') as having a precisely defined boundary",
+            "Assumes all regions are formal regions and misses functional or perceptual examples entirely"
+          ]
+        },
+        {
+          "id": "thinking-geographically.geographic-models-and-theories",
+          "name": "Geographic Models and Theories",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["thinking-geographically.regional-analysis"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to name the model being described (even if the question doesn't name it) before applying it",
+            "Push them to state a model's underlying assumptions and when the model breaks down in the real world",
+            "Require them to distinguish a model (a simplified, generalized representation) from a real-world case that only approximately fits it"
+          ],
+          "common_errors": [
+            "Applies a model's conclusion without checking whether the scenario meets the model's assumptions",
+            "Treats a model as a rule that must exactly predict reality rather than a simplified generalization",
+            "Cannot identify which named model (DTM, Von Thünen, etc.) a described pattern corresponds to"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "population-and-migration",
+      "name": "Population and Migration",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["thinking-geographically"],
+      "topics": [
+        {
+          "id": "population-and-migration.population-distribution-density",
+          "name": "Population Distribution and Density",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["thinking-geographically.geographic-models-and-theories"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Distinguish arithmetic density (people per total land area) from physiological density (people per unit of arable land) and ask which better indicates pressure on farmland",
+            "Push the student to explain WHY population clusters where it does (climate, water access, fertile soil, historical trade routes) rather than just describing where",
+            "Have them compare two countries with similar arithmetic density but very different physiological density, and explain what that reveals"
+          ],
+          "common_errors": [
+            "Uses arithmetic density and physiological density interchangeably as if they measure the same thing",
+            "Describes population clusters (East Asia, South Asia, Europe, eastern North America) without explaining the underlying physical or historical causes",
+            "Assumes high population density always indicates overpopulation, ignoring carrying capacity and resource availability"
+          ]
+        },
+        {
+          "id": "population-and-migration.demographic-transition-model",
+          "name": "Demographic Transition Model",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["population-and-migration.population-distribution-density"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to describe all five stages in terms of birth rate AND death rate trends, not just overall population growth",
+            "Push them to explain specifically why Stage 2 has a birth-death rate gap — death rates fall first, due to medicine and sanitation, while birth rates stay high",
+            "Ask them to name a real country plausibly in each stage and justify the placement using actual birth/death rate reasoning",
+            "Have them explain what social and economic changes (education, urbanization, women's workforce participation) drive the Stage 2-to-3 transition"
+          ],
+          "common_errors": [
+            "Believes birth rate and death rate fall together at the same time, rather than death rate falling first during Stage 2",
+            "Places a country in the wrong stage based on population size alone rather than birth/death rate trends",
+            "Assumes the DTM applies identically and inevitably to every country, ignoring that some countries diverge from the model"
+          ]
+        },
+        {
+          "id": "population-and-migration.population-pyramids",
+          "name": "Population Pyramids",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["population-and-migration.demographic-transition-model"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to connect a pyramid's shape (expansive, constrictive, stationary) to a specific DTM stage",
+            "Push them to read dependency ratio implications directly off the pyramid's youth and elderly bars",
+            "Require them to explain an irregularity (a bulge or notch) as evidence of a specific historical event (war, baby boom, migration wave) rather than ignoring it"
+          ],
+          "common_errors": [
+            "Reads a wide base as automatically meaning 'overpopulated' rather than connecting it to high birth rates and a young population",
+            "Ignores bulges or notches in the pyramid that indicate specific historical events",
+            "Confuses a constrictive pyramid (narrowing base, aging population) with a stationary pyramid (roughly even width, low growth)"
+          ]
+        },
+        {
+          "id": "population-and-migration.malthusian-and-neomalthusian-theory",
+          "name": "Malthusian and Neo-Malthusian Theory",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["population-and-migration.population-pyramids"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to state Malthus's core claim precisely: population grows geometrically while food supply grows arithmetically, leading to inevitable checks",
+            "Push them to explain why Malthus's prediction hasn't played out as he predicted (Green Revolution, contraception, trade) — this is a common FRQ critique point",
+            "Ask them to distinguish neo-Malthusian arguments (which add resource and environmental limits beyond just food) from Malthus's original food-focused argument"
+          ],
+          "common_errors": [
+            "States Malthus's theory without the geometric-vs-arithmetic growth distinction that is the actual core of the argument",
+            "Treats Malthusian theory as an accepted, proven fact rather than a contested theory with documented historical counterexamples",
+            "Conflates Malthusian theory (food supply limits) with neo-Malthusian theory (broader resource and environmental limits)"
+          ]
+        },
+        {
+          "id": "population-and-migration.migration-push-pull-factors",
+          "name": "Migration Push and Pull Factors",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["population-and-migration.malthusian-and-neomalthusian-theory"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to classify each factor as economic, political, environmental, cultural, or demographic before calling it push or pull",
+            "Push them to identify both a push factor at the origin AND a pull factor at the destination for a single migration example, not just one or the other",
+            "Ask them to distinguish an intervening obstacle (a barrier along the way, e.g. cost, distance, border policy) from a push or pull factor itself"
+          ],
+          "common_errors": [
+            "Names only a push factor or only a pull factor when a complete answer requires both",
+            "Confuses an intervening obstacle (e.g. the cost or danger of the journey) with a push or pull factor",
+            "Labels a factor push or pull without specifying whether it's economic, political, environmental, or cultural"
+          ]
+        },
+        {
+          "id": "population-and-migration.migration-patterns-forced-voluntary",
+          "name": "Migration Patterns: Forced, Voluntary, and Refugee Movements",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["population-and-migration.migration-push-pull-factors"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish a refugee (crosses an international border, often forced) from an internally displaced person (forced to move but stays within their own country)",
+            "Push them to identify whether a specific described migration is voluntary (economic or lifestyle choice) or forced (fleeing conflict, persecution, disaster) and justify it",
+            "Ask them to apply Ravenstein's laws of migration (e.g. most migrants move short distances, migration increases with economic development) to a described scenario"
+          ],
+          "common_errors": [
+            "Uses 'refugee' and 'internally displaced person' interchangeably despite the international-border distinction between them",
+            "Treats all migration as voluntary and economic, missing forced migration drivers like conflict, persecution, or environmental disaster",
+            "Assumes migration is always one-directional and permanent, ignoring circular, step, and chain migration patterns"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cultural-patterns-processes",
+      "name": "Cultural Patterns and Processes",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["population-and-migration"],
+      "topics": [
+        {
+          "id": "cultural-patterns-processes.cultural-landscapes",
+          "name": "Cultural Landscapes",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["population-and-migration.migration-patterns-forced-voluntary"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Ask the student to identify specific visible evidence of culture in a landscape (architecture, land use, signage, religious structures) rather than describing culture abstractly",
+            "Push them to explain the cultural landscape as evidence of the interaction between a culture and its environment (the 'human imprint'), not just scenery",
+            "Require them to distinguish sequent occupance (successive layers of cultures leaving evidence in the same place) from a single culture's landscape"
+          ],
+          "common_errors": [
+            "Describes a landscape's physical geography (climate, terrain) instead of the cultural evidence imprinted on it",
+            "Fails to recognize a cultural landscape can contain layered evidence from multiple historical cultures (sequent occupance)",
+            "Assumes cultural landscapes are static rather than continuously reshaped by cultural change"
+          ]
+        },
+        {
+          "id": "cultural-patterns-processes.language-diffusion",
+          "name": "Language Diffusion and Language Families",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cultural-patterns-processes.cultural-landscapes"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to specify which diffusion type (relocation vs. expansion — and if expansion, contagious, hierarchical, or stimulus) explains a described language spread",
+            "Push them to distinguish a language family (broad ancestral grouping, e.g. Indo-European) from a language branch and an individual language",
+            "Ask them to explain how a lingua franca develops and why it differs from an official or a standard language"
+          ],
+          "common_errors": [
+            "Confuses relocation diffusion (requires the population itself to move) with expansion diffusion (the idea spreads while the population stays put)",
+            "Cannot distinguish hierarchical diffusion (spreads through a ranked order, e.g. major cities first) from contagious diffusion (spreads to all nearby people regardless of status)",
+            "Uses 'language family,' 'language branch,' and 'dialect' as if they were interchangeable levels of classification"
+          ]
+        },
+        {
+          "id": "cultural-patterns-processes.religion-distribution-diffusion",
+          "name": "Religion: Distribution and Diffusion",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cultural-patterns-processes.language-diffusion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish universalizing religions (actively seek converts, e.g. Christianity, Islam, Buddhism) from ethnic religions (tied to a specific ethnic group or place, e.g. Judaism, Hinduism)",
+            "Push them to identify the diffusion type (relocation vs. a specific expansion subtype) responsible for a religion's spread to a named region",
+            "Ask them to connect religious landscape evidence (structures, cemeteries, land use) to the underlying belief system"
+          ],
+          "common_errors": [
+            "Classifies an ethnic religion as universalizing or vice versa without checking whether it actively seeks converts",
+            "Attributes the global spread of a universalizing religion to relocation diffusion alone, ignoring hierarchical and contagious expansion diffusion",
+            "Assumes religious regions have hard, uncontested boundaries rather than zones of overlap and conflict"
+          ]
+        },
+        {
+          "id": "cultural-patterns-processes.ethnic-geography",
+          "name": "Ethnic Geography",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cultural-patterns-processes.religion-distribution-diffusion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish ethnicity (shared cultural identity, ancestry, language, or religion) from race and from nationality",
+            "Push them to explain ethnic enclaves and ethnic neighborhoods as products of both voluntary clustering and, sometimes, discriminatory exclusion",
+            "Ask them to connect ethnic geography to conflict — explain how competition over territory between ethnic groups can produce centrifugal forces"
+          ],
+          "common_errors": [
+            "Uses ethnicity and race as interchangeable categories rather than recognizing ethnicity is a cultural, not biological, classification",
+            "Explains ethnic clustering only as voluntary preference, ignoring historical discrimination (e.g. redlining) as a cause",
+            "Fails to connect ethnic tension to a specific real-world example when asked to explain conflict"
+          ]
+        },
+        {
+          "id": "cultural-patterns-processes.cultural-convergence-divergence",
+          "name": "Cultural Convergence and Divergence",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["cultural-patterns-processes.ethnic-geography"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to define cultural convergence (cultures become more similar, often via globalization and technology) and divergence (cultures become more distinct, often as a reactionary response) with named examples of each",
+            "Push them to explain why increased connectivity can produce BOTH outcomes simultaneously — global convergence in some practices alongside local divergence or backlash in others",
+            "Ask them to distinguish cultural globalization from cultural imperialism (convergence imposed by a dominant culture rather than mutual exchange)"
+          ],
+          "common_errors": [
+            "Assumes globalization only ever produces convergence, missing divergence or backlash examples (e.g. revival of regional languages or nationalist movements)",
+            "Uses 'cultural convergence' and 'cultural imperialism' as synonyms rather than recognizing imperialism implies an imposed, one-directional process",
+            "Cannot name a specific real-world example of either process when an FRQ requires one"
+          ]
+        },
+        {
+          "id": "cultural-patterns-processes.folk-vs-popular-culture",
+          "name": "Folk Culture vs. Popular Culture",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cultural-patterns-processes.cultural-convergence-divergence"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish folk culture (small, homogeneous group, traditional, resistant to rapid change, tied closely to place) from popular culture (large, heterogeneous group, rapidly changing, diffused through media and technology)",
+            "Push them to explain why folk culture tends to diffuse through relocation diffusion while popular culture diffuses hierarchically and through media (contagious and hierarchical expansion)",
+            "Ask them to identify placelessness as a critique of popular culture's spread — landscapes in different places starting to look identical, e.g. chain stores"
+          ],
+          "common_errors": [
+            "Assumes any traditional-seeming practice is folk culture without checking group size and rate of change",
+            "Attributes popular culture's spread to relocation diffusion rather than the media-driven hierarchical and contagious diffusion that actually drives it",
+            "Cannot explain placelessness as a specific, named consequence of popular culture diffusion"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "political-patterns-processes",
+      "name": "Political Patterns and Processes",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["cultural-patterns-processes"],
+      "topics": [
+        {
+          "id": "political-patterns-processes.political-boundaries",
+          "name": "Political Boundaries",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cultural-patterns-processes.folk-vs-popular-culture"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to classify a described boundary by origin — antecedent (drawn before the area was significantly settled), subsequent (drawn after settlement, reflecting cultural patterns), superimposed (forcibly drawn over existing cultural patterns, often by an outside power), or relic (no longer functions as a boundary but still visible)",
+            "Push them to distinguish boundary classification by origin/timing from classification by physical vs. cultural/geometric type",
+            "Ask them to explain why superimposed boundaries (e.g. many colonial-era African borders) are especially prone to conflict"
+          ],
+          "common_errors": [
+            "Confuses a superimposed boundary (imposed over existing cultural groups, often by a colonial power) with a subsequent boundary (drawn after and reflecting settlement patterns)",
+            "Cannot identify a relic boundary as one that no longer serves as an active political border despite remaining visible in the landscape",
+            "Classifies boundaries only by physical or geometric shape without considering the origin-based classification the AP exam also tests"
+          ]
+        },
+        {
+          "id": "political-patterns-processes.state-morphology",
+          "name": "State Morphology",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["political-patterns-processes.political-boundaries"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to classify a state's shape (compact, elongated, fragmented, perforated, prorupted) and explain the specific governance challenge that shape creates",
+            "Push them to name a real example for each shape category rather than describing shapes abstractly",
+            "Ask them to distinguish a fragmented state made of islands from one split by another state's territory"
+          ],
+          "common_errors": [
+            "Names a shape category without explaining the specific administrative or security challenge it causes (e.g. elongated states have communication and transportation difficulties across their length)",
+            "Confuses a perforated state (completely surrounds another state's territory, e.g. South Africa and Lesotho) with a fragmented state (separated pieces)",
+            "Cannot supply a real named example when the question requires one"
+          ]
+        },
+        {
+          "id": "political-patterns-processes.centripetal-centrifugal-forces",
+          "name": "Centripetal and Centrifugal Forces",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["political-patterns-processes.state-morphology"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to evaluate the SAME type of force (language, religion, ethnicity, external threat) as potentially centripetal in one country and centrifugal in another, based on the specific scenario given",
+            "Push them to justify their classification with the actual effect described, not a generic assumption about that force type",
+            "Ask them to identify multiple forces acting simultaneously in one country and weigh which is currently dominant"
+          ],
+          "common_errors": [
+            "Assumes a force type (e.g. religion) is always centripetal or always centrifugal regardless of the specific national context described",
+            "Labels a force centripetal or centrifugal without explaining the mechanism by which it unifies or divides",
+            "Misses that a single country can have both centripetal and centrifugal forces acting at the same time"
+          ]
+        },
+        {
+          "id": "political-patterns-processes.devolution-supranationalism",
+          "name": "Devolution and Supranationalism",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["political-patterns-processes.centripetal-centrifugal-forces"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to define devolution as the transfer of power from a central government to regional or local governments, and supranationalism as states voluntarily ceding some sovereignty to a larger organization",
+            "Push them to explain devolution as a response to centrifugal forces (e.g. ethnic or regional separatism) using a real named example",
+            "Ask them to explain why supranational organizations (EU, NATO, UN) trade some sovereignty for collective economic or security benefits, and identify a tension this creates"
+          ],
+          "common_errors": [
+            "Confuses devolution (power moving down to regions within one state) with supranationalism (states pooling power upward into a larger organization)",
+            "Describes devolution as a country splitting apart entirely rather than power being redistributed within a state that remains intact",
+            "Cannot name a real devolved region or supranational organization when the question requires a specific example"
+          ]
+        },
+        {
+          "id": "political-patterns-processes.geopolitics-heartland-rimland",
+          "name": "Geopolitics: Heartland and Rimland Theory",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["political-patterns-processes.devolution-supranationalism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to state Mackinder's Heartland Theory claim (whoever controls the Eurasian interior, the 'Heartland,' controls world power) before critiquing it",
+            "Push them to explain Spykman's Rimland critique — that the coastal periphery ('Rimland') surrounding the Heartland, not the interior itself, is actually more strategically decisive",
+            "Ask them to connect these theories to a real historical or current geopolitical example (e.g. Cold War containment strategy reflects Rimland thinking)"
+          ],
+          "common_errors": [
+            "Confuses Heartland Theory (Mackinder, interior control) with Rimland Theory (Spykman, coastal periphery control), treating them as the same argument",
+            "States the theory without connecting it to an actual historical or current geopolitical strategy or event",
+            "Treats these classical geopolitical theories as current, uncontested doctrine rather than historically situated and contested frameworks"
+          ]
+        },
+        {
+          "id": "political-patterns-processes.electoral-geography",
+          "name": "Electoral Geography and Redistricting",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["political-patterns-processes.geopolitics-heartland-rimland"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish gerrymandering techniques — 'packing' (concentrating opposition voters into few districts) from 'cracking' (spreading opposition voters thinly across many districts)",
+            "Push them to explain why redistricting is inherently geographic — it's about drawing boundaries around people, not just a legal process",
+            "Ask them to evaluate a described district shape (e.g. unusually elongated or fragmented) as potential evidence of gerrymandering, and to justify the reasoning"
+          ],
+          "common_errors": [
+            "Uses 'packing' and 'cracking' interchangeably rather than recognizing they are opposite strategies producing opposite spatial patterns",
+            "Assumes any oddly-shaped district is automatically gerrymandered, without considering that natural or administrative boundaries also produce irregular shapes",
+            "Discusses gerrymandering only in the abstract without connecting it to how it changes representation outcomes for specific groups"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agriculture-rural-land-use",
+      "name": "Agriculture and Rural Land Use",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["political-patterns-processes"],
+      "topics": [
+        {
+          "id": "agriculture-rural-land-use.agricultural-origins-diffusion",
+          "name": "Agricultural Origins and Diffusion",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["political-patterns-processes.electoral-geography"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to identify at least one specific hearth of plant or animal domestication (e.g. Fertile Crescent, Mesoamerica, East Asia) rather than describing agriculture's origin generically",
+            "Push them to distinguish the First Agricultural (Neolithic) Revolution from the Second (mechanization) and Third/Green Revolutions",
+            "Ask them to explain how domestication changed settlement patterns — from nomadic to sedentary — and why that mattered for population growth"
+          ],
+          "common_errors": [
+            "Describes 'the invention of agriculture' as a single global event rather than multiple independent hearths of domestication",
+            "Confuses the First, Second, and Third Agricultural Revolutions when asked to place a described change (e.g. tractors, GMOs) in the correct one",
+            "Fails to connect agricultural origins to the resulting shift toward sedentary settlement and population growth"
+          ]
+        },
+        {
+          "id": "agriculture-rural-land-use.subsistence-vs-commercial-agriculture",
+          "name": "Subsistence vs. Commercial Agriculture",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["agriculture-rural-land-use.agricultural-origins-diffusion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to classify a described farming scenario as subsistence (grown mainly for the farmer's own family or local consumption) or commercial (grown for sale, often to a distant market) and justify it with details from the scenario",
+            "Push them to name specific types within each category (e.g. shifting cultivation, pastoral nomadism, intensive subsistence under subsistence; plantation, mixed crop-livestock, and market gardening under commercial)",
+            "Ask them to explain how a region can transition from subsistence to commercial agriculture as market access and technology increase"
+          ],
+          "common_errors": [
+            "Assumes all agriculture in developing countries is subsistence and all in developed countries is commercial, ignoring exceptions in both directions",
+            "Cannot name a specific subsistence or commercial farming type when the question requires one, not just the broad category",
+            "Confuses shifting cultivation (rotating fields) with permanent intensive subsistence farming"
+          ]
+        },
+        {
+          "id": "agriculture-rural-land-use.von-thunen-model",
+          "name": "Von Thünen's Agricultural Land Use Model",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["agriculture-rural-land-use.subsistence-vs-commercial-agriculture"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain ring order using transportation cost to the central market as the driving variable, not soil quality or climate",
+            "Push them to justify why perishable, high-transport-cost goods (dairy, market gardening) locate closest to the market and extensive land uses (ranching) locate farthest",
+            "Ask them to identify the model's simplifying assumptions (isolated state, uniform flat land, single market, uniform transport cost) and explain how a real landscape deviates from them"
+          ],
+          "common_errors": [
+            "Explains ring order using climate or soil fertility instead of the distance-based transportation cost that is the model's actual logic",
+            "Cannot state the model's core assumptions and therefore can't explain why a real-world example only partially fits it",
+            "Reverses the ring order — assumes extensive land uses like ranching should be closest to market rather than farthest"
+          ]
+        },
+        {
+          "id": "agriculture-rural-land-use.green-revolution-gmos",
+          "name": "Green Revolution and GMOs",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["agriculture-rural-land-use.von-thunen-model"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific Green Revolution technologies (high-yield seed varieties, synthetic fertilizer, irrigation, mechanization) rather than describing it vaguely as 'better farming'",
+            "Push them to explain both benefits (increased yields, reduced famine risk) AND documented costs (dependence on expensive inputs, groundwater depletion, reduced crop diversity, unequal benefit to wealthier farmers) — a complete FRQ answer needs both sides",
+            "Ask them to distinguish the historical Green Revolution (mid-20th century) from modern genetically modified organisms (GMOs) as a related but separate, more recent development"
+          ],
+          "common_errors": [
+            "Describes the Green Revolution only in positive terms, omitting the well-documented environmental and equity costs the AP exam expects",
+            "Cannot name a specific Green Revolution technology beyond a vague 'new farming methods'",
+            "Treats the Green Revolution and GMOs as the same single event rather than related but distinct developments separated by decades"
+          ]
+        },
+        {
+          "id": "agriculture-rural-land-use.land-use-patterns-commodity-chains",
+          "name": "Land Use Patterns and Commodity Chains",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["agriculture-rural-land-use.green-revolution-gmos"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to trace a specific agricultural commodity chain from production through processing, distribution, and consumption, naming a location at each stage",
+            "Push them to explain why commodity chains often connect periphery-country production to core-country consumption",
+            "Ask them to identify who captures the most value at each link of the chain, and why that's often not the original producer"
+          ],
+          "common_errors": [
+            "Describes a commodity chain as a single step (growing the crop) rather than the full sequence from production to final consumption",
+            "Fails to connect commodity chain geography to unequal value capture between producing and consuming countries",
+            "Cannot name a specific real commodity (coffee, cacao, bananas, cotton) and trace its actual chain when the question asks for one"
+          ]
+        },
+        {
+          "id": "agriculture-rural-land-use.sustainable-agriculture",
+          "name": "Sustainable Agriculture",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["agriculture-rural-land-use.land-use-patterns-commodity-chains"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific sustainable practices (crop rotation, no-till farming, agroforestry, organic methods, precision agriculture) rather than describing sustainability abstractly",
+            "Push them to weigh sustainable agriculture's tradeoffs — often lower yield per acre against reduced environmental cost — rather than presenting it as a strictly superior alternative with no downside",
+            "Ask them to connect a described environmental problem (soil erosion, water depletion, biodiversity loss) to the specific sustainable practice that addresses it"
+          ],
+          "common_errors": [
+            "Describes sustainable agriculture as having no tradeoffs or downsides compared to conventional or commercial agriculture",
+            "Cannot name a specific sustainable practice, offering only the vague term 'sustainable farming'",
+            "Fails to connect a named sustainable practice to the specific environmental problem it's meant to solve"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "cities-urban-land-use",
+      "name": "Cities and Urban Land Use",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["agriculture-rural-land-use"],
+      "topics": [
+        {
+          "id": "cities-urban-land-use.urbanization-processes",
+          "name": "Urbanization Processes",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["agriculture-rural-land-use.sustainable-agriculture"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish the urbanization rate (share of a country's population living in urban areas) from urban growth (absolute increase in urban population) — the two can move independently",
+            "Push them to explain push and pull drivers of rural-to-urban migration specifically (not general migration factors) — e.g. mechanized agriculture reducing rural labor demand, urban job opportunities",
+            "Ask them to compare urbanization patterns between developed and developing countries and explain why they differ"
+          ],
+          "common_errors": [
+            "Conflates urbanization (a percentage) with urban growth (an absolute number) — a country can have significant urban growth with little change in its urbanization rate",
+            "Describes rural-to-urban migration using generic push/pull factors instead of the specific agricultural and economic drivers relevant to urbanization",
+            "Assumes urbanization rates are similar worldwide rather than recognizing sharp differences between developed and developing regions"
+          ]
+        },
+        {
+          "id": "cities-urban-land-use.urban-models",
+          "name": "Urban Models: Concentric Zone, Sector, Multiple Nuclei, and Beyond",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["cities-urban-land-use.urbanization-processes"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to match a described city's land use pattern to the correct model — concentric zone (Burgess, rings), sector (Hoyt, wedges along transportation routes), multiple nuclei (Harris-Ullman, several separate growth centers), Latin American city model, or galactic/edge city model — and explain why",
+            "Push them to identify the specific feature (e.g. wedge-shaped high-rent sectors along a transit corridor for Hoyt) that distinguishes one model from the others, not just name the model",
+            "Ask them to explain that these are largely US/Western-city-derived models and to identify features of the Latin American city model (e.g. a disamenity zone, a commercial spine) that the Burgess/Hoyt/Harris-Ullman models don't capture"
+          ],
+          "common_errors": [
+            "Applies the Burgess concentric zone model to a city description that actually matches the sector or multiple nuclei pattern",
+            "Cannot name the specific distinguishing feature of a model (e.g. confuses Hoyt's wedge-shaped sectors with Harris-Ullman's separate nuclei)",
+            "Applies a US-derived urban model to a non-Western city without recognizing region-specific models (e.g. the Latin American city model) may fit better"
+          ]
+        },
+        {
+          "id": "cities-urban-land-use.urban-hierarchy-central-place-theory",
+          "name": "Urban Hierarchy and Central Place Theory",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cities-urban-land-use.urban-models"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain Christaller's central place theory using threshold (minimum population needed to support a good or service) and range (maximum distance people will travel for it)",
+            "Push them to connect a good or service's threshold and range to where it will be found in the urban hierarchy — high-threshold/high-range goods (specialists, major hospitals) only in large central places; low-threshold/low-range goods (convenience stores) even in small towns",
+            "Ask them to explain hexagonal market areas as the model's idealized solution to avoiding both gaps and overlap in service coverage"
+          ],
+          "common_errors": [
+            "Cannot correctly apply threshold and range to explain why a specialized service (e.g. a major hospital) is found only in large cities while a convenience store is found even in small towns",
+            "Treats central place theory's hexagonal market areas as a literal real-world claim rather than an idealized simplification like Von Thünen's rings",
+            "Confuses urban hierarchy (ranking of settlements by size and function) with the rank-size rule (a specific mathematical relationship between city rank and population)"
+          ]
+        },
+        {
+          "id": "cities-urban-land-use.suburbanization-and-urban-sprawl",
+          "name": "Suburbanization and Urban Sprawl",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cities-urban-land-use.urban-hierarchy-central-place-theory"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific historical drivers of suburbanization (affordable automobiles, highway construction, favorable mortgage policy, white flight) rather than a generic 'people wanted more space'",
+            "Push them to explain urban sprawl's documented costs (increased commute times and emissions, habitat loss, infrastructure costs, decline of the central-city tax base) as part of a complete answer",
+            "Ask them to distinguish sprawl from smart growth and New Urbanism policies designed specifically to counter it (mixed-use zoning, walkability, urban growth boundaries)"
+          ],
+          "common_errors": [
+            "Explains suburbanization with only a vague 'desire for space' and skips the specific policy, infrastructure, and economic drivers the exam expects",
+            "Describes urban sprawl as a purely neutral or positive process, omitting its documented environmental and social costs",
+            "Cannot name a specific smart growth or New Urbanism strategy when asked how a city might counter sprawl"
+          ]
+        },
+        {
+          "id": "cities-urban-land-use.gentrification-and-urban-sustainability",
+          "name": "Gentrification and Urban Sustainability",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cities-urban-land-use.suburbanization-and-urban-sprawl"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to define gentrification as the process by which higher-income residents move into a previously lower-income, often disinvested urban neighborhood, raising property values and rents",
+            "Push them to explain both sides of gentrification's real effects — reinvestment and reduced blight, alongside displacement of long-term lower-income residents — rather than a one-sided account",
+            "Ask them to name a specific urban sustainability strategy (transit-oriented development, green infrastructure, mixed-income housing policy) and connect it to the specific urban problem it addresses"
+          ],
+          "common_errors": [
+            "Describes gentrification as either entirely positive (revitalization only) or entirely negative (displacement only) instead of the two-sided process the AP exam expects",
+            "Cannot name a specific urban sustainability strategy, offering only a vague 'making the city greener'",
+            "Confuses gentrification (an income and investment-driven neighborhood change) with general urban growth or suburbanization"
+          ]
+        },
+        {
+          "id": "cities-urban-land-use.primate-cities-and-world-cities",
+          "name": "Primate Cities and World Cities",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cities-urban-land-use.gentrification-and-urban-sustainability"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to define a primate city by comparison to other cities within its own country (disproportionately larger than the next-largest, dominates national political, economic, and cultural life)",
+            "Push them to define a world city by its role in the global network (headquarters of multinational corporations, financial markets, international institutions) regardless of its size ranking within its own country",
+            "Ask them to apply the rank-size rule (a country's nth-largest city is roughly 1/n the population of its largest) and explain what a primate city distribution's deviation from that rule indicates"
+          ],
+          "common_errors": [
+            "Defines a primate city using its role in the global economy rather than its size dominance within its own country's urban hierarchy",
+            "Assumes every primate city is automatically also a major world city, or vice versa, without checking both criteria separately",
+            "Cannot apply or explain the rank-size rule when asked to evaluate whether a country's city-size distribution follows it"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "industrial-economic-development",
+      "name": "Industrial and Economic Development",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["cities-urban-land-use"],
+      "topics": [
+        {
+          "id": "industrial-economic-development.economic-sectors",
+          "name": "Economic Sectors",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["cities-urban-land-use.primate-cities-and-world-cities"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to correctly classify a described job into primary (extraction, e.g. farming or mining), secondary (manufacturing), tertiary (services), quaternary (information and knowledge work), or quinary (top-level decision-making) sectors",
+            "Push them to explain the general pattern of sectoral shift as a country develops — labor moving from primary toward tertiary/quaternary sectors — and connect it to Rostow's stages",
+            "Ask them to explain why a country's mix of economic sectors is itself a development indicator, not just a description of its economy"
+          ],
+          "common_errors": [
+            "Misclassifies a described job's sector, especially confusing quaternary (information and knowledge work) with tertiary (general services)",
+            "Describes sectoral shift as random rather than a general developmental pattern connected to a country's overall development stage",
+            "Cannot explain why sectoral composition itself indicates a country's level of development"
+          ]
+        },
+        {
+          "id": "industrial-economic-development.rostows-stages-of-development",
+          "name": "Rostow's Stages of Economic Growth",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["industrial-economic-development.economic-sectors"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name and correctly order Rostow's five stages (traditional society, preconditions for takeoff, takeoff, drive to maturity, age of mass consumption)",
+            "Push them to explain Rostow's model as internally driven and linear — every country modernizes by following the same sequence of stages, mainly through internal investment and industrialization",
+            "Ask them to state the model's major critique: it assumes a Western/US-style development path applies universally and ignores each country's specific historical and structural context"
+          ],
+          "common_errors": [
+            "Cannot correctly order Rostow's stages or skips stages when describing a country's development trajectory",
+            "Presents Rostow's model uncritically without the standard critique (assumes a one-size-fits-all Western path, ignores colonial history and structural inequality)",
+            "Confuses Rostow's internally-focused stage model with Wallerstein's externally-focused world-systems theory"
+          ]
+        },
+        {
+          "id": "industrial-economic-development.wallerstein-world-systems-theory",
+          "name": "Wallerstein's World-Systems Theory",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["industrial-economic-development.rostows-stages-of-development"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to define the three-tier structure — core (high-tech, high-wage, capital-intensive production), periphery (low-wage, resource extraction and low-skill manufacturing, dependent on the core), and semi-periphery (intermediate, exhibits traits of both)",
+            "Push them to explain that world-systems theory argues underdevelopment isn't a stage a country will simply grow out of, unlike Rostow — it's a structural position maintained by the global economic system, benefiting the core",
+            "Ask them to place a specific named country in core, periphery, or semi-periphery and justify the placement with economic evidence"
+          ],
+          "common_errors": [
+            "Treats world-systems theory as just another version of Rostow's linear stages rather than a structural, relational alternative to it",
+            "Cannot correctly define the semi-periphery as a distinct intermediate category with traits of both core and periphery",
+            "Assumes a country's tier is permanent and can never shift, when the model does allow for a country moving between tiers over time"
+          ]
+        },
+        {
+          "id": "industrial-economic-development.core-periphery-model",
+          "name": "Core-Periphery Model",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["industrial-economic-development.wallerstein-world-systems-theory"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to apply the core-periphery model at multiple scales — it describes relationships between countries globally, but also between regions within a single country",
+            "Push them to explain the mechanism of unequal exchange — how the core benefits from the periphery's cheap resources and labor while the periphery gets comparatively little return",
+            "Ask them to identify specific evidence of core-periphery relationships within one country (e.g. a wealthy urban core versus an underdeveloped rural periphery)"
+          ],
+          "common_errors": [
+            "Applies core-periphery reasoning only at the global/international scale, missing that the same model applies within a single country's regions",
+            "Cannot explain the specific mechanism (unequal exchange and value capture) that produces and maintains the core-periphery relationship",
+            "Treats core and periphery status as fixed geography rather than an economic relationship that can shift over time"
+          ]
+        },
+        {
+          "id": "industrial-economic-development.deindustrialization-and-sez",
+          "name": "Deindustrialization and Special Economic Zones",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["industrial-economic-development.core-periphery-model"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain deindustrialization as manufacturing moving away from a formerly industrial core region (e.g. the US Rust Belt) toward lower-wage locations, and its effects (job loss, population decline, tax base erosion)",
+            "Push them to define a Special Economic Zone (SEZ) as a designated area with reduced regulation and taxation specifically designed to attract foreign manufacturing investment",
+            "Ask them to connect deindustrialization in one place directly to industrialization and SEZ growth in another, as two sides of the same global manufacturing shift"
+          ],
+          "common_errors": [
+            "Describes deindustrialization as simply 'losing factories' without connecting it to where that manufacturing capacity actually relocated",
+            "Cannot define what specifically makes a Special Economic Zone different from an ordinary industrial area (reduced regulation and taxation, designed to attract foreign investment)",
+            "Discusses deindustrialization and SEZ growth as unrelated phenomena rather than linked sides of the same global production shift"
+          ]
+        },
+        {
+          "id": "industrial-economic-development.development-indicators-and-gender",
+          "name": "Development Indicators and Gender",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["industrial-economic-development.deindustrialization-and-sez"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish GDP (total value produced within a country's borders), GNI per capita (total income of a country's residents, including income earned abroad, divided by population), and HDI (a composite index combining income, education, and life expectancy)",
+            "Push them to explain why gender-specific development indicators (e.g. measures covering education, workforce participation, and political representation) can diverge sharply from a country's overall HDI or GNI ranking",
+            "Ask them to justify which single indicator is most appropriate for a specific question — no single indicator captures development completely, and the AP exam rewards recognizing that limitation"
+          ],
+          "common_errors": [
+            "Uses GDP and GNI per capita interchangeably, missing that GNI includes income earned abroad by a country's residents while GDP is bounded strictly by territory",
+            "Treats HDI as purely an income measure, forgetting it's a composite that also includes education and life expectancy",
+            "Assumes a country's overall HDI or GNI ranking automatically reflects gender equality, without checking gender-specific indicators separately"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing_calendar": [
+    { "week": 1, "topic_ids": ["thinking-geographically.maps-and-spatial-data"] },
+    { "week": 2, "topic_ids": ["thinking-geographically.geographic-scales"] },
+    { "week": 3, "topic_ids": ["thinking-geographically.regional-analysis"] },
+    { "week": 4, "topic_ids": ["thinking-geographically.geographic-models-and-theories"] },
+    { "week": 5, "topic_ids": ["population-and-migration.population-distribution-density"] },
+    { "week": 6, "topic_ids": ["population-and-migration.demographic-transition-model"] },
+    { "week": 7, "topic_ids": ["population-and-migration.population-pyramids"] },
+    { "week": 8, "topic_ids": ["population-and-migration.malthusian-and-neomalthusian-theory"] },
+    {
+      "week": 9,
+      "topic_ids": [
+        "population-and-migration.migration-push-pull-factors",
+        "population-and-migration.migration-patterns-forced-voluntary"
+      ]
+    },
+    { "week": 10, "topic_ids": ["cultural-patterns-processes.cultural-landscapes"] },
+    { "week": 11, "topic_ids": ["cultural-patterns-processes.language-diffusion"] },
+    { "week": 12, "topic_ids": ["cultural-patterns-processes.religion-distribution-diffusion"] },
+    { "week": 13, "topic_ids": ["cultural-patterns-processes.ethnic-geography"] },
+    {
+      "week": 14,
+      "topic_ids": [
+        "cultural-patterns-processes.cultural-convergence-divergence",
+        "cultural-patterns-processes.folk-vs-popular-culture"
+      ]
+    },
+    { "week": 15, "topic_ids": ["political-patterns-processes.political-boundaries"] },
+    { "week": 16, "topic_ids": ["political-patterns-processes.state-morphology"] },
+    { "week": 17, "topic_ids": ["political-patterns-processes.centripetal-centrifugal-forces"] },
+    { "week": 18, "topic_ids": ["political-patterns-processes.devolution-supranationalism"] },
+    {
+      "week": 19,
+      "topic_ids": [
+        "political-patterns-processes.geopolitics-heartland-rimland",
+        "political-patterns-processes.electoral-geography"
+      ]
+    },
+    { "week": 20, "topic_ids": ["agriculture-rural-land-use.agricultural-origins-diffusion"] },
+    { "week": 21, "topic_ids": ["agriculture-rural-land-use.subsistence-vs-commercial-agriculture"] },
+    { "week": 22, "topic_ids": ["agriculture-rural-land-use.von-thunen-model"] },
+    { "week": 23, "topic_ids": ["agriculture-rural-land-use.green-revolution-gmos"] },
+    {
+      "week": 24,
+      "topic_ids": [
+        "agriculture-rural-land-use.land-use-patterns-commodity-chains",
+        "agriculture-rural-land-use.sustainable-agriculture"
+      ]
+    },
+    { "week": 25, "topic_ids": ["cities-urban-land-use.urbanization-processes"] },
+    { "week": 26, "topic_ids": ["cities-urban-land-use.urban-models"] },
+    { "week": 27, "topic_ids": ["cities-urban-land-use.urban-hierarchy-central-place-theory"] },
+    { "week": 28, "topic_ids": ["cities-urban-land-use.suburbanization-and-urban-sprawl"] },
+    { "week": 29, "topic_ids": ["cities-urban-land-use.gentrification-and-urban-sustainability"] },
+    { "week": 30, "topic_ids": ["cities-urban-land-use.primate-cities-and-world-cities"] },
+    { "week": 31, "topic_ids": ["industrial-economic-development.economic-sectors"] },
+    { "week": 32, "topic_ids": ["industrial-economic-development.rostows-stages-of-development"] },
+    { "week": 33, "topic_ids": ["industrial-economic-development.wallerstein-world-systems-theory"] },
+    { "week": 34, "topic_ids": ["industrial-economic-development.core-periphery-model"] },
+    {
+      "week": 35,
+      "topic_ids": [
+        "industrial-economic-development.deindustrialization-and-sez",
+        "industrial-economic-development.development-indicators-and-gender"
+      ]
+    },
+    { "week": 36, "topic_ids": [] }
+  ],
+  "common_misconceptions": [
+    {
+      "id": "diffusion-type-confusion",
+      "description": "Students confuse relocation diffusion (requires the original population to physically move) with expansion diffusion (the idea spreads outward while the original population stays in place), and within expansion diffusion, confuse its contagious, hierarchical, and stimulus subtypes.",
+      "affected_topic_ids": [
+        "cultural-patterns-processes.language-diffusion",
+        "cultural-patterns-processes.religion-distribution-diffusion",
+        "cultural-patterns-processes.cultural-convergence-divergence"
+      ],
+      "detection_hints": [
+        "Ask whether the population had to physically move for the idea to spread — if yes, it's relocation diffusion; if the population stayed in place, it's expansion diffusion",
+        "Check whether the student can name the specific expansion diffusion subtype: contagious (person-to-person regardless of status), hierarchical (flows through ranked nodes like cities or social classes), or stimulus (the underlying idea spreads but takes a modified local form)"
+      ]
+    },
+    {
+      "id": "dtm-stage-misidentification",
+      "description": "Students misidentify Demographic Transition Model stages, especially the Stage 2-to-Stage 3 transition — Stage 2 has both a high birth rate AND a high (but falling) death rate briefly before the birth rate itself starts to drop in Stage 3.",
+      "affected_topic_ids": ["population-and-migration.demographic-transition-model", "population-and-migration.population-pyramids"],
+      "detection_hints": [
+        "Check whether the student describes the death rate falling before the birth rate falls, not both falling together",
+        "Ask the student to identify what specifically triggers the shift from Stage 2 to Stage 3 (declining birth rates, often from urbanization, education, and women's workforce participation)"
+      ]
+    },
+    {
+      "id": "urbanization-vs-urban-growth",
+      "description": "Students conflate urbanization (the percentage of a country's population living in cities) with urban growth (the absolute increase in urban population) — a country can have significant urban growth without much change in its urbanization rate.",
+      "affected_topic_ids": ["cities-urban-land-use.urbanization-processes", "population-and-migration.population-distribution-density"],
+      "detection_hints": [
+        "Check whether the student is discussing a percentage (urbanization rate) or an absolute number (urban growth), and whether they've kept the two separate",
+        "Ask for an example where these move in different directions, e.g. a rapidly growing rural population can produce urban growth without much change in the urbanization percentage"
+      ]
+    },
+    {
+      "id": "von-thunen-ring-order",
+      "description": "Students forget that distance from the central market — via transportation cost — drives the Von Thünen model's concentric ring order, not climate or soil quality.",
+      "affected_topic_ids": ["agriculture-rural-land-use.von-thunen-model"],
+      "detection_hints": [
+        "Check whether the student explains ring order using transportation cost to market rather than physical geography like climate or soil fertility",
+        "Ask the student to explain why perishable, intensive land uses like dairy and market gardening sit closest to the central market"
+      ]
+    },
+    {
+      "id": "rostow-vs-wallerstein",
+      "description": "Students conflate modernization theory (Rostow — linear stages, driven by internal factors) with dependency/world-systems theory (Wallerstein — external, structural factors, core-periphery relationships).",
+      "affected_topic_ids": [
+        "industrial-economic-development.rostows-stages-of-development",
+        "industrial-economic-development.wallerstein-world-systems-theory"
+      ],
+      "detection_hints": [
+        "Check whether the student attributes underdevelopment to a country's own internal stage of development (Rostow) versus its structural position in the global economy (Wallerstein)",
+        "Ask which theory assumes all countries can develop by following the same linear path, and which argues the global system requires periphery countries to stay underdeveloped"
+      ]
+    },
+    {
+      "id": "primate-city-vs-world-city",
+      "description": "Students confuse a primate city (disproportionately larger than the next-largest city within its own country, dominates national life) with a world city (a node of global economic and political control, regardless of its size relative to other cities in its own country).",
+      "affected_topic_ids": [
+        "cities-urban-land-use.primate-cities-and-world-cities",
+        "cities-urban-land-use.urban-hierarchy-central-place-theory"
+      ],
+      "detection_hints": [
+        "Check whether the student is comparing the city to other cities within its own country (primate city) or to its role in the global economic network (world city)",
+        "Ask for a named example of each — e.g. a city that is both, and a city that is primate but not a major world city"
+      ]
+    },
+    {
+      "id": "centripetal-vs-centrifugal-force-application",
+      "description": "Students fail to correctly classify a specific real-world force (a shared national language, an external threat, a separatist ethnic minority) as unifying (centripetal) or dividing (centrifugal) for a given country scenario, instead assuming the force type always acts the same way everywhere.",
+      "affected_topic_ids": [
+        "political-patterns-processes.centripetal-centrifugal-forces",
+        "political-patterns-processes.devolution-supranationalism"
+      ],
+      "detection_hints": [
+        "Check whether the student is evaluating the force's actual effect on that specific state, since the same type of force (e.g. religion) can be centripetal in one country and centrifugal in another",
+        "Ask the student to name a specific example and justify unifying vs. dividing rather than just labeling it generically"
+      ]
+    },
+    {
+      "id": "gdp-gni-hdi-confusion",
+      "description": "Students confuse GDP (total value produced within a country's borders), GNI per capita (total income of a country's residents divided by population, including income earned abroad), and HDI (a composite index of income, education, and life expectancy).",
+      "affected_topic_ids": ["industrial-economic-development.development-indicators-and-gender"],
+      "detection_hints": [
+        "Check whether the student explains why GNI per capita includes income earned by citizens working abroad while GDP does not",
+        "Ask why HDI can rank two countries differently than GNI per capita alone would — HDI includes life expectancy and education, not just income"
+      ]
+    }
+  ],
+  "frq_rubric": {
+    "general_guidance": "AP Human Geography FRQs require three things to earn full credit: correct use of geographic terminology, application of the relevant model or theory to the specific scenario described, and at least one specific real-world example (named country, city, region, or process). A technically correct answer with no specific example earns partial credit only. Always check that the student has: named the relevant geographic concept or model explicitly, explained the process (not just described the pattern), and grounded the answer in a real geographic example.",
+    "point_allocation_pattern": "Score out of 4: 4 = complete and accurate with specific examples and geographic terminology, 3 = mostly correct with minor gaps or vague examples, 2 = partial understanding shown, missing key concepts, 1 = attempted but significant conceptual errors, 0 = no credit",
+    "common_reasoning_gaps": [
+      "Describes a pattern without explaining the geographic process causing it (what vs why)",
+      "Applies a model correctly but fails to name it or connect it explicitly to the question",
+      "Uses a real-world example that is too generic ('a developing country') rather than named ('Bangladesh' or 'sub-Saharan Africa')",
+      "Confuses correlation with causation in demographic or economic development arguments",
+      "Answers a different part of the FRQ than the one asked — common when questions have multiple parts"
+    ]
+  }
+}

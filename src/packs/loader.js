@@ -11,6 +11,7 @@
 import { validatePackShape, checkPackIntegrity } from './validatePack.js'
 import apPhysics1Raw from '../../course-packs/ap-physics-1/pack.json' with { type: 'json' }
 import calcAbBcRaw from '../../course-packs/calc-ab-bc/pack.json' with { type: 'json' }
+import apHumanGeographyRaw from '../../course-packs/ap-human-geography/pack.json' with { type: 'json' }
 
 /**
  * @param {unknown} raw
@@ -29,7 +30,7 @@ function loadAndValidate(raw) {
 
 /** @type {Record<string, CoursePack>} */
 const packsById = {}
-for (const raw of [apPhysics1Raw, calcAbBcRaw]) {
+for (const raw of [apPhysics1Raw, calcAbBcRaw, apHumanGeographyRaw]) {
   const pack = loadAndValidate(raw)
   packsById[pack.id] = pack
 }
