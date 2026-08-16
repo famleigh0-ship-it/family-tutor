@@ -1,3 +1,5 @@
+import { useState } from 'react'
+import { supabase } from '../../lib/supabaseClient'
 import type { GradeResult, ServedQuestion } from './types'
 
 interface Props {
@@ -44,9 +46,40 @@ const TONE_STYLES: Record<Tone, { bar: string; label: string }> = {
   wrong: { bar: 'bg-red-100 text-red-800 dark:bg-red-950/50 dark:text-red-300', label: '✗ Not quite' }
 }
 
+type ReportState = 'idle' | 'reporting' | 'reported' | 'error'
+
 export default function FeedbackCard({ question, result, isLast, onNext, crunchMode }: Props) {
   const tone = getTone(question, result)
   const style = TONE_STYLES[tone]
+  const [reportState, setReportState] = useState<ReportState>('idle')
+
+  // Added after a real grading error slipped through during Phase 11
+  // launch testing (a question's correct_answer was flagged wrong) — a
+  // low-friction way to flag a question for review without derailing the
+  // session. No note field on purpose: keeping this to one tap means she'll
+  // actually use it mid-session instead of skipping past something that
+  // seemed off.
+  async function handleReport() {
+    setReportState('reporting')
+    try {
+      const { data } = await supabase.auth.getSession()
+      const token = data.session?.access_token
+      const res = await fetch('/api/bank', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+        body: JSON.stringify({
+          question_id: question.id,
+          pack_id: question.pack_id,
+          topic_id: question.topic_id,
+          question_type: question.question_type
+        })
+      })
+      if (!res.ok) throw new Error('Failed to report question')
+      setReportState('reported')
+    } catch {
+      setReportState('error')
+    }
+  }
 
   return (
     <div className="flex flex-col overflow-hidden rounded-xl border border-slate-200 [animation:slideUp_200ms_ease-out] dark:border-slate-800">
@@ -107,6 +140,33 @@ export default function FeedbackCard({ question, result, isLast, onNext, crunchM
         >
           {isLast ? 'Finish' : 'Next Question'}
         </button>
+
+        <div className="mt-1 text-center">
+          {(reportState === 'idle' || reportState === 'reporting') && (
+            <button
+              type="button"
+              onClick={handleReport}
+              disabled={reportState === 'reporting'}
+              className="flex min-h-[44px] w-full items-center justify-center text-xs text-slate-400 underline disabled:opacity-50 dark:text-slate-500"
+            >
+              {reportState === 'reporting' ? 'Reporting...' : 'Report this question'}
+            </button>
+          )}
+          {reportState === 'reported' && (
+            <p className="flex min-h-[44px] items-center justify-center text-xs text-emerald-600 dark:text-emerald-400">
+              Reported — thanks, we'll take a look ✓
+            </p>
+          )}
+          {reportState === 'error' && (
+            <button
+              type="button"
+              onClick={handleReport}
+              className="flex min-h-[44px] w-full items-center justify-center text-xs text-red-500 underline dark:text-red-400"
+            >
+              Couldn't report — tap to try again
+            </button>
+          )}
+        </div>
       </div>
     </div>
   )

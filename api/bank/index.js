@@ -174,9 +174,49 @@ async function handleFill(req, res) {
 }
 
 // -------------------------------------------------------------------
+// PATCH — report (Phase 11: a student flagging a question as wrong)
+// -------------------------------------------------------------------
+
+const REPORT_NOTE_MAX_LENGTH = 500
+
+async function handleReport(req, res) {
+  const user = await getUserFromRequest(req)
+  if (!user) {
+    res.status(401).json({ error: 'Unauthorized' })
+    return
+  }
+
+  const profile = await getUserProfile(user.id)
+  if (!profile || profile.role !== 'student') {
+    res.status(403).json({ error: 'Forbidden' })
+    return
+  }
+
+  const { question_id: questionId, pack_id: packId, topic_id: topicId, question_type: questionType, note } = req.body || {}
+  if (!questionId || !packId || !topicId || !questionType) {
+    res.status(400).json({ error: 'question_id, pack_id, topic_id, and question_type are required' })
+    return
+  }
+
+  const admin = getSupabaseAdmin()
+  const { error } = await admin.from('question_reports').insert({
+    user_id: user.id,
+    pack_id: packId,
+    topic_id: topicId,
+    question_id: questionId,
+    question_type: questionType,
+    note: typeof note === 'string' ? note.slice(0, REPORT_NOTE_MAX_LENGTH) : null
+  })
+  if (error) throw error
+
+  res.status(200).json({ ok: true })
+}
+
+// -------------------------------------------------------------------
 
 export default async function handler(req, res) {
   if (req.method === 'GET') return handleServe(req, res)
   if (req.method === 'POST') return handleFill(req, res)
+  if (req.method === 'PATCH') return handleReport(req, res)
   res.status(405).json({ error: 'Method not allowed' })
 }
