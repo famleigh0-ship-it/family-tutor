@@ -791,3 +791,166 @@ already uses for pack-wide (not per-real-student) reporting.
       `CRON_SECRET` bearer header runs and logs all 5 steps
 - [ ] The Vercel dashboard (Settings → Cron Jobs) accepts the cron config
       after deploy, and function logs confirm it ran on schedule
+
+## Phase 11: final polish, real account setup, and launch
+
+The app went live for real use in this phase — UI polish across every
+screen, real accounts for the parent and student, and a full end-to-end
+launch test run live on real hardware (an iPhone for the student, an
+Android phone and desktop for the parent) against the production Vercel
+deployment, not local dev. Several real bugs only surfaced once actual
+devices and actual accounts were in the loop; each is documented below
+since none of them were visible from code review or local testing alone.
+
+**UI polish.** Dark mode was inconsistently applied — `Home.jsx`,
+`Login.jsx`, `ResetPassword.jsx`, `TopBar.jsx` (used on nearly every
+screen), and the whole quiz-prep/classroom-log component tree had zero
+`dark:` classes at all, a gap from when those screens were originally
+built in earlier phases before dark mode was a requirement. Also added:
+44px touch targets on several undersized secondary buttons, mobile
+keyboard handling for typed FRQ answers (`scrollIntoView` on focus, a
+fixed bottom bar for Hint/Submit so the keyboard never covers them), page
+fade-in/feedback-slide-up/option-select transitions, and `<h1>` tags
+where whole screens (the onboarding flow, session summary) had none.
+
+**Accounts.** `create-user.js` gained a `--verify` mode (read-only lookup
+by email — the original spec assumed this already existed; it didn't).
+`enroll-student.js` is new: creates the `user_course_packs` row with the
+correct `exam_date`, pre-seeds zeroed `mastery_records` for every topic in
+the pack (so the heatmap shows the full topic set from a student's very
+first login), and ensures a `streaks` row exists. Both the parent and
+student accounts already existed from earlier phase testing; rather than
+creating new ones, the student's accumulated test-session data (14
+sessions, mastery records, classroom logs, unlocked topics — all from
+development testing, never real use) was wiped back to zero before the
+launch test, so onboarding-mode detection and the mastery heatmap would
+behave exactly as they will for her actual first real login.
+
+### Bugs found and fixed during live testing
+
+- **The service worker never activated new deploys.** `src/sw.js` never
+  called `self.skipWaiting()`/`clientsClaim()`, so a newly-installed
+  worker sat waiting indefinitely and the old one kept controlling every
+  open tab — confirmed live: pushed a deploy, Vercel showed it Ready, the
+  browser kept serving the previous build regardless of hard-reloads.
+  This would have silently affected every future deploy, not just this
+  one.
+- **Onboarding-mode detection counted abandoned sessions.**
+  `startSession`'s session-count query (the one `detectSessionMode` uses
+  for the `< 2 sessions = onboarding` threshold) counted every `sessions`
+  row for a user+pack, including ones with `ended_at` still null (started
+  then abandoned via SessionShell's Leave button without finishing). Two
+  quick start-then-leave attempts during testing silently burned through
+  the onboarding budget before a single onboarding session ever
+  completed. Now only counts sessions that actually finished.
+- **A genuine content error in the AI-generated question bank.** A
+  Physics MC question had `correct_answer` pointing at the wrong option —
+  working the physics by hand confirmed "2:1" was correct, not the "1:1"
+  the bank had flagged, and the (also AI-generated) distractor note for
+  the correct option was itself backwards. Fixed in place. This is a
+  standing risk with the ~1,600 AI-generated questions across both packs —
+  worth spot-checking occasionally post-launch rather than assuming zero
+  errors; there's no automated check for factual correctness on generated
+  content today.
+- **No way to start quiz prep from Home at all.** This README has
+  documented a "Quiz coming up?" link on every course card since Phase 8,
+  but no card state (`default`/`completed`/`crunch`/`quiz-prep`) actually
+  rendered one — the quiz-prep card only had an edit link for an
+  *already-active* event. Added the missing entry point.
+- **`QuizPrepCard` had no way back into a session.** Same shape of gap —
+  once quiz prep was active, the only interaction on the card was "Edit
+  quiz prep." Added a primary "Start Practice" button (a plain
+  `/session/:packId` request; `startSession` detects the active
+  `quiz_prep_event` server-side and prioritizes its topics automatically).
+- **Offline sign-in showed the raw browser error.** `Login.jsx` and
+  `ResetPassword.jsx` displayed `error.message` verbatim on a network
+  failure — literally "Failed to fetch." Now shows "You're offline. Check
+  your connection and try again." for anything that looks like a network
+  failure.
+- **A reachable blank white screen with no error boundary anywhere.**
+  Opening the installed PWA fully offline sometimes produced a
+  "Loading..." state that then went to blank white, persisting across
+  close/reopen, resolving only once back online. The exact root cause
+  wasn't fully pinned down without live device debugging access (best
+  guess: a service-worker/precache inconsistency during the transition
+  between two back-to-back deploys with limited connectivity), but two
+  contributing gaps were fixed regardless of trigger: added a top-level
+  React error boundary (`src/components/ErrorBoundary.jsx`) so any
+  uncaught error shows a reload prompt instead of unmounting the whole
+  app, and hardened `sw.js`'s absolute last-resort catch handler to return
+  a hand-written inline HTML response instead of a bare `Response.error()`
+  — in a chrome-less standalone PWA, that bare error was pure silence with
+  no browser UI to show its own error page against.
+- **Dark-mode mastery heatmap was nearly unreadable.** Measured against
+  actual WCAG contrast math: tile backgrounds (`*-950`) came out around
+  1.1-1.3:1 against the page's `slate-950` background (want 3:1+ for a UI
+  boundary to register), and locked-tile text (`slate-600` on
+  `slate-900`) measured around 2.4:1 against the 4.5:1 AA minimum for
+  text. Partly structural too — unlike every other card in the app, the
+  heatmap's unit wrapper had no dark-mode background at all, so it sat
+  directly on the near-black page with zero surface elevation. Fixed by
+  lightening every tier's fill, lightening text, adding an explicit
+  border per cell, and giving the unit wrapper a proper surface color.
+- **The "BC" topic badge drifted vertically per card.** The label row
+  used `flex items-center`, and topic names vary widely in length —
+  `items-center` vertically centered the badge against however tall the
+  wrapped name ended up, so it landed in a different spot on every card
+  depending on wrap. Switched to plain inline text flow so the badge sits
+  right after the name wherever that lands, like any other inline
+  element.
+
+### Phase 11 milestone checklist
+
+- [x] Dark mode, touch targets, mobile keyboard behavior, and loading/
+      error/empty states audited and fixed across every screen
+- [x] Parent and student accounts verified correct (roles, family link,
+      streaks rows) via `create-user.js --verify`
+- [x] Student enrolled in both packs with correct `exam_date`, full
+      mastery-record seeding, and pacing-calendar week-1 unlocks
+- [x] Both question banks confirmed fully filled (0 of 132 / 0 of 153
+      combinations needing a fill) — no additional generation spend needed
+- [x] All 13 steps of the end-to-end launch test passed on real hardware
+      (student on iPhone, parent on Android + desktop), against the
+      production Vercel deployment
+- [x] PWA installs to home screen on both iOS and Android, opens in
+      standalone mode
+- [x] Offline shell shows a working page (not blank) when opened with no
+      connection, and resumes normally once back online
+- [x] `docs/student-guide.md` created
+- [ ] Supabase automated backups enabled and confirmed showing a recent
+      timestamp (dashboard-only step, not scriptable — do this before
+      considering the app launched for real)
+- [x] `node scripts/backup-check.js` runs clean against the real database
+
+## Database backups
+
+**Automated backups** are configured in the Supabase dashboard
+(**Settings → Backups**) — this has to be done manually in the dashboard,
+not from a script, since it's a project-level setting behind Supabase's
+own auth. On the free tier, point-in-time recovery isn't available, but
+daily backups with 7-day retention are — confirm it's enabled and shows a
+recent "last backup" timestamp before considering the app launched for
+real.
+
+**`scripts/backup-check.js`** is a sanity check, not a real backup — it
+counts rows in every table, logs the counts with a timestamp, and flags
+if a critical table (`users`, `mastery_records`, `question_bank`) comes
+back empty. Run it periodically, or right before/after anything risky:
+
+```bash
+node scripts/backup-check.js
+```
+
+**Critical tables**, in rough order of "how bad is it if this is gone":
+`users` (accounts themselves), `mastery_records` (all progress data),
+`sessions` and `question_log` (session history), `question_bank` (the
+$15-25 in Claude API spend from Phase 6's generation run — expensive to
+regenerate, not just inconvenient).
+
+**To restore from a Supabase backup**: Supabase dashboard → Settings →
+Backups → pick a restore point → Supabase handles the restore. This is a
+project-level, irreversible operation — restoring rolls back *every*
+table to that point in time, not just one. Contact Supabase support
+directly if a restore needs to happen and the dashboard flow doesn't
+cover the situation (e.g. needing to recover just one table rather than
+the whole project).
