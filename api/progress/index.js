@@ -194,6 +194,18 @@ async function requireRole(res, profile, role) {
 
 // ---- student: own-data types -------------------------------------------
 
+// Which packs this student is actually enrolled in (user_course_packs has
+// no RLS policy — same reasoning as every other table this file reads —
+// so the client can't query it directly). Home.jsx and WelcomeFlow.tsx use
+// this to stop showing every pack that exists in the codebase; previously
+// both called getAllPacks() unfiltered, so a student saw every course pack
+// ever authored regardless of whether anyone actually assigned it to them.
+async function handleEnrolledPacks(req, res, user, admin) {
+  const { data: rows, error } = await admin.from('user_course_packs').select('pack_id').eq('user_id', user.id)
+  if (error) throw error
+  res.status(200).json({ pack_ids: (rows ?? []).map((r) => r.pack_id) })
+}
+
 async function handleMasterySummary(req, res, user, admin) {
   const packId = typeof req.query.pack_id === 'string' ? req.query.pack_id : null
   if (!packId) return res.status(400).json({ error: 'pack_id is required' })
@@ -675,6 +687,7 @@ async function handleDailyMaintenance(req, res) {
 // ---- dispatch --------------------------------------------------------
 
 const STUDENT_TYPES = {
+  'enrolled-packs': handleEnrolledPacks,
   'mastery-summary': handleMasterySummary,
   'weak-spots': handleWeakSpots,
   'session-history': handleSessionHistory,

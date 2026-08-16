@@ -1,12 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { getAllPacks } from '../../packs/loader'
+import { useAuth } from '../../lib/AuthContext'
 
 type Screen = 'welcome' | 'how-it-works' | 'choose-course'
 
 const PACK_EMOJI: Record<string, string> = {
   'ap-physics-1': '⚛️',
-  'calc-ab-bc': '∫'
+  'calc-ab-bc': '∫',
+  'ap-human-geography': '🌍'
 }
 
 function examMonthYear(examDate: string) {
@@ -21,8 +23,36 @@ function examMonthYear(examDate: string) {
 // care of actually putting that session into onboarding mode server-side.
 export default function WelcomeFlow() {
   const navigate = useNavigate()
+  const { session } = useAuth()
   const [screen, setScreen] = useState<Screen>('welcome')
-  const packs = getAllPacks()
+  // null = not yet loaded. Same reasoning as Home.jsx's enrolledPackIds —
+  // user_course_packs has no RLS policy, so this comes from the API, and
+  // without this filter a brand-new student could pick any course pack
+  // that exists in the codebase, not just one actually assigned to them.
+  const [enrolledPackIds, setEnrolledPackIds] = useState<string[] | null>(null)
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadEnrolledPacks() {
+      const token = session?.access_token
+      if (!token) return
+      try {
+        const res = await fetch('/api/progress?type=enrolled-packs', { headers: { Authorization: `Bearer ${token}` } })
+        const body = await res.json()
+        if (!cancelled) setEnrolledPackIds(res.ok ? body.pack_ids : [])
+      } catch {
+        if (!cancelled) setEnrolledPackIds([])
+      }
+    }
+
+    loadEnrolledPacks()
+    return () => {
+      cancelled = true
+    }
+  }, [session?.access_token])
+
+  const packs = enrolledPackIds === null ? [] : getAllPacks().filter((pack) => enrolledPackIds.includes(pack.id))
 
   const shell = (content: React.ReactNode) => (
     <div className="fixed inset-0 z-50 overflow-y-auto bg-slate-50 dark:bg-slate-950">
@@ -85,6 +115,11 @@ export default function WelcomeFlow() {
         Which course would you like to try first?
       </h1>
       <div className="space-y-3">
+        {enrolledPackIds !== null && packs.length === 0 && (
+          <p className="rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+            No courses assigned yet. Ask your parent to enroll you in a course.
+          </p>
+        )}
         {packs.map((pack) => (
           <button
             key={pack.id}

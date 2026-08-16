@@ -40,6 +40,12 @@ export default function Home() {
   const [sessionCompleteToday, setSessionCompleteToday] = useState({}) // pack_id -> { date, topicName, masteryLabel }
   const [activeQuizPrep, setActiveQuizPrep] = useState({}) // pack_id -> active event summary | null
   const [crunchPriorities, setCrunchPriorities] = useState({}) // pack_id -> [{ topic_name, mastery_label }]
+  // null = not yet loaded. user_course_packs has no RLS policy, so this
+  // comes from /api/progress?type=enrolled-packs rather than a direct
+  // Supabase read — see that handler for why. Every course card below is
+  // gated on this: previously Home showed every pack getAllPacks() knew
+  // about, regardless of whether this student was actually assigned it.
+  const [enrolledPackIds, setEnrolledPackIds] = useState(null)
   // Session.tsx bounces back here with this in location.state when
   // startSession finds an unanswered post-quiz prompt (see api/session's
   // requires_post_quiz branch) — "overlaid on Home, not blocking
@@ -58,6 +64,27 @@ export default function Home() {
       localStorage.getItem('falp:hasStartedFirstSession') !== 'true' &&
       localStorage.getItem('falp:onboarding_complete') !== 'true'
   )
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadEnrolledPacks() {
+      const token = session?.access_token
+      if (!token) return
+      try {
+        const res = await fetch('/api/progress?type=enrolled-packs', { headers: { Authorization: `Bearer ${token}` } })
+        const body = await res.json()
+        if (!cancelled) setEnrolledPackIds(res.ok ? body.pack_ids : [])
+      } catch {
+        if (!cancelled) setEnrolledPackIds([])
+      }
+    }
+
+    loadEnrolledPacks()
+    return () => {
+      cancelled = true
+    }
+  }, [session?.access_token])
 
   useEffect(() => {
     let cancelled = false
@@ -140,20 +167,22 @@ export default function Home() {
 
     async function loadActiveQuizPrep() {
       const token = session?.access_token
-      if (!token) return
+      if (!token || !enrolledPackIds) return
 
       const entries = await Promise.all(
-        getAllPacks().map(async (pack) => {
-          try {
-            const res = await fetch(`/api/quiz-prep?pack_id=${pack.id}`, {
-              headers: { Authorization: `Bearer ${token}` }
-            })
-            const body = await res.json()
-            return [pack.id, res.ok ? body.active : null]
-          } catch {
-            return [pack.id, null]
-          }
-        })
+        getAllPacks()
+          .filter((pack) => enrolledPackIds.includes(pack.id))
+          .map(async (pack) => {
+            try {
+              const res = await fetch(`/api/quiz-prep?pack_id=${pack.id}`, {
+                headers: { Authorization: `Bearer ${token}` }
+              })
+              const body = await res.json()
+              return [pack.id, res.ok ? body.active : null]
+            } catch {
+              return [pack.id, null]
+            }
+          })
       )
 
       if (!cancelled) setActiveQuizPrep(Object.fromEntries(entries))
@@ -163,7 +192,7 @@ export default function Home() {
     return () => {
       cancelled = true
     }
-  }, [session?.access_token])
+  }, [session?.access_token, enrolledPackIds])
 
   useEffect(() => {
     // Crunch priorities (top 3, exam-weight-aware) — only fetched for
@@ -173,9 +202,9 @@ export default function Home() {
 
     async function loadCrunchPriorities() {
       const token = session?.access_token
-      if (!token) return
+      if (!token || !enrolledPackIds) return
 
-      const crunchPacks = getAllPacks().filter(isCrunchActive)
+      const crunchPacks = getAllPacks().filter((pack) => enrolledPackIds.includes(pack.id) && isCrunchActive(pack))
       if (crunchPacks.length === 0) return
 
       const entries = await Promise.all(
@@ -200,7 +229,7 @@ export default function Home() {
     return () => {
       cancelled = true
     }
-  }, [session?.access_token])
+  }, [session?.access_token, enrolledPackIds])
 
   useEffect(() => {
     if (!import.meta.env.DEV) return
@@ -218,7 +247,21 @@ export default function Home() {
     return <WelcomeFlow />
   }
 
-  const packs = getAllPacks()
+  if (enrolledPackIds === null) {
+    return (
+      <div className="min-h-screen bg-slate-50 dark:bg-slate-950">
+        <TopBar title="FALP" />
+        <main className="mx-auto max-w-sm px-4 py-8">
+          <div className="animate-pulse space-y-3">
+            <div className="h-6 w-2/3 rounded bg-slate-200 dark:bg-slate-800" />
+            <div className="h-28 rounded-lg bg-slate-200 dark:bg-slate-800" />
+          </div>
+        </main>
+      </div>
+    )
+  }
+
+  const packs = getAllPacks().filter((pack) => enrolledPackIds.includes(pack.id))
 
   return (
     <div className="min-h-screen animate-[fadeIn_150ms_ease-in] bg-slate-50 dark:bg-slate-950">
@@ -240,6 +283,12 @@ export default function Home() {
         <div className="mt-2 inline-flex items-center gap-2 rounded-full bg-orange-100 px-3 py-1 text-sm font-medium text-orange-700 dark:bg-orange-950 dark:text-orange-300">
           🔥 {streak} day streak
         </div>
+
+        {packs.length === 0 && (
+          <p className="mt-6 rounded-lg border border-dashed border-slate-300 px-4 py-6 text-center text-sm text-slate-500 dark:border-slate-700 dark:text-slate-400">
+            No courses assigned yet. Ask your parent to enroll you in a course.
+          </p>
+        )}
 
         <div className="mt-6 space-y-3">
           {packs.map((pack) => {
