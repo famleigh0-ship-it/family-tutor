@@ -138,7 +138,19 @@ async function cmdFillAll(options) {
   const pack = getPack(packId)
   const userId = await getStatusUserId()
   const health = await checkBankHealth(packId, userId)
-  const needingFill = health.filter((h) => h.needs_fill)
+  // needs_fill alone isn't enough to select entries once a pack has a
+  // bank_size target: needs_fill is driven by the per-user unseen refill
+  // threshold, which a healthy-sized bank clears easily even while sitting
+  // well below its target total (confirmed live: after deduping nmsqt-2026,
+  // math.geometry-trig had 62 unseen — comfortably above its 20-refill
+  // threshold, so needs_fill was false, even though 62 < its 75 target).
+  // So an entry also qualifies whenever a target is configured and the
+  // total hasn't reached it yet, regardless of needs_fill.
+  const needingFill = health.filter((h) => {
+    if (h.needs_fill) return true
+    const target = getBankSizeTarget(pack, h.question_type)
+    return target !== undefined && h.total_in_bank < target
+  })
 
   console.log(
     `Filling ${needingFill.length} topic/type combination(s) for ${pack.name}. This makes at least that many Claude API calls (with automatic retries on transient timeouts, and more per entry for any type with a configured bank_size target) and can take a while — expected.\n`

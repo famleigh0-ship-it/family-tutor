@@ -49,6 +49,26 @@ const TASK_FOR_TYPE = { mc: 'bank_fill_mc', conceptual: 'bank_fill_conceptual', 
 const NOTATION_INSTRUCTION =
   'Use plain Unicode math symbols in all text (×, ÷, ±, ≤, ≥, ≠, →, ⇒, ∞, √, π, ², ³, etc.), never LaTeX commands like \\frac, \\pm, \\infty, \\cdot, or \\Rightarrow — a literal backslash breaks JSON parsing.'
 
+// Repeated fill-all runs against the same narrow topic (confirmed live:
+// nmsqt-2026's bank top-up from 10 to 75/topic produced 47 exact-duplicate
+// questions — e.g. "A circle has a radius of 5 cm. What is its
+// circumference?" generated verbatim 6 times across separate batches) —
+// each fillBank call has no memory of previous calls' output, and for a
+// low-variance domain like basic geometry formulas Claude reliably
+// reconverges on the same canonical textbook example. This is the
+// prompt-level half of the fix: tell Claude what already exists so it can
+// actually try to avoid repeating it. See dedupeRows below for the
+// guaranteed application-level backstop, since a prompt instruction alone
+// doesn't guarantee compliance (same "defense in depth" reasoning as
+// api/grading/grade.js's clampFrqScore).
+const EXISTING_TEXT_CONTEXT_LIMIT = 150
+
+function buildExistingTextsBlock(existingTexts) {
+  if (existingTexts.length === 0) return ''
+  const list = existingTexts.map((t) => `- ${t.replace(/\s+/g, ' ').trim()}`).join('\n')
+  return `\n\nThese questions already exist in the bank for this topic — do not repeat any of them (same scenario, same numbers, same wording), even with minor rewording. Each new question must use a genuinely different scenario, example, or number set, even when testing the same skill:\n${list}`
+}
+
 function findTopic(pack, topicId) {
   for (const unit of pack.units) {
     const topic = unit.topics.find((t) => t.id === topicId)
@@ -57,28 +77,60 @@ function findTopic(pack, topicId) {
   return null
 }
 
-function buildPrompt(pack, topic, questionType, n) {
+function buildPrompt(pack, topic, questionType, n, existingTexts) {
   const personaContext = `${pack.tutor_persona}\n${pack.subject_context}\n${NOTATION_INSTRUCTION}`
+  const existingTextsBlock = buildExistingTextsBlock(existingTexts)
 
   if (questionType === 'mc') {
     return {
       system: `${personaContext}\n\nYou generate multiple choice questions for AP exam practice.\nEach question must:\n- Test understanding, not just recall\n- Have exactly one clearly correct answer\n- Have three plausible distractors that reflect common errors\n- Include a brief explanation of why each option is right or wrong\nReturn JSON only, no other text.`,
-      user: `Generate ${n} multiple choice questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors to incorporate as distractors: ${JSON.stringify(topic.common_errors)}\nHints for question design: ${JSON.stringify(topic.prompt_hints)}\n\nKeep each explanation to 2-3 sentences, each distractor_note to one sentence, and key_reasoning to at most 2 short items — this is a large batch, so concision matters more than exhaustiveness.\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "options": [\n    { "label": "A", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "B", "text": "...", "is_correct": true, "distractor_note": null },\n    { "label": "C", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "D", "text": "...", "is_correct": false, "distractor_note": "why students pick this" }\n  ],\n  "correct_answer": "B",\n  "explanation": "full explanation of the correct reasoning",\n  "key_reasoning": ["reasoning element 1", "reasoning element 2"]\n}]`
+      user: `Generate ${n} multiple choice questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors to incorporate as distractors: ${JSON.stringify(topic.common_errors)}\nHints for question design: ${JSON.stringify(topic.prompt_hints)}${existingTextsBlock}\n\nKeep each explanation to 2-3 sentences, each distractor_note to one sentence, and key_reasoning to at most 2 short items — this is a large batch, so concision matters more than exhaustiveness.\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "options": [\n    { "label": "A", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "B", "text": "...", "is_correct": true, "distractor_note": null },\n    { "label": "C", "text": "...", "is_correct": false, "distractor_note": "why students pick this" },\n    { "label": "D", "text": "...", "is_correct": false, "distractor_note": "why students pick this" }\n  ],\n  "correct_answer": "B",\n  "explanation": "full explanation of the correct reasoning",\n  "key_reasoning": ["reasoning element 1", "reasoning element 2"]\n}]`
     }
   }
 
   if (questionType === 'conceptual') {
     return {
       system: `${personaContext}\n${pack.frq_rubric.general_guidance}\n\nYou generate conceptual free-response questions for AP exam practice.\nThese questions require written explanation and justification, not just numerical answers. A correct answer with no reasoning scores zero. Return JSON only, no other text.`,
-      user: `Generate ${n} conceptual questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors to watch for: ${JSON.stringify(topic.common_errors)}\nQuestion design hints: ${JSON.stringify(topic.prompt_hints)}\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "key_reasoning": [\n    "reasoning element that must appear in a complete answer"\n  ],\n  "rubric": "what a full-credit answer includes",\n  "explanation": "model answer for feedback",\n  "common_misconceptions": ["misconception to watch for"]\n}]`
+      user: `Generate ${n} conceptual questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors to watch for: ${JSON.stringify(topic.common_errors)}\nQuestion design hints: ${JSON.stringify(topic.prompt_hints)}${existingTextsBlock}\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "key_reasoning": [\n    "reasoning element that must appear in a complete answer"\n  ],\n  "rubric": "what a full-credit answer includes",\n  "explanation": "model answer for feedback",\n  "common_misconceptions": ["misconception to watch for"]\n}]`
     }
   }
 
   // frq
   return {
     system: `${personaContext}\n${pack.frq_rubric.general_guidance}\n${pack.frq_rubric.point_allocation_pattern}\n\nYou generate multi-part free-response questions matching AP exam style. Questions must require shown work and written justification. Return JSON only, no other text.`,
-    user: `Generate ${n} FRQ-style questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors: ${JSON.stringify(topic.common_errors)}\nHints: ${JSON.stringify(topic.prompt_hints)}\n\nThe parts' point values must sum to exactly 4 — grading elsewhere in this system always scores FRQs on a 0-4 scale regardless of how many parts a question has, so a 2-part question might be 2+2, a 3-part question 1+1+2, and so on.\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "parts": [\n    { "part": "a", "prompt": "...", "points": 2 },\n    { "part": "b", "prompt": "...", "points": 2 }\n  ],\n  "rubric": "detailed rubric for full credit, matching the 4-point total",\n  "correct_answer": "complete worked solution",\n  "explanation": "explanation of key steps and reasoning",\n  "input_mode": "typed" | "photo"\n}]`
+    user: `Generate ${n} FRQ-style questions for this topic:\nTopic: ${topic.name}\nDifficulty: ${topic.difficulty}/3\nCommon errors: ${JSON.stringify(topic.common_errors)}\nHints: ${JSON.stringify(topic.prompt_hints)}${existingTextsBlock}\n\nThe parts' point values must sum to exactly 4 — grading elsewhere in this system always scores FRQs on a 0-4 scale regardless of how many parts a question has, so a 2-part question might be 2+2, a 3-part question 1+1+2, and so on.\n\nReturn this exact JSON array:\n[{\n  "question_text": "...",\n  "parts": [\n    { "part": "a", "prompt": "...", "points": 2 },\n    { "part": "b", "prompt": "...", "points": 2 }\n  ],\n  "rubric": "detailed rubric for full credit, matching the 4-point total",\n  "correct_answer": "complete worked solution",\n  "explanation": "explanation of key steps and reasoning",\n  "input_mode": "typed" | "photo"\n}]`
   }
+}
+
+// Application-level backstop — guarantees no exact duplicate ever reaches
+// question_bank regardless of whether Claude actually honored the
+// existing-questions instruction above. Catches both a new row matching
+// something already in the bank AND two new rows duplicating each other
+// within the same batch. Deliberately exact-match only (normalized
+// whitespace/case/punctuation) — a looser fuzzy match would also flag
+// legitimate variety (e.g. the same inequality with ≤ vs ≥ are different
+// questions with different answers, not duplicates).
+function normalizeQuestionText(text) {
+  return text.toLowerCase().replace(/[^a-z0-9 ]/g, ' ').replace(/\s+/g, ' ').trim()
+}
+
+function dedupeRows(rows, existingTexts) {
+  const existingNormalized = new Set(existingTexts.map(normalizeQuestionText))
+  const seenInBatch = new Set()
+  const deduped = []
+  let skipped = 0
+
+  for (const row of rows) {
+    const norm = normalizeQuestionText(row.question_text)
+    if (existingNormalized.has(norm) || seenInBatch.has(norm)) {
+      skipped++
+      continue
+    }
+    seenInBatch.add(norm)
+    deduped.push(row)
+  }
+
+  return { deduped, skipped }
 }
 
 function rowsFromParsed(parsed, questionType, pack, topic, model) {
@@ -148,10 +200,27 @@ export async function fillBank({ packId, topicId, questionType }) {
   const topic = findTopic(pack, topicId)
   if (!topic) throw new Error(`Unknown topic "${topicId}" in pack "${packId}"`)
 
+  const admin = getSupabaseAdmin()
+
+  // Existing question text for this exact (pack, topic, type) group — both
+  // handed to Claude as "don't repeat these" context and used as the
+  // guaranteed dedup filter below. Most-recent-first cap keeps prompt size
+  // bounded for a bank much larger than anything today (10-80/topic).
+  const { data: existingRows, error: existingErr } = await admin
+    .from('question_bank')
+    .select('question_text')
+    .eq('pack_id', packId)
+    .eq('topic_id', topicId)
+    .eq('question_type', questionType)
+    .order('generated_at', { ascending: false })
+    .limit(EXISTING_TEXT_CONTEXT_LIMIT)
+  if (existingErr) throw new Error(`Failed to load existing bank content: ${existingErr.message}`)
+  const existingTexts = (existingRows ?? []).map((r) => r.question_text)
+
   const n = FILL_BATCH_SIZE[questionType]
   const task = TASK_FOR_TYPE[questionType]
   const model = getModel(task)
-  const { system, user } = buildPrompt(pack, topic, questionType, n)
+  const { system, user } = buildPrompt(pack, topic, questionType, n, existingTexts)
 
   let response
   try {
@@ -177,11 +246,16 @@ export async function fillBank({ packId, topicId, questionType }) {
   const rows = rowsFromParsed(parsed, questionType, pack, topic, model)
   if (rows.length === 0) throw new Error('No valid questions were generated')
 
-  const admin = getSupabaseAdmin()
-  const { error: insertErr } = await admin.from('question_bank').insert(rows)
+  const { deduped, skipped } = dedupeRows(rows, existingTexts)
+  if (deduped.length === 0) {
+    throw new Error('All generated questions duplicated existing bank content — nothing new to insert')
+  }
+
+  const { error: insertErr } = await admin.from('question_bank').insert(deduped)
   if (insertErr) throw new Error(`Failed to insert generated questions: ${insertErr.message}`)
 
-  console.log(`[bankFill] ${topicId} (${questionType}): generated ${rows.length}, ${response.tokens_used} tokens`)
+  const dupeNote = skipped > 0 ? `, skipped ${skipped} duplicate(s)` : ''
+  console.log(`[bankFill] ${topicId} (${questionType}): generated ${deduped.length}${dupeNote}, ${response.tokens_used} tokens`)
 
-  return { generated: rows.length, topic_id: topicId, question_type: questionType }
+  return { generated: deduped.length, topic_id: topicId, question_type: questionType }
 }
