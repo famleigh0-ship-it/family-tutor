@@ -4,6 +4,7 @@ import TopBar from '../components/TopBar.jsx'
 import QuizPrepCard from '../components/quiz-prep/QuizPrepCard.tsx'
 import PostQuizPrompt from '../components/quiz-prep/PostQuizPrompt.tsx'
 import CrunchCard from '../components/crunch/CrunchCard.tsx'
+import NMSQTCard from '../components/nmsqt/NMSQTCard.tsx'
 import WelcomeFlow from '../components/onboarding/WelcomeFlow.tsx'
 import InstallPrompt from '../components/InstallPrompt.tsx'
 import { useAuth } from '../lib/AuthContext.jsx'
@@ -40,6 +41,7 @@ export default function Home() {
   const [sessionCompleteToday, setSessionCompleteToday] = useState({}) // pack_id -> { date, topicName, masteryLabel }
   const [activeQuizPrep, setActiveQuizPrep] = useState({}) // pack_id -> active event summary | null
   const [crunchPriorities, setCrunchPriorities] = useState({}) // pack_id -> [{ topic_name, mastery_label }]
+  const [nmsqtDomainSummary, setNmsqtDomainSummary] = useState({}) // pack_id -> [{ unitName, practiced, total }]
   // null = not yet loaded. user_course_packs has no RLS policy, so this
   // comes from /api/progress?type=enrolled-packs rather than a direct
   // Supabase read — see that handler for why. Every course card below is
@@ -232,6 +234,50 @@ export default function Home() {
   }, [session?.access_token, enrolledPackIds])
 
   useEffect(() => {
+    // NMSQT's "N of M domains practiced" summary (A8) — "domain" is this
+    // pack's term for a topic, so this is just the existing per-topic
+    // mastery-summary endpoint's data grouped by unit and counted by
+    // attempts > 0, the same underlying numbers MasteryHeatmap renders per
+    // topic for AP packs.
+    let cancelled = false
+
+    async function loadNmsqtDomainSummary() {
+      const token = session?.access_token
+      if (!token || !enrolledPackIds) return
+
+      const nmsqtPacks = getAllPacks().filter((pack) => enrolledPackIds.includes(pack.id) && pack.exam_type === 'nmsqt')
+      if (nmsqtPacks.length === 0) return
+
+      const entries = await Promise.all(
+        nmsqtPacks.map(async (pack) => {
+          try {
+            const res = await fetch(`/api/progress?type=mastery-summary&pack_id=${pack.id}`, {
+              headers: { Authorization: `Bearer ${token}` }
+            })
+            const body = await res.json()
+            if (!res.ok) return [pack.id, []]
+            const summary = (body.units ?? []).map((unit) => ({
+              unitName: unit.name,
+              practiced: unit.topics.filter((t) => t.attempts > 0).length,
+              total: unit.topics.length
+            }))
+            return [pack.id, summary]
+          } catch {
+            return [pack.id, []]
+          }
+        })
+      )
+
+      if (!cancelled) setNmsqtDomainSummary(Object.fromEntries(entries))
+    }
+
+    loadNmsqtDomainSummary()
+    return () => {
+      cancelled = true
+    }
+  }, [session?.access_token, enrolledPackIds])
+
+  useEffect(() => {
     if (!import.meta.env.DEV) return
     // Exposed for manual testing per the Phase 3 milestone, e.g.
     // getPack('ap-physics-1') or getUnlockedTopics('ap-physics-1', '2026-08-11')
@@ -302,6 +348,19 @@ export default function Home() {
             // per course, in priority order: crunch > quiz-prep >
             // completed-today > default.
             const primaryState = crunch ? 'crunch' : quizPrep ? 'quiz-prep' : completedToday ? 'completed' : 'default'
+
+            // NMSQT (A8): no classroom-log prompt, no quiz-prep button —
+            // neither concept exists for this pack type (see
+            // session-orchestrator.js's startSession) — just the exam
+            // countdown and domain-mastery summary in place of the normal
+            // card states above.
+            if (pack.exam_type === 'nmsqt') {
+              return (
+                <div key={pack.id} className="space-y-2">
+                  <NMSQTCard packId={pack.id} daysUntilExam={days} domainSummary={nmsqtDomainSummary[pack.id] ?? []} />
+                </div>
+              )
+            }
 
             return (
               <div key={pack.id} className="space-y-2">

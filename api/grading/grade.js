@@ -70,7 +70,8 @@ async function gradeMc(admin, user, question, body) {
       topic_id: question.topic_id,
       question_type: 'mc',
       correct,
-      time_spent_seconds: typeof timeSpentSeconds === 'number' ? timeSpentSeconds : 0
+      time_spent_seconds: typeof timeSpentSeconds === 'number' ? timeSpentSeconds : 0,
+      difficulty: question.difficulty
     },
     tokensUsed: 0
   })
@@ -114,7 +115,8 @@ async function gradeTyped(admin, user, question, body) {
       question_type: question.question_type,
       correct,
       frq_score: frqScore ?? undefined,
-      time_spent_seconds: typeof timeSpentSeconds === 'number' ? timeSpentSeconds : 0
+      time_spent_seconds: typeof timeSpentSeconds === 'number' ? timeSpentSeconds : 0,
+      difficulty: question.difficulty
     },
     tokensUsed: response.tokens_used
   })
@@ -173,7 +175,8 @@ async function gradePhoto(admin, user, question, body) {
       question_type: 'frq',
       correct,
       frq_score: frqScore ?? undefined,
-      time_spent_seconds: typeof timeSpentSeconds === 'number' ? timeSpentSeconds : 0
+      time_spent_seconds: typeof timeSpentSeconds === 'number' ? timeSpentSeconds : 0,
+      difficulty: question.difficulty
     },
     tokensUsed: response.tokens_used
   })

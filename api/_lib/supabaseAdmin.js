@@ -43,7 +43,7 @@ export async function getUserFromRequest(req) {
 export async function getUserProfile(userId) {
   const { data, error } = await getSupabaseAdmin()
     .from('users')
-    .select('id, role, name')
+    .select('id, role, name, is_admin')
     .eq('id', userId)
     .maybeSingle()
 

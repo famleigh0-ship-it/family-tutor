@@ -10,7 +10,9 @@ import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
 import { randomUUID } from 'node:crypto'
 import { startSession, recordQuestionResult, endSession } from '../src/engine/session-orchestrator.js'
-import { getMasteryLabel } from '../src/engine/mastery.js'
+import { getMasteryLabel, getCurrentDifficulty, updateDifficultyMastery } from '../src/engine/mastery.js'
+import { detectSessionMode } from '../src/engine/session-mode.js'
+import { selectTopics } from '../src/engine/topic-selector.js'
 
 loadEnv({ path: '.env.local' })
 
@@ -192,7 +194,155 @@ function printPlan(plan, sessionNumber) {
   }
 }
 
+function assertEqual(actual, expected, label) {
+  if (actual !== expected) {
+    throw new Error(`[NMSQT test] FAILED — ${label}: expected ${JSON.stringify(expected)}, got ${JSON.stringify(actual)}`)
+  }
+  console.log(`  ok ${label} (${JSON.stringify(actual)})`)
+}
+
+function assertTrue(condition, label) {
+  if (!condition) throw new Error(`[NMSQT test] FAILED — ${label}`)
+  console.log(`  ok ${label}`)
+}
+
+// A10: engine-level NMSQT checks using an inline mock CoursePack, not the
+// real course-packs/nmsqt-2026/pack.json (Part B) — selectTopics and the
+// mastery.js functions all take their pack/record data as plain
+// parameters rather than resolving it through the loader's getPack(), so
+// this exercises the real difficulty-escalation logic against real
+// Supabase-shaped data without needing the pack registered anywhere.
+// startSession/recordQuestionResult themselves DO call getPack()
+// internally, so a true end-to-end DB session test has to wait until the
+// pack exists (Part B) — this covers everything Part A's engine logic
+// owns on its own.
+function testNmsqtEngineLogic() {
+  console.log('\n=== NMSQT engine logic (mock pack, no DB) ===')
+
+  // --- detectSessionMode: NMSQT never onboarding/quiz-prep ---
+  assertEqual(
+    detectSessionMode({ sessionCount: 0, daysUntilExam: 100, examCrunchWeeks: 6, activeQuizPrepEvent: null, isNMSQT: true }),
+    'adaptive',
+    'NMSQT sessionCount=0 still adaptive, not onboarding'
+  )
+  assertEqual(
+    detectSessionMode({ sessionCount: 50, daysUntilExam: 21, examCrunchWeeks: 6, activeQuizPrepEvent: null, isNMSQT: true }),
+    'exam-crunch',
+    'NMSQT daysUntilExam=21 is exam-crunch (3-week window)'
+  )
+  assertEqual(
+    detectSessionMode({ sessionCount: 50, daysUntilExam: 22, examCrunchWeeks: 6, activeQuizPrepEvent: null, isNMSQT: true }),
+    'adaptive',
+    'NMSQT daysUntilExam=22 is adaptive (just outside 3-week window)'
+  )
+  // AP behavior (isNMSQT omitted) must be untouched.
+  assertEqual(
+    detectSessionMode({ sessionCount: 0, daysUntilExam: 100, examCrunchWeeks: 6, activeQuizPrepEvent: null }),
+    'onboarding',
+    'AP sessionCount=0 is still onboarding'
+  )
+
+  // --- getCurrentDifficulty / updateDifficultyMastery ---
+  const freshRecord = {
+    topic_id: 'mock.topic',
+    pack_id: 'mock-nmsqt',
+    mastery_score: 0,
+    attempts: 0,
+    correct: 0,
+    frq_attempts: 0,
+    frq_score_total: 0,
+    last_seen: null,
+    updated_at: new Date(),
+    difficulty_1_mastery: 0,
+    difficulty_2_mastery: 0,
+    difficulty_3_mastery: 0,
+    current_difficulty: 1
+  }
+  assertEqual(getCurrentDifficulty(freshRecord), 1, 'new student starts at difficulty 1')
+
+  let record = freshRecord
+  for (let i = 0; i < 5; i++) {
+    record = updateDifficultyMastery(record, { correct: true, question_type: 'mc', time_spent_seconds: 20 }, 1)
+  }
+  assertTrue(record.difficulty_1_mastery >= 0.7, `difficulty_1_mastery reached ${record.difficulty_1_mastery.toFixed(3)} after 5 correct answers`)
+  assertEqual(record.attempts, 5, 'overall attempts incremented alongside difficulty-specific tracking')
+  assertEqual(getCurrentDifficulty(record), 2, 'current_difficulty escalates to 2 once difficulty_1_mastery >= 0.70')
+  assertEqual(record.current_difficulty, 2, 'updateDifficultyMastery wrote the escalated current_difficulty onto the record')
+
+  // --- selectTopics: served difficulty comes from getCurrentDifficulty, not a static value ---
+  const mockPack = {
+    id: 'mock-nmsqt',
+    name: 'Mock NMSQT',
+    school_year_start: '2026-08-11',
+    exam_date: '2026-10-15',
+    exam_crunch_weeks: 3,
+    tutor_persona: 'mock',
+    subject_context: 'mock',
+    exam_type: 'nmsqt',
+    session_duration_minutes: 15,
+    question_types_allowed: ['mc'],
+    difficulty_escalation: true,
+    units: [
+      {
+        id: 'unit-a',
+        name: 'Unit A',
+        ap_exam_weight_min: 50,
+        ap_exam_weight_max: 50,
+        prerequisite_unit_ids: [],
+        topics: [
+          {
+            id: 'unit-a.escalated-topic',
+            name: 'Escalated Topic',
+            type: 'conceptual',
+            difficulty: 1, // static pack value — must NOT be what gets served
+            prerequisite_topic_ids: [],
+            input_mode: 'typed',
+            prompt_hints: [],
+            common_errors: []
+          },
+          {
+            id: 'unit-a.fresh-topic',
+            name: 'Fresh Topic',
+            type: 'conceptual',
+            difficulty: 1,
+            prerequisite_topic_ids: [],
+            input_mode: 'typed',
+            prompt_hints: [],
+            common_errors: []
+          }
+        ]
+      }
+    ],
+    pacing_calendar: [],
+    common_misconceptions: [],
+    frq_rubric: { general_guidance: 'mock', point_allocation_pattern: 'mock', common_reasoning_gaps: [] }
+  }
+
+  const plan = selectTopics({
+    pack: mockPack,
+    masteryRecords: [{ ...record, topic_id: 'unit-a.escalated-topic' }],
+    unlockedTopicIds: ['unit-a.escalated-topic', 'unit-a.fresh-topic'],
+    prioritizedTopicIds: [],
+    mode: 'adaptive',
+    quizPrepTopicIds: [],
+    recentTopicIds: [],
+    targetDurationMinutes: 15
+  })
+
+  const escalatedTopic = plan.topics.find((t) => t.id === 'unit-a.escalated-topic')
+  const freshTopic = plan.topics.find((t) => t.id === 'unit-a.fresh-topic')
+  assertTrue(!!escalatedTopic, 'escalated topic was selected')
+  assertTrue(!!freshTopic, 'fresh topic was selected')
+  assertEqual(escalatedTopic.difficulty, 2, 'served difficulty for the escalated topic is computed (2), not the static pack value (1)')
+  assertEqual(freshTopic.difficulty, 1, 'served difficulty for a never-attempted topic stays at 1')
+  assertEqual(JSON.stringify(plan.allowed_question_types), JSON.stringify(['mc']), 'plan surfaces pack.question_types_allowed')
+
+  console.log('\nAll NMSQT engine logic checks passed.')
+}
+
 async function main() {
+  testNmsqtEngineLogic()
+
   console.log(`Using test student: ${TEST_EMAIL}`)
   const user = await getOrCreateTestUser()
   console.log(`Test user id: ${user.id}`)

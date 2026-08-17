@@ -358,11 +358,24 @@ async function handleStreakCalendar(req, res, user, admin) {
 
 // ---- parent: linked-student types ---------------------------------------
 
-async function handleParentStudents(req, res, user, admin) {
-  const { data: links, error: linksErr } = await admin.from('family_links').select('student_id').eq('parent_id', user.id)
-  if (linksErr) throw linksErr
+// profile.is_admin (migrations/009) bypasses the family_links filter
+// entirely — an admin parent account sees every student in the app, not
+// just ones explicitly linked to them. Added for oversight of the whole
+// roster (e.g. an NMSQT cohort) without needing a family_links row per
+// student. No UI change needed — StudentCard/StudentDetail already render
+// whatever list this endpoint returns.
+async function handleParentStudents(req, res, user, admin, profile) {
+  let studentIds
+  if (profile.is_admin) {
+    const { data: allStudents, error: allErr } = await admin.from('users').select('id').eq('role', 'student')
+    if (allErr) throw allErr
+    studentIds = (allStudents ?? []).map((s) => s.id)
+  } else {
+    const { data: links, error: linksErr } = await admin.from('family_links').select('student_id').eq('parent_id', user.id)
+    if (linksErr) throw linksErr
+    studentIds = (links ?? []).map((l) => l.student_id)
+  }
 
-  const studentIds = (links ?? []).map((l) => l.student_id)
   if (studentIds.length === 0) return res.status(200).json({ students: [] })
 
   const [
@@ -432,18 +445,21 @@ async function handleParentStudents(req, res, user, admin) {
   res.status(200).json({ students })
 }
 
-async function handleParentStudentDetail(req, res, user, admin) {
+async function handleParentStudentDetail(req, res, user, admin, profile) {
   const studentId = typeof req.query.student_id === 'string' ? req.query.student_id : null
   if (!studentId) return res.status(400).json({ error: 'student_id is required' })
 
-  const { data: link, error: linkErr } = await admin
-    .from('family_links')
-    .select('student_id')
-    .eq('parent_id', user.id)
-    .eq('student_id', studentId)
-    .maybeSingle()
-  if (linkErr) throw linkErr
-  if (!link) return res.status(403).json({ error: 'Not linked to this student' })
+  // Same admin bypass as handleParentStudents above.
+  if (!profile.is_admin) {
+    const { data: link, error: linkErr } = await admin
+      .from('family_links')
+      .select('student_id')
+      .eq('parent_id', user.id)
+      .eq('student_id', studentId)
+      .maybeSingle()
+    if (linkErr) throw linkErr
+    if (!link) return res.status(403).json({ error: 'Not linked to this student' })
+  }
 
   const [{ data: studentRow, error: studentErr }, { data: enrollments, error: enrollErr }, { data: streakRow, error: streakErr }] =
     await Promise.all([
@@ -750,7 +766,7 @@ export default async function handler(req, res) {
     }
     if (type && PARENT_TYPES[type]) {
       if (!(await requireRole(res, profile, 'parent'))) return
-      await PARENT_TYPES[type](req, res, user, admin)
+      await PARENT_TYPES[type](req, res, user, admin, profile)
       return
     }
     res.status(400).json({ error: `Unknown or missing type "${type}"` })

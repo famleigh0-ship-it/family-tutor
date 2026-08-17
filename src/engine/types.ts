@@ -14,6 +14,13 @@ export interface MasteryRecord {
   frq_score_total: number
   last_seen: Date | null
   updated_at: Date
+  // NMSQT (difficulty_escalation packs) only — absent/0 for AP packs, which
+  // never read or write these. See mastery.js's getCurrentDifficulty/
+  // updateDifficultyMastery.
+  difficulty_1_mastery?: number
+  difficulty_2_mastery?: number
+  difficulty_3_mastery?: number
+  current_difficulty?: 1 | 2 | 3
 }
 
 export interface TopicWithState extends Topic {
@@ -30,6 +37,10 @@ export interface SessionPlan {
   target_question_count: number
   target_duration_minutes: number
   notes: string[] // human-readable explanation of selections
+  // Which question types the client should cycle through — pack.question_types_allowed
+  // if set (e.g. NMSQT's MC-only restriction), else all three. See
+  // topic-selector.js's selectTopics.
+  allowed_question_types: ('mc' | 'frq' | 'conceptual')[]
 }
 
 export interface QuestionResult {
@@ -43,6 +54,11 @@ export interface QuestionResult {
   // session (see session-orchestrator.js). Omitted by scripts/test-engine.js's
   // synthetic results, which have no real question_bank row to reference.
   question_id?: string
+  // The question_bank row's own difficulty (1-3) — used by
+  // recordQuestionResult to route the update to the right
+  // difficulty_N_mastery column for difficulty_escalation packs. Omitted by
+  // AP packs and by scripts/test-engine.js's synthetic results.
+  difficulty?: 1 | 2 | 3
 }
 
 // Mirrors the `quiz_prep_events` table (migrations/001_initial_schema.sql,

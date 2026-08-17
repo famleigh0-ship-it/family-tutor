@@ -4,6 +4,9 @@
 /** @typedef {import('../packs/types').Unit} Unit */
 /** @typedef {import('../packs/types').Topic} Topic */
 
+import { getAllowedQuestionTypes } from '../packs/loader.js'
+import { getCurrentDifficulty } from './mastery.js'
+
 const MINUTES_PER_MC = 3
 const MINUTES_PER_FRQ = 8
 const CRITICAL_MASTERY_THRESHOLD = 0.4
@@ -31,6 +34,14 @@ const REVIEW_MASTERY_MIN = 0.6
 const REVIEW_MASTERY_MAX = 0.8
 const REVIEW_MIN_DAYS_SINCE_SEEN = 5
 const MS_PER_DAY = 86_400_000
+// NMSQT (difficulty_escalation) only: surface weak fundamentals first by
+// boosting a topic still stuck at the entry difficulty within a
+// high-exam-weight domain. "High-weight" is scoped to this pack's own
+// range — nmsqt-2026's domains run 15-35% (R&W: 20/26/26/28, Math:
+// 15/15/35/35), so 25 sits above the low-weight tier (15/20) and picks out
+// the domains that matter most to the Selection Index.
+const DIFFICULTY_ESCALATION_HIGH_WEIGHT_THRESHOLD = 25
+const DIFFICULTY_ESCALATION_BOOST = 1.5
 
 /**
  * @param {Date | null} date
@@ -56,7 +67,11 @@ function defaultMasteryRecord(packId, topicId) {
     frq_attempts: 0,
     frq_score_total: 0,
     last_seen: null,
-    updated_at: new Date()
+    updated_at: new Date(),
+    difficulty_1_mastery: 0,
+    difficulty_2_mastery: 0,
+    difficulty_3_mastery: 0,
+    current_difficulty: 1
   }
 }
 
@@ -168,8 +183,19 @@ export function selectTopics(params) {
 
       const record = masteryByTopicId.get(topic.id) ?? defaultMasteryRecord(pack.id, topic.id)
 
+      // NMSQT (difficulty_escalation) only: difficulty here isn't the
+      // pack's static per-topic value — it's the level to serve this
+      // student next, recomputed per topic from their own per-difficulty
+      // mastery. This flows unchanged through the rest of the pipeline
+      // (SessionPlan -> api/session's leanTopic -> the client's bank-serve
+      // request -> the served question's own difficulty column ->
+      // recordQuestionResult), so nothing downstream needs to know it's
+      // dynamic. AP packs keep the topic's fixed pack.json difficulty.
+      const servedDifficulty = pack.difficulty_escalation ? getCurrentDifficulty(record) : topic.difficulty
+
       candidates.push({
         ...topic,
+        difficulty: servedDifficulty,
         unlock_state: prioritizedSet.has(topic.id) ? 'prioritized' : 'unlocked',
         mastery_score: record.mastery_score,
         last_seen: record.last_seen,
@@ -179,13 +205,16 @@ export function selectTopics(params) {
     }
   }
 
+  const allowedQuestionTypes = getAllowedQuestionTypes(pack)
+
   if (candidates.length === 0) {
     return {
       mode,
       topics: [],
       target_question_count: 0,
       target_duration_minutes: 0,
-      notes: ['No unlocked topics available']
+      notes: ['No unlocked topics available'],
+      allowed_question_types: allowedQuestionTypes
     }
   }
 
@@ -207,7 +236,8 @@ export function selectTopics(params) {
         topics: forced,
         target_question_count: forced.length * QUESTIONS_PER_TOPIC,
         target_duration_minutes: targetDurationMinutes,
-        notes: [`Focused practice: ${forced.map((t) => t.name).join(', ')}`]
+        notes: [`Focused practice: ${forced.map((t) => t.name).join(', ')}`],
+        allowed_question_types: allowedQuestionTypes
       }
     }
   }
@@ -233,8 +263,35 @@ export function selectTopics(params) {
       mode === 'exam-crunch' && t.days_since_seen >= CRUNCH_STALE_BOOST_DAYS ? CRUNCH_STALE_BOOST : 1.0
     const crunchBcOnlyBoost = mode === 'exam-crunch' && t.bc_only ? CRUNCH_BC_ONLY_BOOST : 1.0
 
+    // NMSQT (difficulty_escalation) only — surface weak fundamentals in
+    // high-weight domains first. t.difficulty is the *served* difficulty
+    // here (see the candidates loop above), so === 1 means this topic's
+    // own difficulty_1_mastery hasn't cleared the escalation threshold yet.
+    // Uses the topic's OWN ap_exam_weight_min/max (nmsqt-2026's pack.json
+    // sets these per-domain: R&W 20/26/26/28, Math 15/15/35/35) rather than
+    // weightMid above — weightMid is the unit's weight, and both NMSQT
+    // units are an even 50/50 split, so it can't distinguish one domain
+    // from another the way this boost needs to. Falls back to weightMid
+    // for AP packs, which have no per-topic weight fields.
+    const topicWeightMid =
+      typeof t.ap_exam_weight_min === 'number' && typeof t.ap_exam_weight_max === 'number'
+        ? (t.ap_exam_weight_min + t.ap_exam_weight_max) / 2
+        : weightMid
+    const difficultyEscalationBoost =
+      pack.difficulty_escalation && t.difficulty === 1 && topicWeightMid >= DIFFICULTY_ESCALATION_HIGH_WEIGHT_THRESHOLD
+        ? DIFFICULTY_ESCALATION_BOOST
+        : 1.0
+
     t.priority_score =
-      base * recencyPenalty * prioritizedBoost * criticalBoost * decayBoost * crunchMasteryBoost * crunchStaleBoost * crunchBcOnlyBoost
+      base *
+      recencyPenalty *
+      prioritizedBoost *
+      criticalBoost *
+      decayBoost *
+      crunchMasteryBoost *
+      crunchStaleBoost *
+      crunchBcOnlyBoost *
+      difficultyEscalationBoost
   }
 
   const sorted = [...candidates].sort((a, b) => b.priority_score - a.priority_score)
@@ -364,6 +421,7 @@ export function selectTopics(params) {
     topics: selected,
     target_question_count: targetQuestionCount,
     target_duration_minutes: targetDuration,
-    notes
+    notes,
+    allowed_question_types: allowedQuestionTypes
   }
 }

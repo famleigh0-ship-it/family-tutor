@@ -84,6 +84,49 @@ export function applyDecay(records) {
   })
 }
 
+const DIFFICULTY_1_THRESHOLD = 0.7
+const DIFFICULTY_2_THRESHOLD = 0.7
+const DIFFICULTY_3_THRESHOLD = 0.8
+
+/**
+ * NMSQT-only (difficulty_escalation packs): which difficulty to serve next
+ * for a topic, based on that topic's own per-difficulty mastery columns.
+ * Escalates once the current tier is solid; difficulty 3 has no further
+ * tier to escalate to, so a mastered student just keeps getting difficulty
+ * 3 for maintenance.
+ * @param {import('./types').MasteryRecord} record
+ * @returns {1 | 2 | 3}
+ */
+export function getCurrentDifficulty(record) {
+  if ((record.difficulty_1_mastery ?? 0) < DIFFICULTY_1_THRESHOLD) return 1
+  if ((record.difficulty_2_mastery ?? 0) < DIFFICULTY_2_THRESHOLD) return 2
+  if ((record.difficulty_3_mastery ?? 0) < DIFFICULTY_3_THRESHOLD) return 3
+  return 3
+}
+
+/**
+ * NMSQT-only counterpart to updateMastery: updates the mastery column for
+ * the specific difficulty the question was served at (same EMA formula),
+ * plus the overall mastery_score/attempts/correct bookkeeping updateMastery
+ * already does, then recomputes current_difficulty from the result.
+ * @param {import('./types').MasteryRecord} record
+ * @param {import('./types').QuestionResult} result
+ * @param {1 | 2 | 3} questionDifficulty
+ * @returns {import('./types').MasteryRecord}
+ */
+export function updateDifficultyMastery(record, result, questionDifficulty) {
+  const overallUpdated = updateMastery(record, result)
+
+  const resultScore = result.question_type === 'frq' ? (result.frq_score ?? 0) / 4 : result.correct ? 1 : 0
+  const key = `difficulty_${questionDifficulty}_mastery`
+  const oldDifficultyScore = record[key] ?? 0
+  const newDifficultyScore = clamp01(oldDifficultyScore + LEARNING_RATE * (resultScore - oldDifficultyScore))
+
+  const updated = { ...overallUpdated, [key]: newDifficultyScore }
+  updated.current_difficulty = getCurrentDifficulty(updated)
+  return updated
+}
+
 /** @param {number} score */
 export function getMasteryLabel(score) {
   if (score >= 0.9) return 'Mastered'

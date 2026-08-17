@@ -120,6 +120,7 @@ export default function Session() {
       topics: currentPlan.topics,
       targetQuestionCount: currentPlan.target_question_count,
       targetDurationMinutes: currentPlan.target_duration_minutes,
+      allowedQuestionTypes: currentPlan.allowed_question_types,
       questionIndex: index,
       answeredResults: answered,
       startedAtIso: new Date(startedAtMsRef.current).toISOString()
@@ -129,8 +130,15 @@ export default function Session() {
   async function serveQuestionAt(forPlan: SessionPlanResponse, index: number) {
     setPhase('loading')
     const topic = forPlan.topics[index % forPlan.topics.length]
-    const cycle = forPlan.mode === 'onboarding' ? ONBOARDING_QUESTION_TYPE_CYCLE : QUESTION_TYPE_CYCLE
-    const questionType = cycle[index % cycle.length]
+    const baseCycle = forPlan.mode === 'onboarding' ? ONBOARDING_QUESTION_TYPE_CYCLE : QUESTION_TYPE_CYCLE
+    // Restrict to pack.question_types_allowed (e.g. NMSQT's MC-only
+    // restriction) — falls back to the unfiltered cycle if that would
+    // leave nothing, which should never actually happen since every pack
+    // allows at least 'mc'.
+    const allowed = forPlan.allowed_question_types
+    const cycle = allowed && allowed.length > 0 ? baseCycle.filter((t) => allowed.includes(t)) : baseCycle
+    const effectiveCycle = cycle.length > 0 ? cycle : baseCycle
+    const questionType = effectiveCycle[index % effectiveCycle.length]
 
     try {
       const token = await authToken()
@@ -236,7 +244,8 @@ export default function Session() {
       topics: stored.topics,
       target_question_count: stored.targetQuestionCount,
       target_duration_minutes: stored.targetDurationMinutes,
-      notes: []
+      notes: [],
+      allowed_question_types: stored.allowedQuestionTypes
     }
     startedAtMsRef.current = Date.parse(stored.startedAtIso)
     setElapsedSeconds(Math.floor((Date.now() - startedAtMsRef.current) / 1000))

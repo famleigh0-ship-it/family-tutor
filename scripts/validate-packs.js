@@ -14,7 +14,8 @@ const rootDir = path.dirname(path.dirname(fileURLToPath(import.meta.url)))
 const packFiles = [
   path.join(rootDir, 'course-packs', 'ap-physics-1', 'pack.json'),
   path.join(rootDir, 'course-packs', 'calc-ab-bc', 'pack.json'),
-  path.join(rootDir, 'course-packs', 'ap-human-geography', 'pack.json')
+  path.join(rootDir, 'course-packs', 'ap-human-geography', 'pack.json'),
+  path.join(rootDir, 'course-packs', 'nmsqt-2026', 'pack.json')
 ]
 
 let allPassed = true

@@ -1,0 +1,278 @@
+{
+  "id": "nmsqt-2026",
+  "name": "PSAT/NMSQT 2026",
+  "exam_type": "nmsqt",
+  "school_year_start": "2026-08-11",
+  "exam_date": "2026-10-15",
+  "exam_crunch_weeks": 3,
+  "session_duration_minutes": 15,
+  "question_types_allowed": ["mc"],
+  "difficulty_escalation": true,
+  "bank_size_mc": 75,
+  "bank_refill_threshold_mc": 20,
+  "pacing_calendar": [],
+
+  "tutor_persona": "You are an expert PSAT/NMSQT preparation tutor focused on National Merit qualification. You are precise, efficient, and focused — every question and explanation is calibrated to the exact skills tested on the PSAT. You do not waste words. You explain why a wrong answer is wrong as clearly as why the right answer is right. You know that at the National Merit level, students lose points to traps and careless errors more than to genuine knowledge gaps, and you train accordingly.",
+
+  "subject_context": "The PSAT/NMSQT Selection Index rewards mastery across two sections: Reading and Writing (R&W) and Math. At the National Merit level, the margin is razor-thin — a few questions determine commendation. Common failure modes: falling for trap answers designed to attract students who partially understand a concept, losing points on R&W vocabulary-in-context questions by picking a word that fits loosely rather than precisely, algebra errors under time pressure, and over-thinking geometry. The test rewards students who are fast and precise, not just correct.",
+
+  "units": [
+    {
+      "id": "reading-writing",
+      "name": "Reading and Writing",
+      "ap_exam_weight_min": 50,
+      "ap_exam_weight_max": 50,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "reading-writing.information-and-ideas",
+          "name": "Information and Ideas",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 26,
+          "ap_exam_weight_max": 26,
+          "prompt_hints": [
+            "Questions present a short passage (1-3 sentences to a full paragraph) followed by a claim or question. Student must identify central idea, find textual evidence, or make an inference.",
+            "Trap answers are usually too broad, too narrow, or true-but-not-supported-by-the-passage. The correct answer is always directly supported.",
+            "Command of evidence questions give a claim and ask which quote best supports it — wrong answers are often relevant but don't directly support the specific claim.",
+            "Difficulty 3: paired passages requiring synthesis or comparison of two authors' views."
+          ],
+          "common_errors": [
+            "Choosing an answer that is generally true about the topic but not supported by the specific passage text",
+            "On inference questions: inferring too far beyond what the passage actually states",
+            "On command of evidence: picking a quote that is on-topic but supports a slightly different claim than the one asked about",
+            "Confusing the author's view with a view the author is describing or critiquing"
+          ]
+        },
+        {
+          "id": "reading-writing.craft-and-structure",
+          "name": "Craft and Structure",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 28,
+          "ap_exam_weight_max": 28,
+          "prompt_hints": [
+            "Words in context: a word is underlined in a passage; student picks the best replacement. The correct answer fits the precise meaning and tone — not just a synonym.",
+            "Text structure questions: ask how a paragraph is organized or what function a sentence serves (introduces, contrasts, exemplifies, etc.)",
+            "Cross-text connections: two short passages on the same topic; student identifies agreement, disagreement, or how one author would respond to the other.",
+            "Difficulty 3: nuanced tone questions where multiple answers seem plausible but one is more precisely accurate."
+          ],
+          "common_errors": [
+            "Vocabulary-in-context: picking a common definition of the word rather than the meaning that fits the specific passage context",
+            "Choosing answers that are too strong ('strongly criticizes') when the passage is more measured ('questions')",
+            "On cross-text: choosing an answer that describes what one author says rather than how they would respond to the other",
+            "Missing the function of transitional phrases — 'however,' 'moreover,' 'for instance' signal structure the question may test"
+          ]
+        },
+        {
+          "id": "reading-writing.expression-of-ideas",
+          "name": "Expression of Ideas",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 20,
+          "ap_exam_weight_max": 20,
+          "prompt_hints": [
+            "Rhetorical synthesis: student is given notes from a student's research and must pick the sentence that best achieves a stated goal (introduce a contrast, support a claim, etc.)",
+            "Transitions: a blank appears between two sentences or clauses; student picks the transition word/phrase that best shows the logical relationship.",
+            "Wrong transition answers often have the right category (contrast vs addition) but wrong strength, or reverse the direction.",
+            "Difficulty 3: multi-part synthesis where the goal statement is complex and several answers are partially correct."
+          ],
+          "common_errors": [
+            "Choosing a transition that is in the right category but wrong direction (e.g. 'therefore' when 'however' is needed)",
+            "On rhetorical synthesis: picking an answer that includes correct information but doesn't achieve the specific stated goal",
+            "Adding information not present in the notes (all synthesis answers must stay within the provided notes)",
+            "Ignoring the exact wording of the goal — 'emphasize a similarity' vs 'acknowledge a difference' are very different"
+          ]
+        },
+        {
+          "id": "reading-writing.standard-english-conventions",
+          "name": "Standard English Conventions",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 26,
+          "ap_exam_weight_max": 26,
+          "prompt_hints": [
+            "Sentence boundaries: identify run-ons, comma splices, and fragments; choose the correctly punctuated version.",
+            "Punctuation within sentences: commas, semicolons, colons, dashes — student picks correct punctuation for the context.",
+            "Agreement: subject-verb and pronoun-antecedent agreement, often across a long intervening phrase designed to obscure the true subject.",
+            "Form/structure/sense: verb tense consistency, modifier placement, parallel structure.",
+            "Difficulty 3: complex sentences with multiple potential errors where only one answer is fully correct."
+          ],
+          "common_errors": [
+            "Subject-verb agreement errors when a prepositional phrase separates subject from verb ('The results of the study was/were')",
+            "Comma splice: joining two independent clauses with only a comma",
+            "Unnecessary commas around restrictive (essential) clauses",
+            "Pronoun agreement with collective nouns or indefinite pronouns (everyone, each, neither)",
+            "Semicolon misuse — placing before a dependent clause"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "math",
+      "name": "Math",
+      "ap_exam_weight_min": 50,
+      "ap_exam_weight_max": 50,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "math.algebra",
+          "name": "Algebra",
+          "type": "quantitative",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 35,
+          "ap_exam_weight_max": 35,
+          "prompt_hints": [
+            "Linear equations and inequalities in one variable: solve, interpret solutions, identify no solution / infinite solutions.",
+            "Linear functions: slope, intercepts, interpret in context (rate of change, starting value).",
+            "Systems of linear equations: solve by substitution or elimination; interpret number of solutions geometrically.",
+            "Linear inequalities and systems of inequalities: graph, identify solution region.",
+            "Difficulty 3: word problems requiring constructing a system from context, or analyzing when a system has no/infinite solutions and what that means."
+          ],
+          "common_errors": [
+            "Sign errors when distributing a negative across parentheses",
+            "Forgetting to flip the inequality sign when multiplying/dividing by a negative",
+            "Misidentifying slope from a table (dividing Δx by Δy instead of Δy by Δx)",
+            "In systems: substituting back into the wrong equation to find the second variable",
+            "Interpreting 'no solution' as the answer is zero rather than the equation is a contradiction"
+          ]
+        },
+        {
+          "id": "math.advanced-math",
+          "name": "Advanced Math",
+          "type": "quantitative",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 35,
+          "ap_exam_weight_max": 35,
+          "prompt_hints": [
+            "Nonlinear functions: quadratics (factored, standard, vertex form), exponential growth and decay, interpret key features.",
+            "Equivalent expressions: factor, expand, simplify rational expressions, apply exponent rules.",
+            "Nonlinear equations: solve quadratics (factoring, quadratic formula, completing the square), solve systems with one linear and one quadratic.",
+            "Function notation: evaluate f(x), interpret f(a) = b in context, compose simple functions.",
+            "Difficulty 3: identifying structure in expressions, working with complex rational expressions, or interpreting parameters in function transformations."
+          ],
+          "common_errors": [
+            "Expanding (a+b)² as a²+b² (forgetting the 2ab middle term)",
+            "Exponent rules: multiplying bases and adding exponents when the operation is addition, not multiplication",
+            "Quadratic formula sign errors, especially with negative b values",
+            "Confusing zeros of a function with y-intercepts",
+            "Function composition: applying f(g(x)) in the wrong order"
+          ]
+        },
+        {
+          "id": "math.problem-solving-data",
+          "name": "Problem-Solving and Data Analysis",
+          "type": "quantitative",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 15,
+          "ap_exam_weight_max": 15,
+          "prompt_hints": [
+            "Ratios, rates, proportional relationships: set up and solve proportions, unit conversion, percent problems (increase, decrease, of, off).",
+            "Statistics: mean, median, mode, range, standard deviation (interpret, don't calculate), margin of error.",
+            "Data interpretation: read tables, bar charts, scatterplots, histograms — identify trends, make predictions, calculate from data.",
+            "Probability: basic probability, conditional probability from two-way tables.",
+            "Difficulty 3: multi-step problems combining percent change with data interpretation, or evaluating claims about statistical studies (sample size, bias, causation)."
+          ],
+          "common_errors": [
+            "Percent change: using the wrong base (original vs new value)",
+            "Confusing correlation with causation in data interpretation questions",
+            "Probability from two-way tables: using total population instead of the conditional row/column",
+            "Mean vs median: not recognizing when an outlier makes them diverge significantly",
+            "Unit conversion errors — not carrying units through multi-step problems"
+          ]
+        },
+        {
+          "id": "math.geometry-trig",
+          "name": "Geometry and Trigonometry",
+          "type": "quantitative",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "ap_exam_weight_min": 15,
+          "ap_exam_weight_max": 15,
+          "prompt_hints": [
+            "Area and volume: triangles, circles, rectangles, composite figures; cylinders, cones, spheres.",
+            "Angles: complementary, supplementary, vertical angles, parallel lines cut by transversal, triangle angle sum, exterior angles.",
+            "Right triangles: Pythagorean theorem, special triangles (30-60-90, 45-45-90), similarity and proportionality.",
+            "Circles: arc length, sector area, central and inscribed angles, equations of circles.",
+            "Trigonometry: SOH-CAH-TOA, trig ratios in right triangles, co-function relationships (sin θ = cos(90-θ)).",
+            "Difficulty 3: multi-step problems combining trig with circle properties, or 3D geometry requiring decomposition."
+          ],
+          "common_errors": [
+            "Using diameter instead of radius in circle area/circumference formulas",
+            "30-60-90 triangle: confusing which side is x, x√3, and 2x",
+            "Trig: using the wrong ratio for the given angle and sides",
+            "Exterior angle theorem: not recognizing it equals the sum of the two non-adjacent interior angles",
+            "Volume: forgetting to cube units or confusing surface area with volume"
+          ]
+        }
+      ]
+    }
+  ],
+
+  "common_misconceptions": [
+    {
+      "id": "trap-answer-attraction",
+      "description": "Choosing the answer that looks right at first glance rather than verifying against the passage or checking the math",
+      "affected_topic_ids": [
+        "reading-writing.information-and-ideas",
+        "reading-writing.craft-and-structure",
+        "reading-writing.expression-of-ideas",
+        "reading-writing.standard-english-conventions",
+        "math.algebra",
+        "math.advanced-math",
+        "math.problem-solving-data",
+        "math.geometry-trig"
+      ],
+      "detection_hints": ["correct answer eliminated early, trap answer selected"]
+    },
+    {
+      "id": "vocabulary-loose-fit",
+      "description": "Choosing a synonym that fits loosely rather than the word that fits the precise meaning and tone of the passage",
+      "affected_topic_ids": ["reading-writing.craft-and-structure"],
+      "detection_hints": ["selected word is a valid synonym but changes tone or precision"]
+    },
+    {
+      "id": "passage-vs-prior-knowledge",
+      "description": "Answering based on what the student knows about the topic rather than what the passage actually states",
+      "affected_topic_ids": ["reading-writing.information-and-ideas", "reading-writing.craft-and-structure"],
+      "detection_hints": ["answer is factually true but unsupported by the passage text"]
+    },
+    {
+      "id": "algebra-sign-error",
+      "description": "Sign errors when distributing negatives or working with negative coefficients under time pressure",
+      "affected_topic_ids": ["math.algebra", "math.advanced-math"],
+      "detection_hints": ["answer is correct in magnitude but wrong in sign"]
+    },
+    {
+      "id": "formula-component-confusion",
+      "description": "Using the wrong component of a formula (diameter for radius, wrong trig ratio, wrong base for percent change)",
+      "affected_topic_ids": ["math.geometry-trig", "math.problem-solving-data"],
+      "detection_hints": ["setup is correct but wrong value substituted"]
+    }
+  ],
+
+  "frq_rubric": {
+    "general_guidance": "NMSQT is multiple choice only. This rubric field is not used for this pack.",
+    "point_allocation_pattern": "Not applicable — MC only. All questions scored correct (1.0) or incorrect (0.0).",
+    "common_reasoning_gaps": [
+      "Falling for trap answers designed to attract students with partial knowledge",
+      "Not reading all four options before selecting",
+      "Spending too long on a hard question instead of moving on"
+    ]
+  }
+}

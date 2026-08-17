@@ -8,7 +8,7 @@
 // unlock.ts). See src/packs/loader.js for the same fix, applied first.
 
 import { createClient } from '@supabase/supabase-js'
-import { getPack } from '../packs/loader.js'
+import { getPack, isNMSQT } from '../packs/loader.js'
 
 const PRIORITIZED_DAYS = 5
 const MS_PER_DAY = 86_400_000
@@ -141,6 +141,17 @@ export async function runPacingCalendarSweep(admin) {
       pack = getPack(enrollment.pack_id)
     } catch {
       continue // stale/unknown pack id — skip rather than fail the sweep
+    }
+
+    // NMSQT packs have no pacing_calendar at all (every topic unlocks from
+    // day one — see session-orchestrator.js's startSession) — the sweep
+    // below would already no-op for one (topicIdsThroughWeek finds nothing
+    // to unlock against an empty pacing_calendar), but logging it
+    // explicitly makes that "nothing to do here" state visible rather than
+    // silent, matching every other skip reason this sweep logs.
+    if (isNMSQT(pack)) {
+      console.log(`[pacing-calendar] ${pack.id} skipped (no pacing calendar)`)
+      continue
     }
 
     const currentWeek = currentWeekNumber(pack.school_year_start, today)

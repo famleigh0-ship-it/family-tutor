@@ -12,6 +12,7 @@ import { validatePackShape, checkPackIntegrity } from './validatePack.js'
 import apPhysics1Raw from '../../course-packs/ap-physics-1/pack.json' with { type: 'json' }
 import calcAbBcRaw from '../../course-packs/calc-ab-bc/pack.json' with { type: 'json' }
 import apHumanGeographyRaw from '../../course-packs/ap-human-geography/pack.json' with { type: 'json' }
+import nmsqt2026Raw from '../../course-packs/nmsqt-2026/pack.json' with { type: 'json' }
 
 /**
  * @param {unknown} raw
@@ -30,7 +31,7 @@ function loadAndValidate(raw) {
 
 /** @type {Record<string, CoursePack>} */
 const packsById = {}
-for (const raw of [apPhysics1Raw, calcAbBcRaw, apHumanGeographyRaw]) {
+for (const raw of [apPhysics1Raw, calcAbBcRaw, apHumanGeographyRaw, nmsqt2026Raw]) {
   const pack = loadAndValidate(raw)
   packsById[pack.id] = pack
 }
@@ -63,6 +64,52 @@ export function getTopic(packId, topicId) {
     if (topic) return topic
   }
   throw new Error(`Unknown topic "${topicId}" in pack "${packId}"`)
+}
+
+/** @param {CoursePack} pack @returns {boolean} */
+export function isNMSQT(pack) {
+  return pack.exam_type === 'nmsqt'
+}
+
+/** @param {CoursePack} pack @returns {number} */
+export function getSessionDuration(pack) {
+  return pack.session_duration_minutes ?? 25
+}
+
+/** @param {CoursePack} pack @returns {string[]} */
+export function getAllowedQuestionTypes(pack) {
+  return pack.question_types_allowed ?? ['mc', 'frq', 'conceptual']
+}
+
+// Legacy default: no per-user unseen-count refill trigger overridden by a
+// pack, matches src/engine/bank-manager.js's original hardcoded REFILL_BELOW.
+const DEFAULT_BANK_REFILL_THRESHOLD = { mc: 8, conceptual: 5, frq: 3 }
+
+/**
+ * How many unseen-by-this-user questions of a given type trigger a refill
+ * for this pack/topic. Defaults to the values every pack has always used;
+ * only bank_refill_threshold_mc is currently pack-overridable (nmsqt-2026
+ * raises it to 20 so a much bigger bank stays "fresh" per student).
+ * @param {CoursePack} pack @param {'mc'|'conceptual'|'frq'} questionType @returns {number}
+ */
+export function getBankRefillThreshold(pack, questionType) {
+  const key = `bank_refill_threshold_${questionType}`
+  return typeof pack[key] === 'number' ? pack[key] : DEFAULT_BANK_REFILL_THRESHOLD[questionType]
+}
+
+/**
+ * Target total question-bank size per topic for a given type — deliberately
+ * has NO default. Absent means "no target at all," which scripts/manage-bank.js's
+ * fill-all reads as "keep today's legacy behavior" (exactly one batch per
+ * needs-fill trigger, unbounded growth over time) rather than silently
+ * capping or topping up every existing pack's bank size the first time this
+ * shipped. Only packs that explicitly set bank_size_<type> (currently just
+ * nmsqt-2026's bank_size_mc: 75) get the "top up to a target" behavior.
+ * @param {CoursePack} pack @param {'mc'|'conceptual'|'frq'} questionType @returns {number | undefined}
+ */
+export function getBankSizeTarget(pack, questionType) {
+  const key = `bank_size_${questionType}`
+  return typeof pack[key] === 'number' ? pack[key] : undefined
 }
 
 /** @returns {Topic[]} */

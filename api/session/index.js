@@ -80,7 +80,8 @@ async function handleStart(req, res, user) {
       topics: plan.topics.map(leanTopic),
       target_question_count: plan.target_question_count,
       target_duration_minutes: plan.target_duration_minutes,
-      notes: plan.notes
+      notes: plan.notes,
+      allowed_question_types: plan.allowed_question_types
     })
   } catch (err) {
     res.status(500).json({ error: 'Failed to start session', detail: err.message })

@@ -6,15 +6,16 @@
 // src/packs/loader.js for the original discovery.
 
 import { createClient } from '@supabase/supabase-js'
-import { getPack } from '../packs/loader.js'
+import { getPack, getAllowedQuestionTypes, getBankRefillThreshold } from '../packs/loader.js'
 import { fillBank } from '../lib/bankFill.js'
 
 /** @typedef {{ topic_id: string, question_type: string, total_in_bank: number, unseen_by_user: number, needs_fill: boolean }} BankHealthEntry */
 
 // "refill when < N remaining unseen for any user" per spec — the trigger
 // is purely the per-user unseen count, checked independently for whoever
-// is about to start a session.
-const REFILL_BELOW = { mc: 8, conceptual: 5, frq: 3 }
+// is about to start a session. Threshold is pack-configurable (see
+// src/packs/loader.js's getBankRefillThreshold) — defaults to these same
+// numbers for every pack that doesn't override it.
 const QUESTION_TYPES = ['mc', 'conceptual', 'frq']
 
 /** @type {import('@supabase/supabase-js').SupabaseClient | undefined} */
@@ -72,11 +73,21 @@ export async function checkBankHealth(packId, userId) {
     seenQuestionIds = new Set((historyRows ?? []).map((r) => r.question_id))
   }
 
+  // Only check/report on question types the pack actually allows — e.g.
+  // NMSQT's MC-only restriction. Without this, every AP-shaped pack's
+  // implicit "all three types" default still checks all three (unchanged
+  // behavior), but a fresh NMSQT bank would show conceptual/frq as
+  // perpetually needing a fill (0 in bank, always below threshold) and
+  // both scripts/manage-bank.js's fill-all and the runtime auto-fill
+  // triggers (session-orchestrator.js, the daily-maintenance sweep) would
+  // keep generating question types NMSQT is never allowed to serve.
+  const allowedTypes = getAllowedQuestionTypes(pack)
+
   /** @type {BankHealthEntry[]} */
   const results = []
   for (const unit of pack.units) {
     for (const topic of unit.topics) {
-      for (const questionType of QUESTION_TYPES) {
+      for (const questionType of QUESTION_TYPES.filter((t) => allowedTypes.includes(t))) {
         const rowsForGroup = (bankRows ?? []).filter(
           (r) => r.topic_id === topic.id && r.question_type === questionType
         )
@@ -88,7 +99,7 @@ export async function checkBankHealth(packId, userId) {
           question_type: questionType,
           total_in_bank: totalInBank,
           unseen_by_user: unseenByUser,
-          needs_fill: unseenByUser < REFILL_BELOW[questionType]
+          needs_fill: unseenByUser < getBankRefillThreshold(pack, questionType)
         })
       }
     }

@@ -10,6 +10,24 @@ export interface CoursePack {
   pacing_calendar: PacingWeek[]
   common_misconceptions: Misconception[]
   frq_rubric: FRQRubric
+  // NMSQT pack support (all optional, default to today's AP behavior when
+  // absent — see src/packs/loader.js's isNMSQT/getSessionDuration/
+  // getAllowedQuestionTypes helpers for the actual defaulting logic).
+  exam_type?: 'ap' | 'nmsqt'
+  session_duration_minutes?: number
+  question_types_allowed?: ('mc' | 'frq' | 'conceptual')[]
+  difficulty_escalation?: boolean
+  // Bank sizing overrides (all optional, per question type). Absent means
+  // "use the existing default behavior" — see src/packs/loader.js's
+  // getBankSizeTarget/getBankRefillThreshold for exactly what that means
+  // for each one; they are NOT symmetric (no bank_size_* means no target
+  // cap at all — legacy unbounded single-batch-per-trigger fill-all
+  // behavior — while no bank_refill_threshold_* falls back to a real
+  // default number).
+  bank_size_mc?: number
+  bank_size_conceptual?: number
+  bank_size_frq?: number
+  bank_refill_threshold_mc?: number
 }
 
 export interface Unit {

@@ -103,6 +103,31 @@ export function validatePackShape(data) {
     }
   }
 
+  // NMSQT pack fields — all optional, so only validated when present. AP
+  // packs that omit them entirely are untouched by these checks.
+  if (data.exam_type !== undefined && data.exam_type !== 'ap' && data.exam_type !== 'nmsqt') {
+    fail(packId, '"exam_type" must be "ap" or "nmsqt" if present')
+  }
+  if (data.session_duration_minutes !== undefined && typeof data.session_duration_minutes !== 'number') {
+    fail(packId, '"session_duration_minutes" must be a number if present')
+  }
+  if (data.question_types_allowed !== undefined) {
+    if (
+      !Array.isArray(data.question_types_allowed) ||
+      data.question_types_allowed.some((t) => !['mc', 'frq', 'conceptual'].includes(t))
+    ) {
+      fail(packId, '"question_types_allowed" must be an array of "mc"/"frq"/"conceptual" if present')
+    }
+  }
+  if (data.difficulty_escalation !== undefined && typeof data.difficulty_escalation !== 'boolean') {
+    fail(packId, '"difficulty_escalation" must be a boolean if present')
+  }
+  for (const field of ['bank_size_mc', 'bank_size_conceptual', 'bank_size_frq', 'bank_refill_threshold_mc']) {
+    if (data[field] !== undefined && typeof data[field] !== 'number') {
+      fail(packId, `"${field}" must be a number if present`)
+    }
+  }
+
   const rubric = data.frq_rubric
   if (!rubric || typeof rubric !== 'object') fail(packId, '"frq_rubric" must be an object')
   if (typeof rubric.general_guidance !== 'string' || !rubric.general_guidance) {

@@ -14,6 +14,7 @@
 
 import { getUserFromRequest, getUserProfile, getSupabaseAdmin } from '../_lib/supabaseAdmin.js'
 import { fillBank } from '../../src/lib/bankFill.js'
+import { getPack, getAllowedQuestionTypes } from '../../src/packs/loader.js'
 
 const SEEN_STALE_DAYS = 60
 const MS_PER_DAY = 86_400_000
@@ -64,6 +65,22 @@ async function handleServe(req, res) {
   const difficultyNum = Number(difficulty)
   if (!packId || !topicId || !questionType || !Number.isFinite(difficultyNum)) {
     res.status(400).json({ error: 'pack_id, topic_id, question_type, and difficulty are required' })
+    return
+  }
+
+  // Server-side enforcement of pack.question_types_allowed (e.g. NMSQT's
+  // MC-only restriction) — Session.tsx's own question-type cycle already
+  // only ever requests allowed types, but this is the actual gate: nothing
+  // client-side stops a direct/buggy request for a type the pack disallows.
+  let pack
+  try {
+    pack = getPack(packId)
+  } catch {
+    res.status(400).json({ error: `Unknown pack "${packId}"` })
+    return
+  }
+  if (!getAllowedQuestionTypes(pack).includes(questionType)) {
+    res.status(400).json({ error: `question_type "${questionType}" is not allowed for pack "${packId}"` })
     return
   }
 

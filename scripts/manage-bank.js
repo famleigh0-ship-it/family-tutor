@@ -15,7 +15,7 @@
 
 import { config as loadEnv } from 'dotenv'
 import { createClient } from '@supabase/supabase-js'
-import { getPack } from '../src/packs/loader.js'
+import { getPack, getBankSizeTarget } from '../src/packs/loader.js'
 import { checkBankHealth } from '../src/engine/bank-manager.js'
 import { fillBank } from '../src/lib/bankFill.js'
 
@@ -123,6 +123,12 @@ async function fillWithRetry(packId, topicId, questionType) {
   throw lastErr
 }
 
+// Safety cap on how many top-up batches a single fill-all run will fire at
+// one topic/type, purely to bound the damage of a misconfigured huge
+// bank_size_<type> (real money per batch) — not expected to ever bind for
+// nmsqt-2026's bank_size_mc: 75 (8 batches of 10 gets there in 1).
+const MAX_TOPUP_BATCHES_PER_ENTRY = 20
+
 async function cmdFillAll(options) {
   const packId = options.pack
   if (!packId) {
@@ -135,23 +141,51 @@ async function cmdFillAll(options) {
   const needingFill = health.filter((h) => h.needs_fill)
 
   console.log(
-    `Filling ${needingFill.length} topic/type combination(s) for ${pack.name}. This makes that many Claude API calls (with automatic retries on transient timeouts) and can take a while — expected.\n`
+    `Filling ${needingFill.length} topic/type combination(s) for ${pack.name}. This makes at least that many Claude API calls (with automatic retries on transient timeouts, and more per entry for any type with a configured bank_size target) and can take a while — expected.\n`
   )
 
   let succeeded = 0
   let failed = 0
   for (const entry of needingFill) {
-    try {
-      const result = await fillWithRetry(packId, entry.topic_id, entry.question_type)
-      console.log(`  ok ${entry.topic_id} (${entry.question_type}): generated ${result.generated}`)
-      succeeded++
-    } catch (err) {
-      console.error(`  FAILED ${entry.topic_id} (${entry.question_type}) after ${MAX_ATTEMPTS} attempts: ${err.message}`)
-      failed++
+    // getBankSizeTarget returns undefined for any pack that doesn't set
+    // bank_size_<type> — that's every pack except nmsqt-2026 today — which
+    // preserves the exact original one-batch-per-trigger behavior rather
+    // than silently topping every existing pack up to some new default.
+    const target = getBankSizeTarget(pack, entry.question_type)
+
+    if (target === undefined) {
+      try {
+        const result = await fillWithRetry(packId, entry.topic_id, entry.question_type)
+        console.log(`  ok ${entry.topic_id} (${entry.question_type}): generated ${result.generated}`)
+        succeeded++
+      } catch (err) {
+        console.error(`  FAILED ${entry.topic_id} (${entry.question_type}) after ${MAX_ATTEMPTS} attempts: ${err.message}`)
+        failed++
+      }
+      continue
+    }
+
+    let totalInBank = entry.total_in_bank
+    let batches = 0
+    while (totalInBank < target && batches < MAX_TOPUP_BATCHES_PER_ENTRY) {
+      batches++
+      try {
+        const result = await fillWithRetry(packId, entry.topic_id, entry.question_type)
+        totalInBank += result.generated
+        succeeded++
+        console.log(`  ok ${entry.topic_id} (${entry.question_type}): generated ${result.generated}, bank now ${totalInBank}/${target}`)
+      } catch (err) {
+        console.error(`  FAILED ${entry.topic_id} (${entry.question_type}) after ${MAX_ATTEMPTS} attempts: ${err.message}`)
+        failed++
+        break
+      }
+    }
+    if (totalInBank < target && batches >= MAX_TOPUP_BATCHES_PER_ENTRY) {
+      console.error(`  STOPPED ${entry.topic_id} (${entry.question_type}) at ${totalInBank}/${target} — hit the ${MAX_TOPUP_BATCHES_PER_ENTRY}-batch safety cap`)
     }
   }
 
-  console.log(`\nDone. ${succeeded} succeeded, ${failed} failed.`)
+  console.log(`\nDone. ${succeeded} batch(es) succeeded, ${failed} batch(es) failed.`)
 }
 
 async function main() {

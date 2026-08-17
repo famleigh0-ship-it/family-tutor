@@ -11,8 +11,8 @@ import { createClient } from '@supabase/supabase-js'
 // Explicit extensions: this module is imported directly by
 // scripts/test-engine.js under plain Node (no bundler), whose native ESM
 // loader — unlike Vite's — requires extensions on relative specifiers.
-import { getPack } from '../packs/loader.js'
-import { applyDecay, updateMastery } from './mastery.js'
+import { getPack, isNMSQT, getSessionDuration } from '../packs/loader.js'
+import { applyDecay, updateMastery, updateDifficultyMastery } from './mastery.js'
 import { detectSessionMode } from './session-mode.js'
 import { selectTopics, QUESTIONS_PER_TOPIC } from './topic-selector.js'
 import { getPrioritizedTopicIds } from './unlock.js'
@@ -60,7 +60,14 @@ export function rowToMasteryRecord(row) {
     frq_attempts: row.frq_attempts,
     frq_score_total: row.frq_score_total,
     last_seen: row.last_seen ? new Date(row.last_seen) : null,
-    updated_at: new Date(row.updated_at)
+    updated_at: new Date(row.updated_at),
+    // NMSQT (difficulty_escalation) only — migrations/009 defaults these
+    // to 0/0/0/1 for every existing row, so AP packs read the same
+    // "never escalated" defaults and never write anything different.
+    difficulty_1_mastery: row.difficulty_1_mastery ?? 0,
+    difficulty_2_mastery: row.difficulty_2_mastery ?? 0,
+    difficulty_3_mastery: row.difficulty_3_mastery ?? 0,
+    current_difficulty: row.current_difficulty ?? 1
   }
 }
 
@@ -168,60 +175,66 @@ export async function startSession(params) {
   // though the spec wants it to ("prompt returns next session if still
   // unanswered"). post_quiz_result stays a reliable "still needs an
   // answer" signal across any number of visits.
-  const todayStrForExpiry = toDateOnly(now)
-  const { data: unresolvedQuizPrepRows, error: unresolvedQuizPrepErr } = await admin
-    .from('quiz_prep_events')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('pack_id', packId)
-    .lt('quiz_date', todayStrForExpiry)
-    .is('post_quiz_result', null)
+  //
+  // NMSQT has no quiz-prep concept at all (see Home.jsx — no "Quiz coming
+  // up?" entry point is ever shown for it), so no quiz_prep_events row can
+  // exist for this pack_id and this whole step is skipped.
+  if (!isNMSQT(pack)) {
+    const todayStrForExpiry = toDateOnly(now)
+    const { data: unresolvedQuizPrepRows, error: unresolvedQuizPrepErr } = await admin
+      .from('quiz_prep_events')
+      .select('*')
+      .eq('user_id', userId)
+      .eq('pack_id', packId)
+      .lt('quiz_date', todayStrForExpiry)
+      .is('post_quiz_result', null)
 
-  if (unresolvedQuizPrepErr) throw unresolvedQuizPrepErr
+    if (unresolvedQuizPrepErr) throw unresolvedQuizPrepErr
 
-  const needsPostQuizPrompt = []
-  for (const row of unresolvedQuizPrepRows ?? []) {
-    const daysSinceQuiz = Math.floor((now.getTime() - new Date(row.quiz_date).getTime()) / MS_PER_DAY)
-    const tooStaleForPrompt = daysSinceQuiz > POST_QUIZ_STALE_DAYS
+    const needsPostQuizPrompt = []
+    for (const row of unresolvedQuizPrepRows ?? []) {
+      const daysSinceQuiz = Math.floor((now.getTime() - new Date(row.quiz_date).getTime()) / MS_PER_DAY)
+      const tooStaleForPrompt = daysSinceQuiz > POST_QUIZ_STALE_DAYS
 
-    if (tooStaleForPrompt) {
-      const { error: expireErr } = await admin
-        .from('quiz_prep_events')
-        .update({ expired_at: row.expired_at ?? now.toISOString(), post_quiz_result: 'skipped' })
-        .eq('id', row.id)
-      if (expireErr) throw expireErr
-      continue
+      if (tooStaleForPrompt) {
+        const { error: expireErr } = await admin
+          .from('quiz_prep_events')
+          .update({ expired_at: row.expired_at ?? now.toISOString(), post_quiz_result: 'skipped' })
+          .eq('id', row.id)
+        if (expireErr) throw expireErr
+        continue
+      }
+
+      // Idempotent: only write expired_at the first time it's seen, but
+      // still surface the prompt on every subsequent unanswered visit.
+      if (row.expired_at === null) {
+        const { error: expireErr } = await admin
+          .from('quiz_prep_events')
+          .update({ expired_at: now.toISOString() })
+          .eq('id', row.id)
+        if (expireErr) throw expireErr
+      }
+
+      needsPostQuizPrompt.push({ ...row, daysSinceQuiz })
     }
 
-    // Idempotent: only write expired_at the first time it's seen, but
-    // still surface the prompt on every subsequent unanswered visit.
-    if (row.expired_at === null) {
-      const { error: expireErr } = await admin
-        .from('quiz_prep_events')
-        .update({ expired_at: now.toISOString() })
-        .eq('id', row.id)
-      if (expireErr) throw expireErr
-    }
+    if (needsPostQuizPrompt.length > 0) {
+      if (needsPostQuizPrompt.length > 1) {
+        console.warn(
+          `[session-orchestrator] ${needsPostQuizPrompt.length} quiz_prep_events need a post-quiz prompt for ${userId}/${packId} — using the most recent`
+        )
+      }
+      const toPrompt = needsPostQuizPrompt.sort(
+        (a, b) => new Date(b.quiz_date).getTime() - new Date(a.quiz_date).getTime()
+      )[0]
+      const topicNameById = new Map(pack.units.flatMap((u) => u.topics.map((t) => [t.id, t.name])))
 
-    needsPostQuizPrompt.push({ ...row, daysSinceQuiz })
-  }
-
-  if (needsPostQuizPrompt.length > 0) {
-    if (needsPostQuizPrompt.length > 1) {
-      console.warn(
-        `[session-orchestrator] ${needsPostQuizPrompt.length} quiz_prep_events need a post-quiz prompt for ${userId}/${packId} — using the most recent`
-      )
-    }
-    const toPrompt = needsPostQuizPrompt.sort(
-      (a, b) => new Date(b.quiz_date).getTime() - new Date(a.quiz_date).getTime()
-    )[0]
-    const topicNameById = new Map(pack.units.flatMap((u) => u.topics.map((t) => [t.id, t.name])))
-
-    return {
-      requires_post_quiz: true,
-      event_id: toPrompt.id,
-      topic_names: (toPrompt.topic_ids ?? []).map((id) => topicNameById.get(id) ?? id),
-      days_since_quiz: toPrompt.daysSinceQuiz
+      return {
+        requires_post_quiz: true,
+        event_id: toPrompt.id,
+        topic_names: (toPrompt.topic_ids ?? []).map((id) => topicNameById.get(id) ?? id),
+        days_since_quiz: toPrompt.daysSinceQuiz
+      }
     }
   }
 
@@ -252,24 +265,32 @@ export async function startSession(params) {
   }
   masteryRecords = decayed
 
-  // 3. Unlocked topic ids from topic_unlock_log.
-  const { data: unlockRows, error: unlockErr } = await admin
-    .from('topic_unlock_log')
-    .select('topic_id')
-    .eq('user_id', userId)
-    .eq('pack_id', packId)
-
-  if (unlockErr) throw unlockErr
-
-  const unlockedTopicIds = Array.from(new Set((unlockRows ?? []).map((r) => r.topic_id)))
+  // 3. Unlocked topic ids. NMSQT has no classroom-log/pacing-calendar
+  // unlock concept at all — every topic in the pack is unlocked from day
+  // one — so this skips topic_unlock_log entirely rather than querying a
+  // table that will never have rows for this pack_id.
+  let unlockedTopicIds
+  if (isNMSQT(pack)) {
+    unlockedTopicIds = pack.units.flatMap((u) => u.topics.map((t) => t.id))
+  } else {
+    const { data: unlockRows, error: unlockErr } = await admin
+      .from('topic_unlock_log')
+      .select('topic_id')
+      .eq('user_id', userId)
+      .eq('pack_id', packId)
+    if (unlockErr) throw unlockErr
+    unlockedTopicIds = Array.from(new Set((unlockRows ?? []).map((r) => r.topic_id)))
+  }
 
   // 4. Prioritized topic ids — prioritized_until > now, set by
   // unlockTopics/prioritizeTopics (src/engine/unlock.js) when a classroom
-  // log is confirmed.
-  const prioritizedTopicIds = await getPrioritizedTopicIds(userId, packId)
+  // log is confirmed. NMSQT never writes topic_unlock_log rows (step 3
+  // above), so there's nothing to prioritize.
+  const prioritizedTopicIds = isNMSQT(pack) ? [] : await getPrioritizedTopicIds(userId, packId)
 
-  // 5. Active quiz prep event: quiz_date >= today, not expired.
-  const activeQuizPrepEvent = await getActiveQuizPrepEvent(userId, packId)
+  // 5. Active quiz prep event: quiz_date >= today, not expired. Skipped
+  // for NMSQT — same reasoning as step 0.
+  const activeQuizPrepEvent = isNMSQT(pack) ? null : await getActiveQuizPrepEvent(userId, packId)
   const quizPrepTopicIds = activeQuizPrepEvent?.topic_ids ?? []
   const quizPrepDaysUntilQuiz = activeQuizPrepEvent
     ? Math.ceil((new Date(activeQuizPrepEvent.quiz_date).getTime() - now.getTime()) / MS_PER_DAY)
@@ -317,10 +338,18 @@ export async function startSession(params) {
     sessionCount: sessionCount ?? 0,
     daysUntilExam,
     examCrunchWeeks: pack.exam_crunch_weeks,
-    activeQuizPrepEvent
+    activeQuizPrepEvent,
+    isNMSQT: isNMSQT(pack)
   })
 
-  // 9. Select topics.
+  // NMSQT sessions run at the pack's own configured length
+  // (session_duration_minutes, default 25) rather than whatever the caller
+  // passed — api/session/index.js has always hardcoded 20 for every pack,
+  // which predates NMSQT's shorter 15-minute target.
+  const effectiveTargetDurationMinutes = isNMSQT(pack) ? getSessionDuration(pack) : targetDurationMinutes
+
+  // 9. Select topics. difficulty_escalation is read directly off `pack`
+  // inside selectTopics, so no separate flag needs threading through here.
   const plan = selectTopics({
     pack,
     masteryRecords,
@@ -329,7 +358,7 @@ export async function startSession(params) {
     mode,
     quizPrepTopicIds,
     recentTopicIds,
-    targetDurationMinutes,
+    targetDurationMinutes: effectiveTargetDurationMinutes,
     quizPrepDaysUntilQuiz,
     forceTopicIds
   })
@@ -480,13 +509,26 @@ export async function recordQuestionResult(params) {
         frq_attempts: 0,
         frq_score_total: 0,
         last_seen: null,
-        updated_at: new Date()
+        updated_at: new Date(),
+        difficulty_1_mastery: 0,
+        difficulty_2_mastery: 0,
+        difficulty_3_mastery: 0,
+        current_difficulty: 1
       }
 
-  // 2. Update mastery.
-  const updated = updateMastery(current, result)
+  // 2. Update mastery. NMSQT (difficulty_escalation) packs also update the
+  // per-difficulty column the question was actually served at, and
+  // recompute current_difficulty from the result — AP packs never take
+  // this branch, so their mastery update is byte-for-byte what it was
+  // before NMSQT existed.
+  const pack = getPack(packId)
+  const updated = pack.difficulty_escalation
+    ? updateDifficultyMastery(current, result, result.difficulty ?? current.current_difficulty ?? 1)
+    : updateMastery(current, result)
 
-  // 3. Write mastery_records.
+  // 3. Write mastery_records. The difficulty_N_mastery/current_difficulty
+  // columns are always included — for AP packs they just keep re-writing
+  // their untouched defaults (0/0/0/1), a no-op.
   const { error: upsertErr } = await admin.from('mastery_records').upsert(
     {
       user_id: userId,
@@ -498,7 +540,11 @@ export async function recordQuestionResult(params) {
       frq_attempts: updated.frq_attempts,
       frq_score_total: updated.frq_score_total,
       last_seen: updated.last_seen?.toISOString() ?? null,
-      updated_at: updated.updated_at.toISOString()
+      updated_at: updated.updated_at.toISOString(),
+      difficulty_1_mastery: updated.difficulty_1_mastery ?? 0,
+      difficulty_2_mastery: updated.difficulty_2_mastery ?? 0,
+      difficulty_3_mastery: updated.difficulty_3_mastery ?? 0,
+      current_difficulty: updated.current_difficulty ?? 1
     },
     { onConflict: 'user_id,pack_id,topic_id' }
   )

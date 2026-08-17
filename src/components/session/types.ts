@@ -16,6 +16,9 @@ export interface SessionPlanResponse {
   target_question_count: number
   target_duration_minutes: number
   notes: string[]
+  // Which question types this pack allows (e.g. NMSQT's MC-only
+  // restriction) — Session.tsx builds its question-type cycle from this.
+  allowed_question_types: QuestionType[]
 }
 
 export type QuestionType = 'mc' | 'frq' | 'conceptual'
@@ -106,6 +109,7 @@ export interface StoredSessionState {
   topics: SessionTopic[]
   targetQuestionCount: number
   targetDurationMinutes: number
+  allowedQuestionTypes: QuestionType[]
   questionIndex: number
   answeredResults: AnsweredResult[]
   startedAtIso: string
