@@ -24,7 +24,7 @@ function YourAnswerDisclosure({ submittedAnswer }: { submittedAnswer: SubmittedA
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
+    <div className="mb-2">
       <button
         type="button"
         onClick={() => setExpanded((v) => !v)}
@@ -35,7 +35,7 @@ function YourAnswerDisclosure({ submittedAnswer }: { submittedAnswer: SubmittedA
       </button>
 
       {expanded && (
-        <div className="mt-1 [animation:fadeIn_150ms_ease-in]">
+        <div className="mt-1 max-h-40 overflow-y-auto [animation:fadeIn_150ms_ease-in]">
           {submittedAnswer.imageDataUrl ? (
             <img
               src={submittedAnswer.imageDataUrl}
@@ -171,11 +171,17 @@ export default function FeedbackCard({ question, result, submittedAnswer, isLast
         {hasFollowUp(result) && result.follow_up && (
           <p className="text-sm italic text-slate-500 dark:text-slate-400">{result.follow_up}</p>
         )}
-
-        {submittedAnswer && <YourAnswerDisclosure submittedAnswer={submittedAnswer} />}
       </div>
 
       <div className="border-t border-slate-200 p-4 dark:border-slate-800">
+        {/* Lives in the fixed footer, not the scrollable feedback body above —
+            long AI-generated feedback (multi-paragraph critique plus bullet
+            lists) can push this well below the fold inside that small
+            max-h-[60vh] box on mobile, making it hard to relocate once
+            collapsed. The footer is never clipped/scrolled, so this stays
+            reachable regardless of how long the feedback text is. */}
+        {submittedAnswer && <YourAnswerDisclosure submittedAnswer={submittedAnswer} />}
+
         <button
           type="button"
           onClick={onNext}
