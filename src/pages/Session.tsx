@@ -38,17 +38,29 @@ const QUESTION_TYPE_CYCLE: QuestionType[] = ['mc', 'conceptual', 'frq']
 const ONBOARDING_QUESTION_TYPE_CYCLE: QuestionType[] = ['mc', 'conceptual', 'mc']
 const BANK_EMPTY_MAX_RETRIES = 3
 const BANK_EMPTY_RETRY_DELAY_MS = 5000
-const GRADING_TIMEOUT_MS = 30000
+const GRADING_TIMEOUT_MS = 45000
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
+// How long a resume can restore the exact question that was on screen
+// (rather than fetching a fresh one for the same topic/type) — covers a
+// student briefly leaving the PWA (app switch, notification, phone lock)
+// without treating a much later return as still "mid-question."
+const QUESTION_MEMORY_MS = 5 * 60 * 1000
 const CRUNCH_ENCOURAGEMENT_SECONDS = 20 * 60
 
 function storageKey(packId: string) {
   return `falp:activeSession:${packId}`
 }
 
+// localStorage, not sessionStorage: a PWA backgrounded on mobile can have
+// its underlying page/WebView torn down and recreated by the OS at any
+// time (especially iOS standalone PWAs under memory pressure) — that wipes
+// sessionStorage entirely, which was silently dropping the whole session
+// (not just the current question) and dropping straight into a fresh
+// initSession() with no resume prompt at all. localStorage is disk-backed
+// per origin and survives that.
 function readStoredSession(packId: string): StoredSessionState | null {
   try {
-    const raw = sessionStorage.getItem(storageKey(packId))
+    const raw = localStorage.getItem(storageKey(packId))
     return raw ? (JSON.parse(raw) as StoredSessionState) : null
   } catch {
     return null
@@ -56,11 +68,11 @@ function readStoredSession(packId: string): StoredSessionState | null {
 }
 
 function writeStoredSession(packId: string, state: StoredSessionState) {
-  sessionStorage.setItem(storageKey(packId), JSON.stringify(state))
+  localStorage.setItem(storageKey(packId), JSON.stringify(state))
 }
 
 function clearStoredSession(packId: string) {
-  sessionStorage.removeItem(storageKey(packId))
+  localStorage.removeItem(storageKey(packId))
 }
 
 async function authToken() {
@@ -114,7 +126,16 @@ export default function Session() {
     navigate('/home')
   }
 
-  function persistProgress(index: number, answered: AnsweredResult[], currentPlan: SessionPlanResponse) {
+  // `question` is the exact in-flight (unanswered) question to remember for
+  // a same-question resume — pass it when a question is freshly served,
+  // and omit it (clearing any previously remembered one) once it's been
+  // answered or the session has moved on.
+  function persistProgress(
+    index: number,
+    answered: AnsweredResult[],
+    currentPlan: SessionPlanResponse,
+    question?: ServedQuestion
+  ) {
     if (!packId || !startedAtMsRef.current) return
     writeStoredSession(packId, {
       sessionId: currentPlan.session_id,
@@ -126,11 +147,13 @@ export default function Session() {
       allowedQuestionTypes: currentPlan.allowed_question_types,
       questionIndex: index,
       answeredResults: answered,
-      startedAtIso: new Date(startedAtMsRef.current).toISOString()
+      startedAtIso: new Date(startedAtMsRef.current).toISOString(),
+      currentQuestion: question,
+      questionServedAtIso: question ? new Date().toISOString() : undefined
     })
   }
 
-  async function serveQuestionAt(forPlan: SessionPlanResponse, index: number) {
+  async function serveQuestionAt(forPlan: SessionPlanResponse, index: number, answered: AnsweredResult[]) {
     setPhase('loading')
     const topic = forPlan.topics[index % forPlan.topics.length]
     const baseCycle = forPlan.mode === 'onboarding' ? ONBOARDING_QUESTION_TYPE_CYCLE : QUESTION_TYPE_CYCLE
@@ -161,7 +184,7 @@ export default function Session() {
         } else {
           setErrorInfo({ kind: 'bank-empty', exhausted: false })
           setPhase('error')
-          setTimeout(() => serveQuestionAt(forPlan, index), BANK_EMPTY_RETRY_DELAY_MS)
+          setTimeout(() => serveQuestionAt(forPlan, index, answered), BANK_EMPTY_RETRY_DELAY_MS)
         }
         return
       }
@@ -175,11 +198,12 @@ export default function Session() {
       setGradeResult(null)
       questionStartedAtRef.current = Date.now()
       setPhase('question')
+      persistProgress(index, answered, forPlan, body.question)
     } catch (err) {
       setErrorInfo({
         kind: 'network',
         message: err instanceof Error ? err.message : undefined,
-        onRetry: () => serveQuestionAt(forPlan, index)
+        onRetry: () => serveQuestionAt(forPlan, index, answered)
       })
       setPhase('error')
     }
@@ -194,7 +218,7 @@ export default function Session() {
     setPlan(planResp)
     setQuestionIndex(resumeIndex)
     setAnsweredResults(resumeAnswered)
-    await serveQuestionAt(planResp, resumeIndex)
+    await serveQuestionAt(planResp, resumeIndex, resumeAnswered)
   }
 
   async function initSession() {
@@ -253,6 +277,24 @@ export default function Session() {
     }
     startedAtMsRef.current = Date.parse(stored.startedAtIso)
     setElapsedSeconds(Math.floor((Date.now() - startedAtMsRef.current) / 1000))
+
+    // If the same unanswered question was served recently enough, restore
+    // it directly instead of fetching a fresh one for the topic/type —
+    // otherwise a brief app-switch/lock-screen interruption looks to the
+    // student like the question changed on them.
+    const questionAgeMs = stored.questionServedAtIso ? Date.now() - Date.parse(stored.questionServedAtIso) : Infinity
+    if (stored.currentQuestion && questionAgeMs <= QUESTION_MEMORY_MS) {
+      setPlan(restoredPlan)
+      setQuestionIndex(stored.questionIndex)
+      setAnsweredResults(stored.answeredResults)
+      setCurrentQuestion(stored.currentQuestion)
+      setCurrentTopic(restoredPlan.topics[stored.questionIndex % restoredPlan.topics.length])
+      setGradeResult(null)
+      questionStartedAtRef.current = Date.now()
+      setPhase('question')
+      return
+    }
+
     await beginPlan(restoredPlan, stored.questionIndex, stored.answeredResults)
   }
 
@@ -381,7 +423,7 @@ export default function Session() {
     if (nextIndex >= plan.target_question_count) {
       finishSession()
     } else {
-      serveQuestionAt(plan, nextIndex)
+      serveQuestionAt(plan, nextIndex, answeredResults)
     }
   }
 
@@ -393,7 +435,7 @@ export default function Session() {
     if (nextIndex >= plan.target_question_count) {
       finishSession()
     } else {
-      serveQuestionAt(plan, nextIndex)
+      serveQuestionAt(plan, nextIndex, answeredResults)
     }
   }
 

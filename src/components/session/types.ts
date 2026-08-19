@@ -111,8 +111,10 @@ export interface SessionEndResponse {
   topics: { id: string; name: string; mastery_score: number; mastery_label: string }[]
 }
 
-// Persisted to sessionStorage so an interrupted session can resume within
-// the 2-hour window described in the Phase 7 spec.
+// Persisted to localStorage (survives a PWA's underlying page/WebView being
+// torn down and recreated when backgrounded — sessionStorage does not) so
+// an interrupted session can resume within the 2-hour window described in
+// the Phase 7 spec.
 export interface StoredSessionState {
   sessionId: string
   packName: string
@@ -124,4 +126,11 @@ export interface StoredSessionState {
   questionIndex: number
   answeredResults: AnsweredResult[]
   startedAtIso: string
+  // The exact question currently being shown (unanswered), plus when it was
+  // served — lets a resume within QUESTION_MEMORY_MS restore this literal
+  // question instead of fetching a new random one for the same topic/type.
+  // Undefined once the question has been answered or the session has moved
+  // on (see Session.tsx's persistProgress).
+  currentQuestion?: ServedQuestion
+  questionServedAtIso?: string
 }
