@@ -1,15 +1,56 @@
 import { useState } from 'react'
 import { supabase } from '../../lib/supabaseClient'
-import type { GradeResult, ServedQuestion } from './types'
+import type { GradeResult, ServedQuestion, SubmittedAnswer } from './types'
 
 interface Props {
   question: ServedQuestion
   result: GradeResult
+  // Only set for typed/photo answers (FRQ, conceptual) — never for MC,
+  // whose selected option is already shown color-coded on the question
+  // card itself before the transition here, so re-showing it would be
+  // redundant. See YourAnswerDisclosure below.
+  submittedAnswer?: SubmittedAnswer
   isLast: boolean
   onNext: () => void
   // Phase 10 exam-crunch: show the explicit AP-exam point value alongside
   // the score for FRQs, per spec.
   crunchMode?: boolean
+}
+
+// Collapsed by default so it doesn't compete with the feedback itself —
+// students who want to double-check exactly what they wrote can expand it,
+// everyone else never sees it.
+function YourAnswerDisclosure({ submittedAnswer }: { submittedAnswer: SubmittedAnswer }) {
+  const [expanded, setExpanded] = useState(false)
+
+  return (
+    <div className="border-t border-slate-200 pt-3 dark:border-slate-800">
+      <button
+        type="button"
+        onClick={() => setExpanded((v) => !v)}
+        className="flex min-h-[44px] w-full items-center justify-between text-sm font-medium text-slate-500 dark:text-slate-400"
+      >
+        Your answer
+        <span className={`transition-transform ${expanded ? 'rotate-180' : ''}`}>▾</span>
+      </button>
+
+      {expanded && (
+        <div className="mt-1 [animation:fadeIn_150ms_ease-in]">
+          {submittedAnswer.imageDataUrl ? (
+            <img
+              src={submittedAnswer.imageDataUrl}
+              alt="What you submitted"
+              className="w-full rounded-lg border border-slate-200 dark:border-slate-800"
+            />
+          ) : (
+            <p className="whitespace-pre-wrap rounded-lg bg-slate-100 p-3 text-sm text-slate-700 dark:bg-slate-900 dark:text-slate-300">
+              {submittedAnswer.text}
+            </p>
+          )}
+        </div>
+      )}
+    </div>
+  )
 }
 
 type Tone = 'correct' | 'partial' | 'wrong'
@@ -48,7 +89,7 @@ const TONE_STYLES: Record<Tone, { bar: string; label: string }> = {
 
 type ReportState = 'idle' | 'reporting' | 'reported' | 'error'
 
-export default function FeedbackCard({ question, result, isLast, onNext, crunchMode }: Props) {
+export default function FeedbackCard({ question, result, submittedAnswer, isLast, onNext, crunchMode }: Props) {
   const tone = getTone(question, result)
   const style = TONE_STYLES[tone]
   const [reportState, setReportState] = useState<ReportState>('idle')
@@ -130,6 +171,8 @@ export default function FeedbackCard({ question, result, isLast, onNext, crunchM
         {hasFollowUp(result) && result.follow_up && (
           <p className="text-sm italic text-slate-500 dark:text-slate-400">{result.follow_up}</p>
         )}
+
+        {submittedAnswer && <YourAnswerDisclosure submittedAnswer={submittedAnswer} />}
       </div>
 
       <div className="border-t border-slate-200 p-4 dark:border-slate-800">

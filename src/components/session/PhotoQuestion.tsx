@@ -1,12 +1,12 @@
 import { useRef, useState } from 'react'
 import HintButton from './HintButton'
 import TypedQuestion, { ThinkingDots } from './TypedQuestion'
-import type { GradeResult, PhotoGradeResult, ServedQuestion, TypedGradeResult } from './types'
+import type { GradeResult, PhotoGradeResult, ServedQuestion, SubmittedAnswer, TypedGradeResult } from './types'
 
 interface Props {
   question: ServedQuestion
   onSubmit: (payload: { image_base64: string } | { student_answer: string }) => Promise<GradeResult>
-  onGraded: (result: GradeResult) => void
+  onGraded: (result: GradeResult, submitted?: SubmittedAnswer) => void
 }
 
 // Same downscale approach as PhotoCapture.tsx (Phase 5) — Vercel functions
@@ -98,7 +98,7 @@ export default function PhotoQuestion({ question, onSubmit, onGraded }: Props) {
         setLoading(false)
         return
       }
-      onGraded(result)
+      onGraded(result, { imageDataUrl })
     } catch {
       setLoading(false)
     }

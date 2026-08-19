@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import { localDateStr } from '../../lib/localDate.js'
 import type { AnsweredResult, SessionTopic } from './types'
 
 interface TopicAfter {
@@ -83,7 +84,7 @@ export default function SessionSummary({
   }, [topicsAfter])
 
   useEffect(() => {
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = localDateStr()
     localStorage.setItem(
       `falp:sessionComplete:${packId}`,
       JSON.stringify({

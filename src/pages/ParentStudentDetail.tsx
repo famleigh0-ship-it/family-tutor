@@ -5,6 +5,7 @@ import { SkeletonCard, SkeletonHeatmap } from '../components/Skeleton'
 import StudentDetail from '../components/parent/StudentDetail'
 import type { ParentStudentDetailData } from '../components/parent/types'
 import { useAuth } from '../lib/AuthContext.jsx'
+import { clientTimeZone } from '../lib/localDate.js'
 
 export default function ParentStudentDetail() {
   const { studentId } = useParams<{ studentId: string }>()
@@ -22,9 +23,10 @@ export default function ParentStudentDetail() {
 
     async function load() {
       try {
-        const res = await fetch(`/api/progress?type=parent-student-detail&student_id=${studentId}`, {
-          headers: { Authorization: `Bearer ${token}` }
-        })
+        const res = await fetch(
+          `/api/progress?type=parent-student-detail&student_id=${studentId}&tz=${encodeURIComponent(clientTimeZone())}`,
+          { headers: { Authorization: `Bearer ${token}` } }
+        )
         const body = await res.json()
         if (cancelled) return
 

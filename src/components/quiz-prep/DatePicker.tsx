@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { localDateStr } from '../../lib/localDate.js'
 
 interface Props {
   initialDate?: string
@@ -9,10 +10,6 @@ const MIN_DAYS_OUT = 1 // tomorrow — no same-day quiz prep
 const MAX_DAYS_OUT = 30
 const MS_PER_DAY = 86_400_000
 
-function toDateOnly(date: Date) {
-  return date.toISOString().slice(0, 10)
-}
-
 function formatLabel(dateStr: string) {
   // Parsed as UTC midnight so the label doesn't shift a day depending on
   // the browser's local timezone offset.
@@ -21,8 +18,8 @@ function formatLabel(dateStr: string) {
 }
 
 export default function DatePicker({ initialDate, onNext }: Props) {
-  const min = toDateOnly(new Date(Date.now() + MIN_DAYS_OUT * MS_PER_DAY))
-  const max = toDateOnly(new Date(Date.now() + MAX_DAYS_OUT * MS_PER_DAY))
+  const min = localDateStr(new Date(Date.now() + MIN_DAYS_OUT * MS_PER_DAY))
+  const max = localDateStr(new Date(Date.now() + MAX_DAYS_OUT * MS_PER_DAY))
   const [quizDate, setQuizDate] = useState(initialDate && initialDate >= min && initialDate <= max ? initialDate : '')
 
   return (

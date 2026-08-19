@@ -17,6 +17,7 @@ import { detectSessionMode } from './session-mode.js'
 import { selectTopics, QUESTIONS_PER_TOPIC } from './topic-selector.js'
 import { getPrioritizedTopicIds } from './unlock.js'
 import { checkBankHealth, triggerBankFill } from './bank-manager.js'
+import { localDateStrInTimeZone, shiftDateStr } from '../lib/localDate.js'
 
 const RECENT_SESSIONS_FOR_TOPICS = 2 // "topics from last 2 sessions"
 const MS_PER_DAY = 86_400_000
@@ -71,11 +72,6 @@ export function rowToMasteryRecord(row) {
   }
 }
 
-/** @param {Date} date */
-function toDateOnly(date) {
-  return date.toISOString().slice(0, 10)
-}
-
 /**
  * The nearest not-expired, not-yet-passed quiz_prep_event for this user +
  * pack, or null. Fetches all matches rather than `.limit(1)` so a "shouldn't
@@ -86,11 +82,12 @@ function toDateOnly(date) {
  * sessions/mastery_records).
  * @param {string} userId
  * @param {string} packId
+ * @param {string} [timeZone] client's IANA timezone (Intl.DateTimeFormat().resolvedOptions().timeZone) — "today" is meaningless without it; falls back to UTC if omitted
  * @returns {Promise<import('./types').QuizPrepEvent | null>}
  */
-export async function getActiveQuizPrepEvent(userId, packId) {
+export async function getActiveQuizPrepEvent(userId, packId, timeZone) {
   const admin = getSupabaseAdmin()
-  const todayStr = toDateOnly(new Date())
+  const todayStr = localDateStrInTimeZone(new Date(), timeZone)
 
   const { data, error } = await admin
     .from('quiz_prep_events')
@@ -125,7 +122,11 @@ export async function getActiveQuizPrepEvent(userId, packId) {
  */
 export async function expireAllStaleQuizPrepEvents(admin) {
   const now = new Date()
-  const todayStr = toDateOnly(now)
+  // Cross-user batch sweep (cron / scripts/run-pacing-calendar.js) — there's
+  // no single browser's timezone to defer to here, so UTC is the correct,
+  // intentional choice (unlike the per-request checks below, which always
+  // use the requesting client's own timezone).
+  const todayStr = localDateStrInTimeZone(now)
 
   const { data: staleRows, error } = await admin
     .from('quiz_prep_events')
@@ -149,11 +150,11 @@ export async function expireAllStaleQuizPrepEvents(admin) {
 }
 
 /**
- * @param {{ userId: string, packId: string, targetDurationMinutes: number, forceTopicIds?: string[] }} params
+ * @param {{ userId: string, packId: string, targetDurationMinutes: number, forceTopicIds?: string[], timeZone?: string }} params
  * @returns {Promise<(import('./types').SessionPlan & { sessionId: string }) | import('./types').RequiresPostQuiz>}
  */
 export async function startSession(params) {
-  const { userId, packId, targetDurationMinutes, forceTopicIds } = params
+  const { userId, packId, targetDurationMinutes, forceTopicIds, timeZone } = params
   const admin = getSupabaseAdmin()
   const pack = getPack(packId)
   const now = new Date()
@@ -180,7 +181,7 @@ export async function startSession(params) {
   // up?" entry point is ever shown for it), so no quiz_prep_events row can
   // exist for this pack_id and this whole step is skipped.
   if (!isNMSQT(pack)) {
-    const todayStrForExpiry = toDateOnly(now)
+    const todayStrForExpiry = localDateStrInTimeZone(now, timeZone)
     const { data: unresolvedQuizPrepRows, error: unresolvedQuizPrepErr } = await admin
       .from('quiz_prep_events')
       .select('*')
@@ -290,7 +291,7 @@ export async function startSession(params) {
 
   // 5. Active quiz prep event: quiz_date >= today, not expired. Skipped
   // for NMSQT — same reasoning as step 0.
-  const activeQuizPrepEvent = isNMSQT(pack) ? null : await getActiveQuizPrepEvent(userId, packId)
+  const activeQuizPrepEvent = isNMSQT(pack) ? null : await getActiveQuizPrepEvent(userId, packId, timeZone)
   const quizPrepTopicIds = activeQuizPrepEvent?.topic_ids ?? []
   const quizPrepDaysUntilQuiz = activeQuizPrepEvent
     ? Math.ceil((new Date(activeQuizPrepEvent.quiz_date).getTime() - now.getTime()) / MS_PER_DAY)
@@ -579,11 +580,11 @@ export async function recordQuestionResult(params) {
 }
 
 /**
- * @param {{ sessionId: string, userId: string }} params
+ * @param {{ sessionId: string, userId: string, timeZone?: string }} params
  * @returns {Promise<void>}
  */
 export async function endSession(params) {
-  const { sessionId, userId } = params
+  const { sessionId, userId, timeZone } = params
   const admin = getSupabaseAdmin()
 
   const { data: sessionRow, error: sessionErr } = await admin
@@ -622,9 +623,12 @@ export async function endSession(params) {
 
   if (streakErr) throw streakErr
 
-  const todayStr = toDateOnly(endedAt)
-  const yesterday = new Date(endedAt.getTime() - MS_PER_DAY)
-  const yesterdayStr = toDateOnly(yesterday)
+  // Client's own local calendar day, not the server's (UTC) one — see
+  // src/lib/localDate.js. yesterdayStr is calendar-date arithmetic on the
+  // string itself (not a second real-instant conversion) so it can't drift
+  // from todayStr across a DST boundary.
+  const todayStr = localDateStrInTimeZone(endedAt, timeZone)
+  const yesterdayStr = shiftDateStr(todayStr, -1)
 
   let currentStreak = streakRow?.current_streak ?? 0
   let longestStreak = streakRow?.longest_streak ?? 0

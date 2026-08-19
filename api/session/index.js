@@ -29,7 +29,7 @@ function leanTopic(t) {
 }
 
 async function handleStart(req, res, user) {
-  const { pack_id: packId, topic_ids: topicIds } = req.body || {}
+  const { pack_id: packId, topic_ids: topicIds, tz: timeZone } = req.body || {}
   if (typeof packId !== 'string' || !packId) {
     res.status(400).json({ error: 'pack_id is required' })
     return
@@ -56,7 +56,8 @@ async function handleStart(req, res, user) {
       userId: user.id,
       packId,
       targetDurationMinutes: DEFAULT_TARGET_DURATION_MINUTES,
-      forceTopicIds: topicIds
+      forceTopicIds: topicIds,
+      timeZone
     })
 
     // Quiz-prep gate: startSession found a quiz_prep_event whose quiz has
@@ -89,7 +90,7 @@ async function handleStart(req, res, user) {
 }
 
 async function handleEnd(req, res, user) {
-  const { session_id: sessionId } = req.body || {}
+  const { session_id: sessionId, tz: timeZone } = req.body || {}
   if (typeof sessionId !== 'string' || !sessionId) {
     res.status(400).json({ error: 'session_id is required' })
     return
@@ -112,7 +113,7 @@ async function handleEnd(req, res, user) {
   }
 
   try {
-    await endSession({ sessionId, userId: user.id })
+    await endSession({ sessionId, userId: user.id, timeZone })
   } catch (err) {
     res.status(500).json({ error: 'Failed to end session', detail: err.message })
     return

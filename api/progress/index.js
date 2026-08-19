@@ -20,6 +20,7 @@ import { getMasteryLabel, applyDecay } from '../../src/engine/mastery.js'
 import { runPacingCalendarSweep } from '../../src/engine/unlock.js'
 import { expireAllStaleQuizPrepEvents, rowToMasteryRecord } from '../../src/engine/session-orchestrator.js'
 import { checkBankHealth, triggerBankFill } from '../../src/engine/bank-manager.js'
+import { localDateStrInTimeZone } from '../../src/lib/localDate.js'
 
 const MS_PER_DAY = 86_400_000
 const STREAK_CALENDAR_DAYS = 84 // 12 weeks
@@ -34,14 +35,6 @@ const DECAY_GRACE_DAYS = 7 // matches src/engine/mastery.js's DECAY_GRACE_DAYS
 // same reference account scripts/manage-bank.js's status/fill-all commands
 // already use, so all three share one well-known reference point.
 const BANK_HEALTH_REFERENCE_EMAIL = 'engine-test@family-tutor.local'
-
-function todayStr() {
-  return new Date().toISOString().slice(0, 10)
-}
-
-function toDateOnly(date) {
-  return date.toISOString().slice(0, 10)
-}
 
 function unitWeightMid(unit) {
   return (unit.ap_exam_weight_min + unit.ap_exam_weight_max) / 2
@@ -169,15 +162,19 @@ function quizResultSummary(pack, row) {
 // timestamps — collapses same-day sessions to one active day, same
 // "did she study anything that day" semantics the spec's parent combined
 // view asks for.
-function buildStreakDays(startedAtList) {
-  const activeDates = new Set(startedAtList.map((iso) => toDateOnly(new Date(iso))))
+// timeZone is the requesting client's own IANA timezone (see
+// src/lib/localDate.js) — without it, every session's calendar day would be
+// bucketed by the server's (UTC) clock rather than the student's actual
+// local day, which is exactly the "shows up as tomorrow" bug this guards
+// against.
+function buildStreakDays(startedAtList, timeZone) {
+  const activeDates = new Set(startedAtList.map((iso) => localDateStrInTimeZone(new Date(iso), timeZone)))
   const days = []
-  const today = new Date()
-  today.setUTCHours(0, 0, 0, 0)
+  const now = new Date()
 
   for (let i = STREAK_CALENDAR_DAYS - 1; i >= 0; i--) {
-    const date = new Date(today.getTime() - i * MS_PER_DAY)
-    const dateStr = toDateOnly(date)
+    const date = new Date(now.getTime() - i * MS_PER_DAY)
+    const dateStr = localDateStrInTimeZone(date, timeZone)
     days.push({ date: dateStr, active: activeDates.has(dateStr) })
   }
 
@@ -345,6 +342,7 @@ async function handleSessionHistory(req, res, user, admin) {
 
 async function handleStreakCalendar(req, res, user, admin) {
   const packId = typeof req.query.pack_id === 'string' ? req.query.pack_id : null
+  const timeZone = typeof req.query.tz === 'string' ? req.query.tz : undefined
   const cutoffIso = new Date(Date.now() - STREAK_CALENDAR_DAYS * MS_PER_DAY).toISOString()
 
   let query = admin.from('sessions').select('started_at').eq('user_id', user.id).gte('started_at', cutoffIso)
@@ -353,7 +351,7 @@ async function handleStreakCalendar(req, res, user, admin) {
   const { data, error } = await query
   if (error) throw error
 
-  res.status(200).json({ days: buildStreakDays((data ?? []).map((r) => r.started_at)) })
+  res.status(200).json({ days: buildStreakDays((data ?? []).map((r) => r.started_at), timeZone) })
 }
 
 // ---- parent: linked-student types ---------------------------------------
@@ -447,6 +445,7 @@ async function handleParentStudents(req, res, user, admin, profile) {
 
 async function handleParentStudentDetail(req, res, user, admin, profile) {
   const studentId = typeof req.query.student_id === 'string' ? req.query.student_id : null
+  const timeZone = typeof req.query.tz === 'string' ? req.query.tz : undefined
   if (!studentId) return res.status(400).json({ error: 'student_id is required' })
 
   // Same admin bypass as handleParentStudents above.
@@ -488,7 +487,7 @@ async function handleParentStudentDetail(req, res, user, admin, profile) {
       student: studentRow,
       streak: { current_streak: streakRow?.current_streak ?? 0, longest_streak: streakRow?.longest_streak ?? 0 },
       courses: [],
-      streak_calendar: { days: buildStreakDays([]) },
+      streak_calendar: { days: buildStreakDays([], timeZone) },
       session_history: []
     })
   }
@@ -552,7 +551,7 @@ async function handleParentStudentDetail(req, res, user, admin, profile) {
     quizRowsByPack.get(row.pack_id).push(row)
   }
 
-  const today = todayStr()
+  const today = localDateStrInTimeZone(new Date(), timeZone)
   const courses = packIds.map((packId) => {
     const pack = getPack(packId)
     const masteryByTopicId = masteryByPack.get(packId) ?? new Map()
@@ -586,7 +585,7 @@ async function handleParentStudentDetail(req, res, user, admin, profile) {
     student: studentRow,
     streak: { current_streak: streakRow?.current_streak ?? 0, longest_streak: streakRow?.longest_streak ?? 0 },
     courses,
-    streak_calendar: { days: buildStreakDays((streakSessionRows ?? []).map((r) => r.started_at)) },
+    streak_calendar: { days: buildStreakDays((streakSessionRows ?? []).map((r) => r.started_at), timeZone) },
     session_history: (historySessionRows ?? []).map((s) => ({
       id: s.id,
       pack_id: s.pack_id,

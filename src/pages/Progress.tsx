@@ -11,6 +11,7 @@ import type { HeatmapUnit, SessionHistoryEntry, StreakDay, WeakSpot } from '../c
 import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
 import { getPack } from '../packs/loader'
+import { clientTimeZone } from '../lib/localDate.js'
 
 export default function Progress() {
   const { packId } = useParams<{ packId: string }>()
@@ -61,7 +62,9 @@ export default function Progress() {
           fetch(`/api/progress?type=mastery-summary&pack_id=${packId}`, { headers: authHeader }),
           fetch(`/api/progress?type=weak-spots&pack_id=${packId}`, { headers: authHeader }),
           fetch(`/api/progress?type=session-history&pack_id=${packId}&limit=10`, { headers: authHeader }),
-          fetch(`/api/progress?type=streak-calendar&pack_id=${packId}`, { headers: authHeader })
+          fetch(`/api/progress?type=streak-calendar&pack_id=${packId}&tz=${encodeURIComponent(clientTimeZone())}`, {
+            headers: authHeader
+          })
         ])
 
         const [masteryBody, weakSpotBody, sessionBody, streakBody] = await Promise.all([

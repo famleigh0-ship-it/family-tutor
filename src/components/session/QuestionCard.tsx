@@ -1,12 +1,12 @@
 import MCQuestion from './MCQuestion'
 import TypedQuestion from './TypedQuestion'
 import PhotoQuestion from './PhotoQuestion'
-import type { GradeResult, MCGradeResult, ServedQuestion, TypedGradeResult } from './types'
+import type { GradeResult, MCGradeResult, ServedQuestion, SubmittedAnswer, TypedGradeResult } from './types'
 
 interface Props {
   question: ServedQuestion
   onSubmit: (payload: Record<string, unknown>) => Promise<GradeResult>
-  onGraded: (result: GradeResult) => void
+  onGraded: (result: GradeResult, submitted?: SubmittedAnswer) => void
 }
 
 // Dispatches on the served question's own shape — question_type plus

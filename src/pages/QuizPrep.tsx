@@ -5,6 +5,7 @@ import TopicSelector from '../components/quiz-prep/TopicSelector.tsx'
 import DatePicker from '../components/quiz-prep/DatePicker.tsx'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { getPack } from '../packs/loader'
+import { localDateStr, clientTimeZone } from '../lib/localDate.js'
 
 type Step = 'loading' | 'topics' | 'date' | 'replace-confirm' | 'saving' | 'confirm' | 'error'
 
@@ -18,7 +19,7 @@ interface ActiveEvent {
 const MS_PER_DAY = 86_400_000
 
 function daysUntil(dateStr: string) {
-  const today = new Date(`${new Date().toISOString().slice(0, 10)}T00:00:00.000Z`)
+  const today = new Date(`${localDateStr()}T00:00:00.000Z`)
   const target = new Date(`${dateStr}T00:00:00.000Z`)
   return Math.ceil((target.getTime() - today.getTime()) / MS_PER_DAY)
 }
@@ -47,7 +48,7 @@ export default function QuizPrep() {
     async function load() {
       if (!packId || !session) return
       try {
-        const res = await fetch(`/api/quiz-prep?pack_id=${packId}`, {
+        const res = await fetch(`/api/quiz-prep?pack_id=${packId}&tz=${encodeURIComponent(clientTimeZone())}`, {
           headers: { Authorization: `Bearer ${session.access_token}` }
         })
         const body = await res.json()
@@ -80,7 +81,12 @@ export default function QuizPrep() {
       const res = await fetch('/api/quiz-prep', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${session?.access_token}` },
-        body: JSON.stringify({ pack_id: packId, topic_ids: selectedTopicIds, quiz_date: quizDateOverride ?? quizDate })
+        body: JSON.stringify({
+          pack_id: packId,
+          topic_ids: selectedTopicIds,
+          quiz_date: quizDateOverride ?? quizDate,
+          tz: clientTimeZone()
+        })
       })
       const body = await res.json()
       if (!res.ok) throw new Error(body.error || 'Failed to save quiz prep')

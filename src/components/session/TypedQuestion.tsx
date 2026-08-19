@@ -1,11 +1,11 @@
 import { useRef, useState } from 'react'
 import HintButton from './HintButton'
-import type { ServedQuestion, TypedGradeResult } from './types'
+import type { ServedQuestion, SubmittedAnswer, TypedGradeResult } from './types'
 
 interface Props {
   question: ServedQuestion
   onSubmit: (payload: { student_answer: string }) => Promise<TypedGradeResult>
-  onGraded: (result: TypedGradeResult) => void
+  onGraded: (result: TypedGradeResult, submitted: SubmittedAnswer) => void
 }
 
 const MAX_LENGTH = 1000
@@ -44,7 +44,7 @@ export default function TypedQuestion({ question, onSubmit, onGraded }: Props) {
     setSubmitting(true)
     try {
       const result = await onSubmit({ student_answer: answer })
-      onGraded(result)
+      onGraded(result, { text: answer })
     } catch {
       setSubmitting(false)
     }

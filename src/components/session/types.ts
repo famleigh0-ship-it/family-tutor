@@ -84,6 +84,17 @@ export interface PhotoGradeResult {
 
 export type GradeResult = MCGradeResult | TypedGradeResult | PhotoGradeResult
 
+// What the student actually submitted, lifted from the question component's
+// local state up to FeedbackCard so they can review it — text for a typed
+// FRQ/conceptual answer, an image for a photo FRQ. Never set for MC (the
+// selected option is already shown color-coded on the question card itself
+// before the transition to feedback, so re-showing it here would be
+// redundant).
+export interface SubmittedAnswer {
+  text?: string
+  imageDataUrl?: string
+}
+
 export interface AnsweredResult {
   topic_id: string
   topic_name: string

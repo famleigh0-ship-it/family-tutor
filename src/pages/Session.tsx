@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { useLocation, useNavigate, useParams } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { clientTimeZone } from '../lib/localDate.js'
 import SessionShell from '../components/session/SessionShell'
 import QuestionCard from '../components/session/QuestionCard'
 import FeedbackCard from '../components/session/FeedbackCard'
@@ -16,7 +17,8 @@ import type {
   SessionEndResponse,
   SessionPlanResponse,
   SessionTopic,
-  StoredSessionState
+  StoredSessionState,
+  SubmittedAnswer
 } from '../components/session/types'
 
 type Phase = 'loading' | 'resume-prompt' | 'question' | 'feedback' | 'summary' | 'post-onboarding' | 'error'
@@ -36,7 +38,7 @@ const QUESTION_TYPE_CYCLE: QuestionType[] = ['mc', 'conceptual', 'frq']
 const ONBOARDING_QUESTION_TYPE_CYCLE: QuestionType[] = ['mc', 'conceptual', 'mc']
 const BANK_EMPTY_MAX_RETRIES = 3
 const BANK_EMPTY_RETRY_DELAY_MS = 5000
-const GRADING_TIMEOUT_MS = 15000
+const GRADING_TIMEOUT_MS = 30000
 const TWO_HOURS_MS = 2 * 60 * 60 * 1000
 const CRUNCH_ENCOURAGEMENT_SECONDS = 20 * 60
 
@@ -98,6 +100,7 @@ export default function Session() {
   const [currentQuestion, setCurrentQuestion] = useState<ServedQuestion | null>(null)
   const [currentTopic, setCurrentTopic] = useState<SessionTopic | null>(null)
   const [gradeResult, setGradeResult] = useState<GradeResult | null>(null)
+  const [submittedAnswer, setSubmittedAnswer] = useState<SubmittedAnswer | undefined>(undefined)
   const [answeredResults, setAnsweredResults] = useState<AnsweredResult[]>([])
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [errorInfo, setErrorInfo] = useState<ErrorInfo | null>(null)
@@ -203,6 +206,7 @@ export default function Session() {
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
         body: JSON.stringify({
           pack_id: packId,
+          tz: clientTimeZone(),
           ...(forceTopicIdsRef.current ? { topic_ids: forceTopicIdsRef.current } : {})
         })
       })
@@ -258,7 +262,7 @@ export default function Session() {
       await fetch('/api/session', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ session_id: sessionId })
+        body: JSON.stringify({ session_id: sessionId, tz: clientTimeZone() })
       })
     } catch {
       // Best effort — a stale session getting cleaned up server-side isn't
@@ -350,7 +354,7 @@ export default function Session() {
     }
   }
 
-  function handleGraded(result: GradeResult) {
+  function handleGraded(result: GradeResult, submitted?: SubmittedAnswer) {
     if (!currentQuestion || !currentTopic || !plan) return
     const frqScore = 'frq_score' in result ? result.frq_score : null
 
@@ -364,6 +368,7 @@ export default function Session() {
     const nextAnswered = [...answeredResults, answered]
     setAnsweredResults(nextAnswered)
     setGradeResult(result)
+    setSubmittedAnswer(submitted)
     persistProgress(questionIndex, nextAnswered, plan)
     setPhase('feedback')
   }
@@ -400,7 +405,7 @@ export default function Session() {
       const res = await fetch('/api/session', {
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-        body: JSON.stringify({ session_id: plan.session_id })
+        body: JSON.stringify({ session_id: plan.session_id, tz: clientTimeZone() })
       })
       const body = await res.json()
       if (!res.ok) throw new Error(body.error || 'Failed to end session')
@@ -538,6 +543,7 @@ export default function Session() {
         <FeedbackCard
           question={currentQuestion}
           result={gradeResult}
+          submittedAnswer={submittedAnswer}
           isLast={questionIndex + 1 >= plan.target_question_count}
           onNext={handleNext}
           crunchMode={isCrunch}

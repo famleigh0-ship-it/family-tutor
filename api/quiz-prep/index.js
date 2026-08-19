@@ -14,6 +14,7 @@ import { getUserFromRequest, getUserProfile, getSupabaseAdmin } from '../_lib/su
 import { getPack } from '../../src/packs/loader.js'
 import { getActiveQuizPrepEvent } from '../../src/engine/session-orchestrator.js'
 import { prioritizeTopics } from '../../src/engine/unlock.js'
+import { localDateStrInTimeZone } from '../../src/lib/localDate.js'
 
 const MS_PER_DAY = 86_400_000
 const MIN_DAYS_OUT = 1 // tomorrow — "no same-day quiz prep"
@@ -23,16 +24,15 @@ const HISTORY_LIMIT_PER_PACK = 5
 const MASTERY_DELTA = { good: 0.15, okay: 0.05, rough: -0.1 }
 const PRIORITIZE_DAYS_ON_ROUGH = 7
 
-function todayStr() {
-  return new Date().toISOString().slice(0, 10)
-}
-
 function clamp01(x) {
   return Math.max(0, Math.min(1, x))
 }
 
-function daysUntil(dateStr) {
-  const today = new Date(`${todayStr()}T00:00:00.000Z`)
+// timeZone is the requesting client's own IANA timezone (see
+// src/lib/localDate.js) — "days until" is meaningless without knowing whose
+// "today" it's relative to; falls back to UTC if omitted.
+function daysUntil(dateStr, timeZone) {
+  const today = new Date(`${localDateStrInTimeZone(new Date(), timeZone)}T00:00:00.000Z`)
   const target = new Date(`${dateStr}T00:00:00.000Z`)
   return Math.ceil((target.getTime() - today.getTime()) / MS_PER_DAY)
 }
@@ -42,14 +42,14 @@ function topicNamesFor(pack, topicIds) {
   return (topicIds ?? []).map((id) => nameById.get(id) ?? id)
 }
 
-function eventSummary(pack, row) {
+function eventSummary(pack, row, timeZone) {
   return {
     id: row.id,
     pack_id: row.pack_id,
     topic_ids: row.topic_ids ?? [],
     topic_names: topicNamesFor(pack, row.topic_ids),
     quiz_date: row.quiz_date,
-    days_until_quiz: daysUntil(row.quiz_date)
+    days_until_quiz: daysUntil(row.quiz_date, timeZone)
   }
 }
 
@@ -64,6 +64,7 @@ function resultSummary(pack, row) {
 
 async function handleGetForStudent(req, res, user) {
   const packId = typeof req.query.pack_id === 'string' ? req.query.pack_id : null
+  const timeZone = typeof req.query.tz === 'string' ? req.query.tz : undefined
   if (!packId) {
     res.status(400).json({ error: 'pack_id is required' })
     return
@@ -77,12 +78,13 @@ async function handleGetForStudent(req, res, user) {
     return
   }
 
-  const active = await getActiveQuizPrepEvent(user.id, packId)
-  res.status(200).json({ active: active ? eventSummary(pack, active) : null })
+  const active = await getActiveQuizPrepEvent(user.id, packId, timeZone)
+  res.status(200).json({ active: active ? eventSummary(pack, active, timeZone) : null })
 }
 
 async function handleGetForParent(req, res, user, admin) {
   const studentId = typeof req.query.student_id === 'string' ? req.query.student_id : null
+  const timeZone = typeof req.query.tz === 'string' ? req.query.tz : undefined
   if (!studentId) {
     res.status(400).json({ error: 'student_id is required' })
     return
@@ -107,7 +109,7 @@ async function handleGetForParent(req, res, user, admin) {
     .order('quiz_date', { ascending: false })
   if (rowsErr) throw rowsErr
 
-  const today = todayStr()
+  const today = localDateStrInTimeZone(new Date(), timeZone)
   /** @type {Record<string, any>} */
   const active = {}
   /** @type {Record<string, any[]>} */
@@ -124,7 +126,7 @@ async function handleGetForParent(req, res, user, admin) {
     if (row.expired_at === null && row.quiz_date >= today) {
       const existing = active[row.pack_id]
       if (!existing || row.quiz_date < existing.quiz_date) {
-        active[row.pack_id] = eventSummary(pack, row)
+        active[row.pack_id] = eventSummary(pack, row, timeZone)
       }
     }
 
@@ -151,7 +153,7 @@ async function handlePost(req, res, user, profile, admin) {
     return
   }
 
-  const { pack_id: packId, topic_ids: topicIds, quiz_date: quizDate } = req.body || {}
+  const { pack_id: packId, topic_ids: topicIds, quiz_date: quizDate, tz: timeZone } = req.body || {}
   if (typeof packId !== 'string' || !packId) {
     res.status(400).json({ error: 'pack_id is required' })
     return
@@ -180,13 +182,13 @@ async function handlePost(req, res, user, profile, admin) {
     return
   }
 
-  const daysOut = daysUntil(quizDate)
+  const daysOut = daysUntil(quizDate, timeZone)
   if (daysOut < MIN_DAYS_OUT || daysOut > MAX_DAYS_OUT) {
     res.status(400).json({ error: `quiz_date must be ${MIN_DAYS_OUT}-${MAX_DAYS_OUT} days from today` })
     return
   }
 
-  const existing = await getActiveQuizPrepEvent(user.id, packId)
+  const existing = await getActiveQuizPrepEvent(user.id, packId, timeZone)
 
   let row
   if (existing) {
@@ -208,7 +210,7 @@ async function handlePost(req, res, user, profile, admin) {
     row = data
   }
 
-  res.status(200).json({ event: eventSummary(pack, row) })
+  res.status(200).json({ event: eventSummary(pack, row, timeZone) })
 }
 
 async function handlePatch(req, res, user, profile, admin) {

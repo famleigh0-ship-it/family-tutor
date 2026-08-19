@@ -10,6 +10,7 @@ import InstallPrompt from '../components/InstallPrompt.tsx'
 import { useAuth } from '../lib/AuthContext.jsx'
 import { supabase } from '../lib/supabaseClient'
 import { getAllPacks, getPack, getUnit, getTopic, getTopicsForWeek, getUnlockedTopics } from '../packs/loader'
+import { localDateStr, clientTimeZone } from '../lib/localDate.js'
 
 function daysUntil(dateStr) {
   const today = new Date()
@@ -136,7 +137,7 @@ export default function Home() {
     // rather than from Supabase since sessions/mastery_records have no RLS
     // policy yet (see migrations/002 and 003), so the frontend never
     // queries them directly with the anon key.
-    const todayStr = new Date().toISOString().slice(0, 10)
+    const todayStr = localDateStr()
     const result = {}
     for (const pack of getAllPacks()) {
       try {
@@ -176,7 +177,7 @@ export default function Home() {
           .filter((pack) => enrolledPackIds.includes(pack.id))
           .map(async (pack) => {
             try {
-              const res = await fetch(`/api/quiz-prep?pack_id=${pack.id}`, {
+              const res = await fetch(`/api/quiz-prep?pack_id=${pack.id}&tz=${encodeURIComponent(clientTimeZone())}`, {
                 headers: { Authorization: `Bearer ${token}` }
               })
               const body = await res.json()
