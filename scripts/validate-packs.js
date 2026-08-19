@@ -15,7 +15,8 @@ const packFiles = [
   path.join(rootDir, 'course-packs', 'ap-physics-1', 'pack.json'),
   path.join(rootDir, 'course-packs', 'calc-ab-bc', 'pack.json'),
   path.join(rootDir, 'course-packs', 'ap-human-geography', 'pack.json'),
-  path.join(rootDir, 'course-packs', 'nmsqt-2026', 'pack.json')
+  path.join(rootDir, 'course-packs', 'nmsqt-2026', 'pack.json'),
+  path.join(rootDir, 'course-packs', 'ap-us-history', 'pack.json')
 ]
 
 let allPassed = true

@@ -1,0 +1,1061 @@
+{
+  "id": "ap-us-history",
+  "name": "AP United States History",
+  "school_year_start": "2026-08-11",
+  "exam_date": "2027-05-09",
+  "exam_crunch_weeks": 6,
+  "tutor_persona": "You are an experienced AP United States History tutor. You teach students to think historically, not just memorize facts. Every explanation connects events to causation, continuity and change over time, and the broader historical context. You require students to make arguments supported by specific evidence — a general statement with no named people, events, or dates earns no credit on the AP exam. You know that APUSH rewards complexity: acknowledging counterarguments, corroborating across documents, and connecting to a broader pattern. You push students to reach that complexity.",
+  "subject_context": "APUSH rewards historical thinking skills over factual recall. Students can know every date and still fail FRQs by writing lists instead of arguments. The hardest part for most students is building a defensible thesis that goes beyond restating the prompt, then supporting it with specific evidence (named people, events, legislation, movements) and analysis (not just what happened but why it mattered and how it connects to the broader argument). Common failure modes: thesis that merely describes rather than argues, evidence mentioned but not analyzed, CCOT essays that address only change or only continuity but not both, DBQs that summarize documents instead of using them as evidence for an argument, and failing to contextualize beyond the immediate period.",
+  "units": [
+    {
+      "id": "period-1",
+      "name": "Period 1: 1491-1607",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 6,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "period-1.native-american-societies",
+          "name": "Native American Societies Before Contact",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Emphasize the diversity of pre-Columbian societies — Mississippian mound-builders, Pueblo agricultural societies, Great Plains hunting societies — rather than treating 'Native Americans' as a single culture",
+            "Push the student to contextualize: how geography and climate shaped subsistence patterns (agriculture vs. hunting-gathering) across different regions"
+          ],
+          "common_errors": [
+            "Treating pre-Columbian Native societies as a single undifferentiated culture rather than diverse nations with distinct economies, political structures, and religious practices",
+            "Assuming Native societies were static/unchanging before contact rather than themselves undergoing change over time (e.g., the rise and decline of Cahokia)"
+          ]
+        },
+        {
+          "id": "period-1.european-exploration-motivations",
+          "name": "European Motivations for Exploration",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["period-1.native-american-societies"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific motivations — God, Gold, Glory — with concrete examples (Spanish search for precious metals, missionary conversion efforts, national rivalry with Portugal)",
+            "Ask the student to connect motivations to specific nations' colonization styles (Spanish conquest vs. French fur trade vs. English settlement)"
+          ],
+          "common_errors": [
+            "Listing 'God, Gold, Glory' without connecting each motivation to a specific, named example of exploration or colonization",
+            "Treating all European colonizing powers as pursuing identical goals rather than distinguishing Spanish, French, and English approaches"
+          ]
+        },
+        {
+          "id": "period-1.columbian-exchange",
+          "name": "The Columbian Exchange",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-1.european-exploration-motivations"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to address both directions of exchange — what moved from the Americas to Europe/Africa (maize, potatoes, syphilis) and what moved the other way (horses, smallpox, wheat)",
+            "Push for a CCOT argument: what changed for Native populations (demographic collapse from disease) and what stayed the same in the short term (many political structures persisted until later)"
+          ],
+          "common_errors": [
+            "Focusing only on disease and demographic collapse without addressing the exchange's broader ecological and economic effects (new crops enabling European population growth)",
+            "CCOT responses that address only the change (population decline) without addressing any continuity, losing credit for incomplete analysis"
+          ]
+        },
+        {
+          "id": "period-1.spanish-colonization-encomienda",
+          "name": "Spanish Colonization and the Encomienda System",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-1.columbian-exchange"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain the encomienda system's specific mechanics — Spanish colonists granted the right to Native labor in exchange for 'protection' and religious instruction",
+            "Ask the student to contextualize Spanish colonization within the broader Reconquista mindset and Catholic missionary goals"
+          ],
+          "common_errors": [
+            "Describing the encomienda system vaguely as 'slavery' without addressing its specific legal structure and how it differed from later chattel slavery",
+            "Failing to connect the encomienda system's labor demands to the Native population collapse from disease and overwork"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-2",
+      "name": "Period 2: 1607-1754",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 6,
+      "prerequisite_unit_ids": ["period-1"],
+      "topics": [
+        {
+          "id": "period-2.colonial-regions",
+          "name": "British Colonial Regions: New England, Middle, Chesapeake, and Southern",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["period-1.spanish-colonization-encomienda"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to make a real comparison — same category (economy, religion, or social structure) compared explicitly across at least two regions, not just parallel descriptions",
+            "Push the student to connect each region's economy to its geography and labor system (Chesapeake tobacco and indentured servants, New England subsistence farming and Puritan town life)"
+          ],
+          "common_errors": [
+            "Describing each region in isolation without making an explicit comparative claim ('New England was X. The Chesapeake was Y.' with no stated similarity or difference)",
+            "Treating 'the colonies' as a single uniform society rather than addressing real regional variation in economy, religion, and government"
+          ]
+        },
+        {
+          "id": "period-2.colonial-self-governance",
+          "name": "Colonial Self-Governance: House of Burgesses and Mayflower Compact",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["period-2.colonial-regions"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name the specific institution (House of Burgesses, 1619; Mayflower Compact, 1620) and explain what kind of governance each actually established",
+            "Push the student to contextualize these as early steps toward self-government, not full democracy — property and religious restrictions still limited participation"
+          ],
+          "common_errors": [
+            "Treating the House of Burgesses or Mayflower Compact as full democratic self-rule rather than limited self-governance under English royal authority",
+            "Confusing the Mayflower Compact (a social contract among Pilgrims) with the House of Burgesses (an elected legislative assembly)"
+          ]
+        },
+        {
+          "id": "period-2.indentured-servitude-to-slavery",
+          "name": "The Transition from Indentured Servitude to Slavery",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-2.colonial-self-governance"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain the causation chain: declining supply of English indentured servants plus events like Bacon's Rebellion pushed planters toward a permanent, racially defined enslaved labor force",
+            "Push for complexity: acknowledge that both systems coexisted for decades before slavery became dominant, rather than treating the shift as sudden or total"
+          ],
+          "common_errors": [
+            "Treating the shift from indentured servitude to slavery as instantaneous rather than a gradual process spanning the mid-to-late 17th century",
+            "Failing to connect the shift to elite planters' fear of poor White and Black solidarity after events like Bacon's Rebellion"
+          ]
+        },
+        {
+          "id": "period-2.great-awakening",
+          "name": "The Great Awakening",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-2.indentured-servitude-to-slavery"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain the Great Awakening's causation and effects: emotional, personal religious experience challenged established/hierarchical churches and clergy authority",
+            "Push the student to connect the Great Awakening to longer-term effects — the growth of new denominations and a shared colonial religious experience that some historians link to later revolutionary unity"
+          ],
+          "common_errors": [
+            "Describing the Great Awakening only as a religious event without addressing its social and political effects (challenging traditional authority, splitting congregations)",
+            "Overstating the Great Awakening's direct causal link to the Revolution rather than treating it as one contributing factor among many"
+          ]
+        },
+        {
+          "id": "period-2.bacons-rebellion",
+          "name": "Bacon's Rebellion and Its Significance",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-2.great-awakening"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name the specific causes — frontier settlers' anger at Virginia's government over Native American policy and access to land — not just 'a rebellion happened'",
+            "Push the student to explain Bacon's Rebellion's long-term significance: it accelerated the shift toward racial slavery as elites sought a labor force less able to unite with poor Whites"
+          ],
+          "common_errors": [
+            "Describing Bacon's Rebellion without explaining its long-term significance for the development of racial slavery",
+            "Treating Bacon's Rebellion as solely about Native American policy without addressing the underlying class tensions between elite planters and poor frontier settlers"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-3",
+      "name": "Period 3: 1754-1800",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["period-2"],
+      "topics": [
+        {
+          "id": "period-3.french-indian-war",
+          "name": "French and Indian War and Its Consequences",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-2.bacons-rebellion"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to trace a causation chain: British war debt and the Proclamation Line of 1763 to colonial resentment of new taxes and restrictions",
+            "Push the student to contextualize this within the broader pattern of increasing British control after decades of 'salutary neglect'"
+          ],
+          "common_errors": [
+            "Treating the French and Indian War as unrelated background rather than a direct cause of the tax policies that triggered revolutionary tension",
+            "Ignoring the Proclamation Line of 1763's role in angering colonists eager to expand westward"
+          ]
+        },
+        {
+          "id": "period-3.revolutionary-ideology-declaration",
+          "name": "Revolutionary Ideology and the Declaration of Independence",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-3.french-indian-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to connect specific Enlightenment ideas (natural rights, social contract, Locke) to specific grievances listed in the Declaration, not just assert 'ideology mattered'",
+            "Push against treating the Revolution as purely a tax revolt — require the student to address ideology and republican identity as independent, non-economic causes",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., excerpts from Common Sense, the Declaration, or colonial pamphlets), formatted as 'Document 1: [source attribution]' followed by a brief quoted excerpt. Instruct the student to cite and analyze the documents plus outside knowledge, and require the rubric to include sourcing (author, purpose, audience, or context) for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating the Revolution as purely about taxation without addressing ideology and republican identity as independent causes",
+            "Citing Enlightenment ideas by name (Locke, natural rights) without connecting them to a specific grievance or argument in the Declaration"
+          ]
+        },
+        {
+          "id": "period-3.articles-of-confederation",
+          "name": "Articles of Confederation — Weaknesses and Successes",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-3.revolutionary-ideology-declaration"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific weaknesses (no power to tax, no executive, unanimous consent to amend) rather than a vague 'it was weak'",
+            "Push for complexity: require the student to acknowledge a genuine success — the Northwest Ordinance's system for admitting new states — rather than treating the Articles as purely a failure"
+          ],
+          "common_errors": [
+            "Treating the Articles of Confederation as only negative, missing the rubric-rewarded complexity of acknowledging its real success (the Northwest Ordinance)",
+            "Confusing the Articles' weaknesses with the Constitution's structure (e.g., claiming the Articles had no legislature at all)"
+          ]
+        },
+        {
+          "id": "period-3.constitutional-convention",
+          "name": "The Constitutional Convention — Compromises and Debates",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-3.articles-of-confederation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific compromises (Great Compromise, Three-Fifths Compromise, Commerce Compromise) and explain the competing interests each resolved",
+            "Push the student to contextualize the Convention as a response to the Articles' weaknesses, particularly Shays' Rebellion",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., Convention debate notes, Federalist Papers excerpts), formatted as 'Document 1: [source attribution]' with a brief quote. Require the student to cite and analyze the documents plus outside knowledge, and require the rubric to include sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Conflating the Three-Fifths Compromise with the Great Compromise, or describing 'compromises' vaguely without naming which interests were being balanced",
+            "Failing to contextualize the Convention as a direct response to the Articles' failures, especially Shays' Rebellion"
+          ]
+        },
+        {
+          "id": "period-3.federalists-vs-antifederalists",
+          "name": "Federalist vs. Anti-Federalist Arguments",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-3.constitutional-convention"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Explicitly distinguish 'Federalists' (supporters of ratifying the 1787 Constitution) from the later 'Federalist Party' (Hamilton's 1790s political party) — these are different referents that share a name",
+            "Require the student to cite specific arguments: Federalists' claim that an extended republic prevents faction (Madison, Federalist No. 10) vs. Anti-Federalist fears of a too-powerful central government and the absence of a bill of rights"
+          ],
+          "common_errors": [
+            "Conflating Federalists (pro-Constitution, 1787-88) with the Federalist Party (Hamilton, 1790s) — same word, different referents, a very common APUSH error",
+            "Describing the ratification debate without naming a specific argument on either side (e.g., just saying 'some people wanted a strong government')"
+          ]
+        },
+        {
+          "id": "period-3.washington-adams-parties",
+          "name": "Washington and Adams: The New Government and Emergence of Political Parties",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-3.federalists-vs-antifederalists"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to trace the causation of party formation: disagreements over Hamilton's financial plan and the French Revolution split Washington's cabinet into Federalists and Democratic-Republicans",
+            "Push the student to name specific events (Whiskey Rebellion, XYZ Affair, Alien and Sedition Acts) rather than describing the era in generalities"
+          ],
+          "common_errors": [
+            "Describing the emergence of political parties without connecting it to a specific policy dispute (Hamilton's financial plan, the National Bank, or the French Revolution)",
+            "Treating Washington's Farewell Address warning against parties as proof no parties existed yet, rather than recognizing parties had already begun forming during his presidency"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-4",
+      "name": "Period 4: 1800-1848",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["period-3"],
+      "topics": [
+        {
+          "id": "period-4.jeffersonian-vs-hamiltonian",
+          "name": "Jeffersonian Democracy vs. Hamiltonian Vision",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-3.washington-adams-parties"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to compare specific policy positions — Hamilton's National Bank and manufacturing vision vs. Jefferson's agrarian republic and strict constitutional construction — not just personality differences",
+            "Note: distinguish 'Jeffersonian Democracy' (Jefferson's political philosophy and the Democratic-Republican party) from later 'Jacksonian Democracy' — different era, different expansions of political participation"
+          ],
+          "common_errors": [
+            "Confusing Jeffersonian Democracy with Jacksonian Democracy — mixing up which era expanded suffrage and for whom, and which specific expansion belongs to which",
+            "Describing Hamilton and Jefferson's disagreement only in vague terms (big government vs. small government) without citing the specific policy dispute (the National Bank, assumption of state debts)"
+          ]
+        },
+        {
+          "id": "period-4.expansion-war-1812",
+          "name": "Louisiana Purchase, Manifest Destiny, and the War of 1812",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-4.jeffersonian-vs-hamiltonian"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to address Jefferson's constitutional dilemma in purchasing Louisiana — a strict constructionist making a loose-construction purchase — as a point of irony/complexity",
+            "Push the student to explain the War of 1812's causes (impressment, trade restrictions, war hawks' expansionist ambitions) and its nationalist consequences (Era of Good Feelings)"
+          ],
+          "common_errors": [
+            "Describing the Louisiana Purchase without addressing Jefferson's ideological inconsistency (a strict constructionist exercising broad implied powers)",
+            "Treating the War of 1812 as a clear American victory rather than a complex, largely inconclusive conflict whose main effect was surging nationalism"
+          ]
+        },
+        {
+          "id": "period-4.market-revolution",
+          "name": "The Market Revolution",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-4.expansion-war-1812"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to identify specific causes (transportation improvements — Erie Canal, railroads; technological innovation — interchangeable parts) driving the shift from subsistence to market-oriented production",
+            "Push for complexity: the Market Revolution is not uniformly positive — require the student to address working-class displacement, the rise of wage labor, and growing regional/economic inequality alongside its benefits"
+          ],
+          "common_errors": [
+            "Presenting the Market Revolution as uniformly positive progress, missing the AP-rewarded complexity of working-class displacement and regional inequality",
+            "Describing transportation improvements (canals, railroads) without connecting them causally to the growth of market-oriented (rather than subsistence) agriculture and industry"
+          ]
+        },
+        {
+          "id": "period-4.jacksonian-democracy",
+          "name": "Jacksonian Democracy, Indian Removal, and the Expansion of Suffrage",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-4.market-revolution"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name the specific suffrage expansion (removal of property qualifications for White male voters) and explicitly state who was excluded — women, enslaved and free Black Americans, and Native Americans",
+            "Require the student to address Indian Removal (the Indian Removal Act of 1830, the Trail of Tears, Worcester v. Georgia) as a direct consequence of the same Jacksonian ideology that expanded White male political participation",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., Jackson's Bank Veto Message, Cherokee petitions, newspaper accounts of the Trail of Tears), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing requirements for at least 3 documents"
+          ],
+          "common_errors": [
+            "Presenting Jacksonian Democracy as purely democratic expansion without noting it explicitly excluded women, enslaved and free Black Americans, and Native Americans",
+            "Describing Indian Removal without naming specific events (Indian Removal Act, Trail of Tears, Worcester v. Georgia) or connecting it to Jackson's broader political ideology"
+          ]
+        },
+        {
+          "id": "period-4.nullification-crisis",
+          "name": "The Nullification Crisis",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-4.jacksonian-democracy"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to move past 'it was about tariffs' — push for the states' rights argument (Calhoun's doctrine of nullification) as a vehicle South Carolina used partly out of concern for protecting slavery from future federal interference",
+            "Ask the student to connect the Nullification Crisis causally to the later secession crisis of 1860-61 as an early test of states' rights vs. federal authority"
+          ],
+          "common_errors": [
+            "Treating the Nullification Crisis as purely about tariff policy, missing the states' rights / slavery-protection connection the AP rubric rewards",
+            "Confusing nullification (a state declaring a federal law void within its borders) with secession (a state leaving the Union)"
+          ]
+        },
+        {
+          "id": "period-4.antebellum-reform-movements",
+          "name": "Antebellum Reform Movements",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-4.nullification-crisis"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific movements (abolitionism, women's rights — Seneca Falls, temperance, education reform — Horace Mann) and connect at least one to the religious enthusiasm of the Second Great Awakening",
+            "Push for comparison: how did goals and tactics differ between the abolitionist and women's rights movements, and where did they intersect (e.g., women abolitionists at Seneca Falls)?",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., Seneca Falls Declaration of Sentiments, abolitionist newspaper excerpts, temperance pamphlets), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Naming reform movements without connecting any of them to the religious revivalism of the Second Great Awakening that helped drive many of them",
+            "Treating the abolitionist and women's rights movements as entirely separate rather than noting their real historical overlap and tension"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-5",
+      "name": "Period 5: 1844-1877",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["period-4"],
+      "topics": [
+        {
+          "id": "period-5.causes-of-civil-war",
+          "name": "Causes of the Civil War",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-4.antebellum-reform-movements"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to address multiple interconnected causes — slavery, sectionalism, the Compromise of 1850, the Kansas-Nebraska Act, and the Dred Scott decision — rather than reducing causation to a single factor",
+            "Push the student to explain how states' rights arguments functioned specifically as a vehicle for protecting slavery, not as a separate, unrelated cause",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., excerpts from the Kansas-Nebraska Act, the Dred Scott decision, or a secessionist declaration), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Reducing Civil War causation to a single factor (usually slavery alone, without the nuance of states' rights as a vehicle for protecting slavery, or vice versa)",
+            "Treating the Compromise of 1850, Kansas-Nebraska Act, and Dred Scott as isolated events rather than an escalating causal chain toward sectional crisis"
+          ]
+        },
+        {
+          "id": "period-5.lincoln-election-secession",
+          "name": "Lincoln's Election and Secession",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-5.causes-of-civil-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain why Lincoln's 1860 election specifically triggered secession — his party's opposition to the expansion of slavery, not abolition itself, was the immediate trigger",
+            "Push the student to name the sequence: South Carolina's secession, the formation of the Confederacy, and the attack on Fort Sumter"
+          ],
+          "common_errors": [
+            "Assuming Lincoln ran on immediate abolition in 1860, rather than opposition to slavery's expansion into new territories",
+            "Describing secession without naming the specific sequence of events (South Carolina first, Confederacy formed, Fort Sumter)"
+          ]
+        },
+        {
+          "id": "period-5.civil-war-turning-points",
+          "name": "Civil War Military Turning Points",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-5.lincoln-election-secession"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain why a specific battle (Antietam, Gettysburg) was a turning point in terms of its strategic or political consequences, not just describe who won",
+            "Push the student to connect Sherman's March to the Sea to the concept of 'total war' and its effect on Confederate morale and infrastructure"
+          ],
+          "common_errors": [
+            "Naming a battle as a 'turning point' without explaining its actual strategic or political significance (e.g., Antietam's connection to the Emancipation Proclamation and preventing British/French recognition of the Confederacy)",
+            "Describing military events without addressing the home front consequences (total war, economic strain) alongside battlefield outcomes"
+          ]
+        },
+        {
+          "id": "period-5.emancipation-proclamation",
+          "name": "The Emancipation Proclamation — Purpose and Limits",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-5.civil-war-turning-points"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to state precisely what the Emancipation Proclamation did and did not do — it applied only to enslaved people in Confederate states still in rebellion, not to border states or Union-controlled areas",
+            "Push the student to explain its strategic purpose (weakening the Confederate war effort, deterring European intervention) alongside its limits"
+          ],
+          "common_errors": [
+            "Believing the Emancipation Proclamation freed all enslaved people — it only applied to Confederate states still in rebellion, not border states or Union-controlled territory",
+            "Treating the Proclamation as purely a moral document without addressing its military/diplomatic strategic purpose"
+          ]
+        },
+        {
+          "id": "period-5.reconstruction-plans-amendments",
+          "name": "Reconstruction — Radical vs. Presidential, and the 13th, 14th, and 15th Amendments",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-5.emancipation-proclamation"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to compare Presidential Reconstruction (Lincoln's and Johnson's lenient plans) with Radical/Congressional Reconstruction (military districts, requirements for readmission) as a real comparison, not parallel description",
+            "Require the student to name what each amendment specifically did (13th: abolished slavery; 14th: citizenship and equal protection; 15th: voting rights regardless of race) rather than treating them as one undifferentiated bloc",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., Freedmen's Bureau reports, a Black Codes excerpt, a Reconstruction-era political cartoon description), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating the 13th, 14th, and 15th Amendments as interchangeable rather than naming what each specifically accomplished",
+            "Describing Presidential and Radical Reconstruction without a real point-by-point comparison of how lenient each was toward the former Confederacy"
+          ]
+        },
+        {
+          "id": "period-5.failure-of-reconstruction",
+          "name": "The Failure of Reconstruction and Redeemers",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-5.reconstruction-plans-amendments"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push against treating Reconstruction as simply a failure — require the student to first acknowledge its constitutional achievements (the three Reconstruction amendments, Black political officeholding) before addressing its collapse",
+            "Require the student to explain specific causes of Reconstruction's end: the Compromise of 1877, the rise of Redeemer governments, and the growth of Black Codes and later Jim Crow"
+          ],
+          "common_errors": [
+            "Presenting Reconstruction as simply a total failure, missing the AP-rewarded complexity of acknowledging its real constitutional achievements before its political collapse",
+            "Describing the end of Reconstruction without naming the Compromise of 1877 or explaining how Redeemer governments dismantled Reconstruction-era gains"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-6",
+      "name": "Period 6: 1865-1898",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["period-5"],
+      "topics": [
+        {
+          "id": "period-6.gilded-age-industrialization",
+          "name": "Gilded Age Industrialization, Railroads, and Big Business",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-5.failure-of-reconstruction"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific business practices (vertical/horizontal integration, trusts) and specific industrialists (Carnegie in steel, Rockefeller in oil) rather than describing 'big business' generically",
+            "Push the student to explain railroads' role as the era's foundational technology enabling national markets, not just one industry among many"
+          ],
+          "common_errors": [
+            "Describing industrial consolidation without naming a specific practice (vertical integration, horizontal integration, trusts) or a specific industrialist",
+            "Treating railroads as just one Gilded Age industry rather than the connective infrastructure that enabled national-scale business in the first place"
+          ]
+        },
+        {
+          "id": "period-6.social-darwinism-gospel-wealth",
+          "name": "Social Darwinism and the Gospel of Wealth",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-6.gilded-age-industrialization"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish Social Darwinism (survival of the fittest applied to economic competition, used to justify inequality) from the Gospel of Wealth (Carnegie's argument that the wealthy have a moral duty to philanthropy)",
+            "Push the student to explain how both ideologies functioned to justify the era's economic inequality, despite their different prescriptions"
+          ],
+          "common_errors": [
+            "Conflating Social Darwinism with the Gospel of Wealth as if they were the same idea, rather than distinguishing justification-for-inequality from a duty-to-philanthropy argument",
+            "Failing to connect either ideology to a real historical use (e.g., citing Carnegie's actual philanthropic giving as an application of the Gospel of Wealth)"
+          ]
+        },
+        {
+          "id": "period-6.populist-movement",
+          "name": "The Populist Movement and Farmer Grievances",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-6.social-darwinism-gospel-wealth"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific farmer grievances (railroad shipping rates, currency deflation, crop-lien system) and specific Populist demands (free silver, direct election of senators, graduated income tax)",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., the Populist Party's Omaha Platform, a farmer's grievance letter), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Describing farmer grievances vaguely ('farmers were struggling') without naming specific causes like currency deflation or railroad rate discrimination",
+            "Treating Populism and Progressivism as the same movement rather than distinguishing the Populists' rural, agrarian base from Progressivism's largely urban, middle-class base"
+          ]
+        },
+        {
+          "id": "period-6.new-south-sharecropping",
+          "name": "The New South and Sharecropping System",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-6.populist-movement"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain how sharecropping functioned as a system that kept formerly enslaved people and poor Whites in cycles of debt, despite technically being 'free' labor",
+            "Push the student to contextualize the 'New South' rhetoric of industrial diversification against the reality of continued agricultural dependence"
+          ],
+          "common_errors": [
+            "Describing sharecropping as simply 'a job' without explaining the debt-peonage mechanics (crop liens, company stores) that trapped workers",
+            "Accepting 'New South' boosterism at face value rather than noting the gap between its industrial rhetoric and the region's continued agricultural, low-wage economy"
+          ]
+        },
+        {
+          "id": "period-6.immigration-urbanization",
+          "name": "Immigration, Nativism, and Urbanization",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-6.new-south-sharecropping"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish push factors (economic hardship, religious persecution in home countries) from pull factors (industrial jobs, family networks) for New Immigrants",
+            "Require the student to connect urbanization and immigration to the rise of political machines (e.g., Tammany Hall) providing services in exchange for votes",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., a nativist political cartoon description, an immigrant's letter home, a settlement house report), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Describing 'immigration' without distinguishing Old Immigrants (northern/western Europe, earlier period) from New Immigrants (southern/eastern Europe, later 19th century) and the different nativist reactions each provoked",
+            "Explaining political machines only as corrupt rather than also addressing the real services (jobs, housing help) they provided to new immigrants in exchange for political loyalty"
+          ]
+        },
+        {
+          "id": "period-6.west-labor-movement",
+          "name": "Settlement of the West, Native American Displacement, and the Labor Movement",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-6.immigration-urbanization"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to connect the Homestead Act's promise of free land to the displacement of Native peoples formalized by the Dawes Act's allotment policy",
+            "Require the student to distinguish specific labor organizations (Knights of Labor's broad inclusive membership vs. the AFL's skilled-craft-only approach) and name specific events (Haymarket, Pullman Strike)"
+          ],
+          "common_errors": [
+            "Describing westward settlement (Homestead Act) without connecting it causally to Native American displacement and the assimilationist goals of the Dawes Act",
+            "Treating all labor unions of the era as interchangeable rather than distinguishing the Knights of Labor's inclusive approach from the AFL's narrower, skilled-trades focus"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-7",
+      "name": "Period 7: 1890-1945",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["period-6"],
+      "topics": [
+        {
+          "id": "period-7.progressivism",
+          "name": "Progressivism — Muckrakers, Reforms, and the Amendments",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-6.west-labor-movement"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific muckrakers and their targets (Sinclair's The Jungle and meatpacking, Riis's How the Other Half Lives and urban poverty) and connect each to a specific resulting reform",
+            "Push against treating Progressivism as universally inclusive — require the student to address racism within the movement (Wilson's segregation of the federal workforce) as a genuine limitation",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., a muckraking journalism excerpt, a Progressive-era political cartoon description, a suffragist speech excerpt), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Presenting Progressivism as universally inclusive reform, missing the racism within the movement (Wilson's segregation of the federal workforce, many Progressives' exclusion of Black Americans from their agenda)",
+            "Naming a muckraker or reform without connecting it to a specific resulting law or amendment (e.g., The Jungle to the Meat Inspection Act)"
+          ]
+        },
+        {
+          "id": "period-7.american-imperialism",
+          "name": "American Imperialism — Spanish-American War, Philippines, Panama Canal",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-7.progressivism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific causes of the Spanish-American War (yellow journalism, the USS Maine, Cuban independence) and the Roosevelt Corollary's extension of the Monroe Doctrine",
+            "Push the student to address the debate over the Philippines annexation (imperialists vs. anti-imperialists) as a genuine ideological conflict, not a foregone conclusion"
+          ],
+          "common_errors": [
+            "Describing the Spanish-American War's causes vaguely without naming yellow journalism or the USS Maine specifically",
+            "Treating American imperialism as uncontested rather than addressing the real anti-imperialist opposition to Philippine annexation"
+          ]
+        },
+        {
+          "id": "period-7.wwi",
+          "name": "WWI — Neutrality, Involvement, and Wilson's 14 Points",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-7.american-imperialism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push against a purely idealistic explanation for U.S. entry — require the student to address economic ties to the Allies and unrestricted submarine warfare as the proximate causes",
+            "Require the student to explain why the Senate rejected the League of Nations (fears over Article X and loss of congressional war-declaring power), not just that it was rejected",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., the Zimmermann Telegram, a Wilson speech excerpt, a war bonds propaganda poster description), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Explaining U.S. entry into WWI as primarily idealistic (defending democracy) while missing the economic ties to the Allies and submarine warfare as the actual proximate causes",
+            "Describing the League of Nations' rejection without explaining the specific Senate objection (Article X's collective security requirement)"
+          ]
+        },
+        {
+          "id": "period-7.1920s-culture",
+          "name": "The 1920s — Nativism, KKK, Harlem Renaissance, Red Scare",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-7.wwi"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to address the decade's real tensions and contradictions — cultural liberation (Harlem Renaissance, flappers) alongside resurgent nativism (immigration quotas, the second KKK)",
+            "Push the student to connect the First Red Scare to specific events (Palmer Raids, the Sacco and Vanzetti case) rather than describing it in the abstract"
+          ],
+          "common_errors": [
+            "Describing the 1920s as either purely liberating or purely reactionary rather than addressing both trends as coexisting and in tension",
+            "Confusing the (First) Red Scare of the 1920s with the Second Red Scare/McCarthyism of the 1950s"
+          ]
+        },
+        {
+          "id": "period-7.great-depression-new-deal",
+          "name": "The Great Depression and the New Deal",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-7.1920s-culture"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific causes of the Depression (stock market speculation, bank failures, overproduction, Hoover's limited response) before addressing the New Deal",
+            "Push against the claim that the New Deal ended the Depression — require the student to note that WWII mobilization, not the New Deal alone, was the actual driver of full economic recovery",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., an FDR fireside chat excerpt, a Dust Bowl migrant account, a New Deal critic's speech), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Claiming the New Deal ended the Great Depression — the AP rubric rewards noting that WWII mobilization was the actual driver of full economic recovery",
+            "Listing New Deal programs without connecting any to a specific problem they addressed (e.g., the FDIC to bank failures, Social Security to old-age poverty)"
+          ]
+        },
+        {
+          "id": "period-7.wwii-homefront",
+          "name": "WWII — Mobilization, Homefront, Internment, and the Atomic Bomb Decision",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-7.great-depression-new-deal"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to connect wartime mobilization to major homefront changes — women and Black Americans entering war-production jobs, and the Double V campaign's fight against fascism abroad and racism at home",
+            "Require the student to address the atomic bomb decision and Japanese American internment as genuinely contested historical judgments, not settled facts — the rubric rewards acknowledging multiple perspectives"
+          ],
+          "common_errors": [
+            "Describing wartime homefront changes without naming a specific example (Rosie the Riveter, the Double V campaign, the Bracero Program)",
+            "Presenting Japanese American internment or the atomic bomb decision as uncomplicated rather than addressing the historical debate over justification and consequences"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-8",
+      "name": "Period 8: 1945-1980",
+      "ap_exam_weight_min": 10,
+      "ap_exam_weight_max": 17,
+      "prerequisite_unit_ids": ["period-7"],
+      "topics": [
+        {
+          "id": "period-8.origins-cold-war",
+          "name": "Origins of the Cold War — Truman Doctrine, Marshall Plan, Containment",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-7.wwii-homefront"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push against a purely ideological framing of the Cold War — require the student to address economic competition (Marshall Plan's economic rebuilding goals) and proxy conflicts alongside the ideological rivalry",
+            "Require the student to name the specific doctrine (Truman Doctrine's containment policy) and connect it to a specific application (Korea, later Vietnam)",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., the Truman Doctrine speech, a Marshall Plan document, a containment policy memo excerpt), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Framing the Cold War as purely a US vs. USSR ideological conflict, missing the economic competition and proxy wars that also drove it",
+            "Describing containment without connecting it to a specific policy application (the Marshall Plan, the Korean War, later Vietnam)"
+          ]
+        },
+        {
+          "id": "period-8.second-red-scare",
+          "name": "The Second Red Scare and McCarthyism",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-8.origins-cold-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish the Second Red Scare/McCarthyism (1950s, tied to Cold War fears of Soviet espionage) from the First Red Scare (1919-20, tied to the Russian Revolution and labor unrest)",
+            "Push the student to address McCarthyism's real domestic consequences — blacklisting, loyalty oaths, the chilling of political dissent — alongside genuine (if often exaggerated) espionage concerns"
+          ],
+          "common_errors": [
+            "Confusing the Second Red Scare/McCarthyism with the First Red Scare of the 1920s",
+            "Describing McCarthyism only as 'false accusations' without addressing its real institutional mechanisms (HUAC, loyalty oaths, blacklisting)"
+          ]
+        },
+        {
+          "id": "period-8.civil-rights-movement",
+          "name": "The Civil Rights Movement",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-8.second-red-scare"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push against treating the Civil Rights Movement as a single, unified effort — require the student to address internal debates and divergent strategies (MLK's nonviolent civil disobedience vs. Malcolm X's Black nationalism vs. SNCC's later radicalization)",
+            "Require the student to name specific events with specific significance (Brown v. Board's legal foundation, Montgomery Bus Boycott's grassroots organizing model, Freedom Rides testing federal enforcement)",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., an excerpt from MLK's 'Letter from Birmingham Jail,' a SNCC statement, a Southern Manifesto excerpt), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Presenting the Civil Rights Movement as a single unified movement, missing the real internal debates over strategy and philosophy (MLK vs. Malcolm X vs. SNCC's radicalization)",
+            "Naming an event (Brown v. Board, Montgomery) without explaining its specific significance beyond 'it helped civil rights'"
+          ]
+        },
+        {
+          "id": "period-8.great-society",
+          "name": "The Great Society and LBJ's Domestic Programs",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-8.civil-rights-movement"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific programs (Medicare, Medicaid, the Civil Rights Act of 1964, the Voting Rights Act of 1965, the Elementary and Secondary Education Act) and their specific targets",
+            "Push the student to compare the Great Society's scope and ambition to the New Deal as a useful historical comparison (both expanding the federal government's social welfare role, in different eras and contexts)"
+          ],
+          "common_errors": [
+            "Listing Great Society programs without naming what specific problem each addressed (Medicare/elderly healthcare, Medicaid/poverty healthcare)",
+            "Describing the Civil Rights Act of 1964 and Voting Rights Act of 1965 as the same law or interchangeable rather than naming their distinct provisions"
+          ]
+        },
+        {
+          "id": "period-8.vietnam-war",
+          "name": "The Vietnam War",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["period-8.great-society"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Push against framing anti-war opposition as solely youth/student-driven — require the student to address the broader, more mainstream opposition that grew after the 1968 Tet Offensive",
+            "Require the student to trace the escalation causally: the Gulf of Tonkin Resolution's expansion of presidential war powers to the buildup of ground troops under Johnson",
+            "For FRQ questions on this topic, generate DBQs: include 2-3 realistic primary source excerpts inline in question_text (e.g., the Gulf of Tonkin Resolution, a Vietnam veteran's account, an antiwar protest speech), formatted as 'Document 1: [source attribution]' with a brief quote. Require citing and analyzing documents plus outside knowledge, with rubric sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Framing antiwar opposition to Vietnam as solely a youth/student phenomenon, missing the broader mainstream opposition that grew especially after the 1968 Tet Offensive",
+            "Describing U.S. escalation in Vietnam without naming the Gulf of Tonkin Resolution's specific role in expanding presidential war powers"
+          ]
+        },
+        {
+          "id": "period-8.nixon-counterculture",
+          "name": "Nixon, Watergate, Détente, and Social Movements",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-8.vietnam-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to explain détente as a genuine shift in Cold War strategy (opening to China, SALT talks with the USSR) rather than simply 'Nixon was less aggressive'",
+            "Require the student to name at least one specific social movement beyond civil rights (feminist movement/NOW, Chicano movement/UFW, American Indian Movement, gay rights/Stonewall) with a specific goal or event"
+          ],
+          "common_errors": [
+            "Describing détente vaguely as 'improved relations' without naming a specific policy (the opening to China, SALT I)",
+            "Treating 'the 1970s social movements' as a single undifferentiated wave rather than naming distinct movements with distinct goals and leaders"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "period-9",
+      "name": "Period 9: 1980-present",
+      "ap_exam_weight_min": 4,
+      "ap_exam_weight_max": 6,
+      "prerequisite_unit_ids": ["period-8"],
+      "topics": [
+        {
+          "id": "period-9.reagan-revolution",
+          "name": "The Reagan Revolution",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-8.nixon-counterculture"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name specific elements of Reaganomics (tax cuts, deregulation, reduced domestic spending) and connect them to supply-side economic theory",
+            "Push the student to address the Reagan Revolution's social conservative dimension alongside its economic policy, as two connected but distinct components"
+          ],
+          "common_errors": [
+            "Describing 'Reaganomics' without naming a specific policy (tax cuts, deregulation) or connecting it to supply-side theory",
+            "Treating Reagan's economic and social conservatism as a single undifferentiated ideology rather than distinct (if allied) political coalitions"
+          ]
+        },
+        {
+          "id": "period-9.end-of-cold-war",
+          "name": "The End of the Cold War",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-9.reagan-revolution"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to address this as a genuinely debated historical question — how much credit belongs to Reagan's policies vs. internal Soviet economic weakness and Gorbachev's reforms (glasnost, perestroika)",
+            "Push the student to avoid a single-cause narrative and instead weigh multiple contributing factors"
+          ],
+          "common_errors": [
+            "Presenting the Cold War's end as caused entirely by Reagan's policies without acknowledging the debated role of internal Soviet weakness and Gorbachev's own reforms",
+            "Treating the fall of the Soviet Union (1991) and the fall of the Berlin Wall (1989) as the same event rather than distinct, sequential milestones"
+          ]
+        },
+        {
+          "id": "period-9.clinton-globalization",
+          "name": "The Clinton Era and Globalization",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["period-9.end-of-cold-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name a specific Clinton-era policy or event (NAFTA, welfare reform, impeachment over the Lewinsky scandal) rather than describing the decade generally",
+            "Push the student to connect NAFTA and globalization to both its economic benefits (growth, cheaper goods) and its costs (manufacturing job losses) as genuine tradeoffs"
+          ],
+          "common_errors": [
+            "Describing the 1990s economy as uncomplicated prosperity without addressing globalization's real costs (job losses in manufacturing regions)",
+            "Confusing Clinton's impeachment (by the House, over perjury/obstruction) with removal from office (he was acquitted by the Senate and remained president)"
+          ]
+        },
+        {
+          "id": "period-9.war-on-terror-recession",
+          "name": "9/11, the War on Terror, and the Great Recession",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["period-9.clinton-globalization"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to distinguish the wars in Afghanistan (direct response to 9/11, targeting al-Qaeda/the Taliban) and Iraq (a more contested, separate decision) rather than treating them as one conflict",
+            "Require the student to name a specific cause of the 2008 Great Recession (subprime mortgage crisis, financial deregulation) rather than describing it as a generic 'economic downturn'"
+          ],
+          "common_errors": [
+            "Treating the Afghanistan and Iraq wars as a single undifferentiated conflict rather than distinguishing their different justifications and timelines",
+            "Describing the Great Recession without naming a specific cause (the subprime mortgage crisis, deregulated mortgage-backed securities)"
+          ]
+        },
+        {
+          "id": "period-9.obama-presidency",
+          "name": "The Obama Presidency",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["period-9.war-on-terror-recession"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require the student to name a specific policy (the Affordable Care Act, the 2009 stimulus package) and its specific goal rather than describing the presidency in generalities",
+            "Push the student to contextualize Obama's election within the longer arc of the Civil Rights Movement discussed earlier in the course"
+          ],
+          "common_errors": [
+            "Describing the Affordable Care Act's goals vaguely ('healthcare reform') without naming a specific mechanism (individual mandate, insurance exchanges, Medicaid expansion)",
+            "Discussing Obama's presidency in isolation without connecting his election to the broader historical arc of the Civil Rights Movement"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing_calendar": [
+    { "week": 1, "topic_ids": ["period-1.native-american-societies", "period-1.european-exploration-motivations"] },
+    { "week": 2, "topic_ids": ["period-1.columbian-exchange", "period-1.spanish-colonization-encomienda"] },
+    { "week": 3, "topic_ids": ["period-2.colonial-regions", "period-2.colonial-self-governance", "period-2.indentured-servitude-to-slavery"] },
+    { "week": 4, "topic_ids": ["period-2.great-awakening", "period-2.bacons-rebellion"] },
+    { "week": 5, "topic_ids": ["period-3.french-indian-war"] },
+    { "week": 6, "topic_ids": ["period-3.revolutionary-ideology-declaration"] },
+    { "week": 7, "topic_ids": ["period-3.articles-of-confederation", "period-3.constitutional-convention"] },
+    { "week": 8, "topic_ids": ["period-3.federalists-vs-antifederalists", "period-3.washington-adams-parties"] },
+    { "week": 9, "topic_ids": ["period-4.jeffersonian-vs-hamiltonian"] },
+    { "week": 10, "topic_ids": ["period-4.expansion-war-1812"] },
+    { "week": 11, "topic_ids": ["period-4.market-revolution", "period-4.antebellum-reform-movements"] },
+    { "week": 12, "topic_ids": ["period-4.jacksonian-democracy", "period-4.nullification-crisis"] },
+    { "week": 13, "topic_ids": ["period-5.causes-of-civil-war"] },
+    { "week": 14, "topic_ids": ["period-5.lincoln-election-secession", "period-5.civil-war-turning-points"] },
+    { "week": 15, "topic_ids": ["period-5.emancipation-proclamation"] },
+    { "week": 16, "topic_ids": ["period-5.reconstruction-plans-amendments", "period-5.failure-of-reconstruction"] },
+    { "week": 17, "topic_ids": ["period-6.gilded-age-industrialization"] },
+    { "week": 18, "topic_ids": ["period-6.social-darwinism-gospel-wealth", "period-6.populist-movement"] },
+    { "week": 19, "topic_ids": ["period-6.new-south-sharecropping", "period-6.immigration-urbanization"] },
+    { "week": 20, "topic_ids": ["period-6.west-labor-movement"] },
+    { "week": 21, "topic_ids": ["period-7.progressivism"] },
+    { "week": 22, "topic_ids": ["period-7.american-imperialism"] },
+    { "week": 23, "topic_ids": ["period-7.wwi"] },
+    { "week": 24, "topic_ids": ["period-7.1920s-culture"] },
+    { "week": 25, "topic_ids": ["period-7.great-depression-new-deal", "period-7.wwii-homefront"] },
+    { "week": 26, "topic_ids": ["period-8.origins-cold-war"] },
+    { "week": 27, "topic_ids": ["period-8.second-red-scare"] },
+    { "week": 28, "topic_ids": ["period-8.civil-rights-movement"] },
+    { "week": 29, "topic_ids": ["period-8.great-society", "period-8.vietnam-war"] },
+    { "week": 30, "topic_ids": ["period-8.nixon-counterculture"] },
+    { "week": 31, "topic_ids": ["period-9.reagan-revolution", "period-9.end-of-cold-war"] },
+    { "week": 32, "topic_ids": ["period-9.clinton-globalization", "period-9.war-on-terror-recession"] },
+    { "week": 33, "topic_ids": ["period-9.obama-presidency"] },
+    { "week": 34, "topic_ids": [] },
+    { "week": 35, "topic_ids": [] },
+    { "week": 36, "topic_ids": [] }
+  ],
+  "common_misconceptions": [
+    {
+      "id": "federalist-federalist-party-conflation",
+      "description": "Students conflate 'Federalists' (supporters of ratifying the 1787 Constitution) with the later 'Federalist Party' (Hamilton's 1790s political party) — same word, different referents.",
+      "affected_topic_ids": ["period-3.federalists-vs-antifederalists", "period-4.jeffersonian-vs-hamiltonian"],
+      "detection_hints": [
+        "Check whether the student specifies which era/referent they mean when using 'Federalist'",
+        "Watch for a response that treats the 1787 ratification debate and 1790s party politics as the same event"
+      ]
+    },
+    {
+      "id": "emancipation-proclamation-scope",
+      "description": "Students believe the Emancipation Proclamation freed all enslaved people, when it only applied to enslaved people in Confederate states still in rebellion.",
+      "affected_topic_ids": ["period-5.emancipation-proclamation"],
+      "detection_hints": [
+        "Check whether the response mentions border states or Union-controlled territory as exceptions"
+      ]
+    },
+    {
+      "id": "new-deal-ended-depression",
+      "description": "Students believe the New Deal alone ended the Great Depression, missing that WWII mobilization was the actual driver of full economic recovery.",
+      "affected_topic_ids": ["period-7.great-depression-new-deal"],
+      "detection_hints": [
+        "Check whether the response credits WWII mobilization at all, or attributes full recovery to New Deal programs alone"
+      ]
+    },
+    {
+      "id": "civil-war-single-cause",
+      "description": "Students reduce Civil War causation to a single factor, missing the AP rubric's reward for addressing multiple interconnected causes.",
+      "affected_topic_ids": ["period-5.causes-of-civil-war"],
+      "detection_hints": [
+        "Count how many distinct causal factors the response actually engages with, not just names"
+      ]
+    },
+    {
+      "id": "reconstruction-total-failure",
+      "description": "Students present Reconstruction as simply a failure, missing the AP-rewarded complexity of acknowledging its real constitutional achievements before its political collapse.",
+      "affected_topic_ids": ["period-5.failure-of-reconstruction", "period-5.reconstruction-plans-amendments"],
+      "detection_hints": [
+        "Check whether the response credits any Reconstruction-era achievement (the amendments, Black officeholding) before discussing its end"
+      ]
+    },
+    {
+      "id": "progressivism-universally-inclusive",
+      "description": "Students present Progressivism as universally inclusive reform, missing the racism within the movement, including Wilson's segregation of the federal workforce.",
+      "affected_topic_ids": ["period-7.progressivism"],
+      "detection_hints": [
+        "Check whether the response addresses any exclusionary or racist dimension of Progressive-era reform"
+      ]
+    },
+    {
+      "id": "cold-war-purely-ideological",
+      "description": "Students frame the Cold War as purely a US vs. USSR ideological conflict, missing the economic competition and proxy wars that also drove it.",
+      "affected_topic_ids": ["period-8.origins-cold-war"],
+      "detection_hints": [
+        "Check whether the response mentions any economic or proxy-conflict dimension alongside ideology"
+      ]
+    },
+    {
+      "id": "civil-rights-unified-movement",
+      "description": "Students present the Civil Rights Movement as a single unified movement, missing real internal debates over strategy and philosophy (MLK vs. Malcolm X vs. SNCC's later radicalization).",
+      "affected_topic_ids": ["period-8.civil-rights-movement"],
+      "detection_hints": [
+        "Check whether the response names more than one strategic approach or leader with differing views"
+      ]
+    },
+    {
+      "id": "ccot-single-dimension",
+      "description": "In Continuity and Change Over Time (CCOT) arguments, students identify change OR continuity across a period but fail to address both, losing credit for incomplete analysis — a skill-level error that recurs across every period.",
+      "affected_topic_ids": [
+        "period-1.columbian-exchange",
+        "period-4.market-revolution",
+        "period-6.gilded-age-industrialization",
+        "period-7.great-depression-new-deal",
+        "period-8.origins-cold-war",
+        "period-9.end-of-cold-war"
+      ],
+      "detection_hints": [
+        "Check whether the response explicitly addresses both what changed and what stayed the same across the stated period"
+      ]
+    },
+    {
+      "id": "dbq-documents-summarized-not-used",
+      "description": "On DBQs, students summarize each document in order rather than grouping them as evidence to support an argument, and often fail to bring in outside knowledge beyond the documents — a skill-level error across every DBQ-eligible topic.",
+      "affected_topic_ids": [
+        "period-3.revolutionary-ideology-declaration",
+        "period-3.constitutional-convention",
+        "period-4.jacksonian-democracy",
+        "period-4.antebellum-reform-movements",
+        "period-5.causes-of-civil-war",
+        "period-5.reconstruction-plans-amendments",
+        "period-6.populist-movement",
+        "period-6.immigration-urbanization",
+        "period-7.progressivism",
+        "period-7.wwi",
+        "period-7.great-depression-new-deal",
+        "period-8.origins-cold-war",
+        "period-8.civil-rights-movement",
+        "period-8.vietnam-war"
+      ],
+      "detection_hints": [
+        "Check whether documents are cited as evidence grouped by argument point, or merely summarized document-by-document in order",
+        "Check whether the response includes at least one piece of outside knowledge beyond the provided documents"
+      ]
+    }
+  ],
+  "frq_rubric": {
+    "general_guidance": "APUSH FRQs (SAQ, LEQ, DBQ) all require historical argument supported by specific evidence. A response earns no credit for vague generalities — every claim needs a named person, event, legislation, movement, or date. The thesis must make a historically defensible claim that goes beyond restating the prompt. For DBQs: students must cite documents as evidence (not just summarize them), source at least 3 documents (author, purpose, audience, or historical situation), and bring in at least one piece of outside knowledge beyond the provided documents. For LEQs and SAQs: contextualize the argument within the broader historical period before making specific claims.",
+    "point_allocation_pattern": "Score out of 4: 4 = defensible thesis with specific named evidence from at least two examples, analysis of causation or change/continuity, and contextualization beyond the immediate event; 3 = thesis present and specific evidence used but analysis or contextualization underdeveloped; 2 = attempts an argument with some specific evidence but thesis is descriptive rather than analytical or evidence is too vague; 1 = minimal attempt with general claims and no specific evidence; 0 = no credit, off-topic, or purely descriptive summary",
+    "common_reasoning_gaps": [
+      "Thesis restates the prompt rather than making a historically defensible argument with a line of reasoning",
+      "Evidence is mentioned but not analyzed — student says what happened but not why it mattered or how it supports the argument",
+      "DBQ responses summarize each document in order rather than grouping them to support an argument",
+      "CCOT responses address only change or only continuity — AP requires both",
+      "Contextualization placed at the end as an afterthought rather than setting up the argument",
+      "Complexity attempted through a single counterexample rather than a sustained analysis of multiple perspectives"
+    ]
+  }
+}
