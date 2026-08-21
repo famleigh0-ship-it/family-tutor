@@ -79,7 +79,7 @@
           "prompt_hints": [
             "Mansa Musa's 1324 pilgrimage to Mecca is high-value evidence — require students to use it to demonstrate Mali's wealth, trans-Saharan gold-salt trade, and integration into the Islamic scholarly world (Timbuktu)",
             "Require a real comparison between Mali's trans-Saharan trade-based state and the Swahili Coast city-states' Indian Ocean trade-based economy — same category (trade-based statehood), different network",
-            "Push students to address Great Zimbabwe as evidence of sophisticated state building not dependent on any single external trade network"
+            "Push students to address Great Zimbabwe as evidence of sophisticated interior state building — note that it DID participate in Indian Ocean trade (exporting gold and ivory via the Swahili coast port of Sofala, evidenced by imported Chinese porcelain and Persian pottery found at the site) alongside its cattle and agricultural wealth; do not claim it developed independent of long-distance trade networks"
           ],
           "common_errors": [
             "Treating Africa as a single undifferentiated region rather than distinguishing trans-Saharan (Mali), Indian Ocean (Swahili Coast), and interior (Great Zimbabwe) state-building patterns",
@@ -160,7 +160,7 @@
           "prompt_hints": [
             "The Mongol Empire must be treated with complexity: require students to acknowledge both the initial devastation of conquest AND the Pax Mongolica's facilitation of trade, religious tolerance, and cross-cultural exchange across a unified Eurasia",
             "Push students to use the Mongols as evidence that a single political power controlling multiple trade segments dramatically increases exchange volume — connect this directly to the Silk Roads topic",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a Mongol edict on religious tolerance, a European or Chinese traveler's account of Mongol rule), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, and require the rubric to include HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a Mongol edict on religious tolerance, a European or Chinese traveler's account of Mongol rule), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, and require the rubric to include HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Describing the Mongol Empire as purely destructive without acknowledging the Pax Mongolica — trade facilitation, religious tolerance, and disease transmission — missing the complexity AP rewards",
@@ -230,7 +230,7 @@
           "prompt_hints": [
             "Require students to compare how different trade networks facilitated different types of exchange — the Silk Roads spread technology (paper, gunpowder) and disease, the Indian Ocean and trans-Saharan networks spread religion (Buddhism, Islam) via merchant contact",
             "Push for a synthesis argument across at least three networks (Silk Roads, Indian Ocean, trans-Saharan) rather than treating each network's cultural consequences in isolation",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a merchant's travel account, a religious conversion narrative), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a merchant's travel account, a religious conversion narrative), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating the cultural consequences of exchange as identical across all networks rather than distinguishing what each network primarily spread",
@@ -257,7 +257,7 @@
           "prompt_hints": [
             "Require students to explain the devshirme system (conscripting and training Christian boys as elite administrators and janissary soldiers) as a specific mechanism for building a loyal, merit-based ruling class",
             "Push students to address Ottoman religious tolerance under the millet system as a genuine administrative strategy for governing a religiously diverse empire (Muslims, Christians, Jews), not just passive coexistence",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., an Ottoman administrative decree, a European traveler's account of Istanbul), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., an Ottoman administrative decree, a European traveler's account of Istanbul), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Describing the devshirme system as simple slavery without addressing how it created a genuinely powerful, socially mobile administrative and military class",
@@ -344,8 +344,7 @@
           "input_mode": "typed",
           "prompt_hints": [
             "Require students to compare how the Ottomans, Mughals, and Qing each managed religiously or ethnically diverse populations — millet system, Akbar's syncretism vs. Aurangzeb's orthodoxy, and Qing accommodation of Han bureaucratic tradition — this is a high-frequency AP comparison",
-            "Push students to explain how gunpowder weaponry enabled all of these empires (Ottoman, Safavid, Mughal) to centralize power against regional nobility, forming a real causal link between military technology and administrative centralization",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., administrative decrees from two different empires on governing a religious minority), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "Push students to explain how gunpowder weaponry enabled all of these empires (Ottoman, Safavid, Mughal) to centralize power against regional nobility, forming a real causal link between military technology and administrative centralization"
           ],
           "common_errors": [
             "Treating all land-based empires as administratively identical rather than distinguishing their different approaches to religious/ethnic diversity, succession, and centralization",
@@ -388,7 +387,7 @@
           "prompt_hints": [
             "The Columbian Exchange is bidirectional — require students to acknowledge consequences in both directions: American crops (maize, potato, tomato) transforming Afro-Eurasian food systems and populations, and Old World disease, animals, and plants transforming the Americas",
             "Push students to address demographic catastrophe honestly — disease killed an estimated 50-90% of indigenous American populations — as the exchange's most consequential and tragic effect",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a Spanish colonial account, an indigenous account of demographic collapse, a European agricultural record), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a Spanish colonial account, an indigenous account of demographic collapse, a European agricultural record), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating the Columbian Exchange as flowing only from Europe to the Americas — missing how American crops (potato, maize, tomato) transformed Afro-Eurasian food systems and enabled population growth there",
@@ -406,7 +405,7 @@
           "prompt_hints": [
             "Require students to explain the causal chain: indigenous demographic collapse plus growing plantation labor demand in the Americas drove the shift to a permanent, racially defined enslaved African labor force",
             "Push students to address Africa's active role beyond being a source of enslaved people — African kingdoms (Kongo, Dahomey, Asante) actively participated in, profited from, and were also politically transformed and destabilized by the trade",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a ship captain's log, an enslaved person's account, an African ruler's correspondence with European traders), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a ship captain's log, an enslaved person's account, an African ruler's correspondence with European traders), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Missing Africa's active role in the Atlantic system beyond being a source of enslaved people — African kingdoms actively participated in and were transformed by the trade",
@@ -501,7 +500,7 @@
           "prompt_hints": [
             "The Haitian Revolution should be treated as uniquely radical — the only successful large-scale slave revolt to create an independent nation — require students to connect it to both Enlightenment ideals and the contradiction of Atlantic slavery",
             "Require students to compare the outcomes of these three revolutions — why did the American Revolution produce a stable republic while the French Revolution cycled through radical phases and Napoleon, and Haiti faced international isolation and enormous indemnity debt?",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., excerpts from the Declaration of the Rights of Man, the Haitian Declaration of Independence, or a French revolutionary pamphlet), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., excerpts from the Declaration of the Rights of Man, the Haitian Declaration of Independence, or a French revolutionary pamphlet), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating the French and American Revolutions as equally radical — the French Revolution went through far more violent phases and produced Napoleon's empire",
@@ -567,7 +566,7 @@
           "prompt_hints": [
             "Require students to explain multiple causes for why industrialization began in Britain specifically — coal and iron deposits, colonial markets and raw material access, the enclosure movement freeing agricultural labor, and relative political stability — rather than a single cause",
             "Push students to address uneven global spread: industrialization moved to continental Europe and the United States relatively quickly, but require students to explain why other regions industrialized later or not at all in this period (colonial extraction relationships, lack of capital, deliberate deindustrialization by colonizers, as in India's textile industry)",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a factory inspector's report, a colonial trade statistic, a worker's account), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a factory inspector's report, a colonial trade statistic, a worker's account), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating industrialization as a purely British then European phenomenon — missing its uneven global spread and the reasons non-industrializing regions did not follow the same path",
@@ -609,7 +608,7 @@
           "input_mode": "typed",
           "prompt_hints": [
             "Require students to explain the Berlin Conference (1884-85) as the organizing framework for African partition — European powers dividing territory among themselves with no African representation, using arbitrary boundaries that ignored existing ethnic and political geography",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a Berlin Conference provision, an African ruler's letter of protest, a colonial administrator's report), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a Berlin Conference provision, an African ruler's letter of protest, a colonial administrator's report), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Describing the Scramble for Africa without naming the Berlin Conference or explaining its specific role in setting the rules for partition",
@@ -674,7 +673,7 @@
           "prompt_hints": [
             "Require students to compare at least two African or Asian responses to imperialism — Ethiopia's successful military resistance at Adwa (1896) vs. the brutal extraction and resistance in the Congo Free State vs. settler displacement resistance in South Africa (Zulu resistance) — a real cross-regional comparison",
             "Push students to treat colonized peoples as active historical agents — the Sepoy Mutiny and the Boxer Rebellion should be presented as deliberate, organized resistance with specific causes, not spontaneous chaos",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., an Ethiopian account of Adwa, a Boxer Rebellion proclamation, a colonial administrator's account of resistance), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., an Ethiopian account of Adwa, a Boxer Rebellion proclamation, a colonial administrator's account of resistance), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating colonized peoples as passive victims — AP rewards acknowledging active resistance and adaptation, not just suffering",
@@ -702,7 +701,7 @@
             "Require students to use the MAIN framework (Militarism, Alliances, Imperialism, Nationalism) as long-term preconditions the 1914 assassination merely triggered, not the sole cause",
             "Push students to frame WWI as a genuinely global conflict — colonial troops from Africa, South Asia, and the Pacific fought and died for European imperial powers; require this global framing over a purely European one",
             "Require students to name the Ottoman Empire's collapse and the Armenian Genocide as significant global consequences beyond the Western Front",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a colonial soldier's letter, a war propaganda poster description, a treaty excerpt), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a colonial soldier's letter, a war propaganda poster description, a treaty excerpt), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating WWI as purely a European war — missing its global dimensions and the colonial troops who fought for European powers",
@@ -753,7 +752,7 @@
             "Require students to address WWII's genuinely global scope — the Pacific theater and Japanese expansion into China and Southeast Asia deserve equal treatment with the European theater, not an afterthought",
             "Push students to contextualize the Holocaust within both modern state administrative capacity (enabling genocide at unprecedented scale) and long-term patterns of European antisemitism, rather than treating it as an isolated aberration",
             "Require students to address colonial soldiers' and colonies' contributions to the Allied war effort as part of the war's global — not just European and American — dimensions",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a wartime propaganda excerpt, a survivor's account, a colonial soldier's letter), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., a wartime propaganda excerpt, a survivor's account, a colonial soldier's letter), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating WWII as primarily a European conflict and giving the Pacific theater and Japanese expansion in Asia only minor attention",
@@ -796,7 +795,7 @@
           "prompt_hints": [
             "Require students to name the Truman Doctrine and containment policy specifically, connecting containment to its later applications in Korea and Vietnam rather than describing US-Soviet tension abstractly",
             "Push students to explain the ideological rivalry (capitalism vs. communism) as running alongside, not replacing, direct US-Soviet strategic and territorial competition in postwar Europe",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., the Truman Doctrine speech, a Soviet policy statement, a Marshall Plan document), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., the Truman Doctrine speech, a Soviet policy statement, a Marshall Plan document), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Describing Cold War origins without naming the Truman Doctrine or explaining containment as a specific, named policy",
@@ -847,7 +846,7 @@
           "prompt_hints": [
             "Require students to compare decolonization paths across at least two African states — Ghana's largely negotiated, peaceful independence under Nkrumah vs. Algeria's prolonged violent war against France vs. the Congo's chaotic, externally destabilized transition — a real comparative argument",
             "Push students to treat African peoples as active agents building the independence movements themselves, not passive recipients of granted freedom",
-            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., an African independence leader's speech, a colonial power's withdrawal statement, an account of post-independence instability), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+            "FRQ-TYPE ONLY — do not apply this instruction when generating MC or conceptual questions, only when the question_type being generated is FRQ: generate document-based questions (DBQs) by including 2-3 realistic primary source excerpts inline in question_text (e.g., an African independence leader's speech, a colonial power's withdrawal statement, an account of post-independence instability), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
           ],
           "common_errors": [
             "Treating colonized peoples as passive victims rather than active resisters and agents who organized and led their own independence movements",
