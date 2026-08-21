@@ -1,0 +1,1148 @@
+{
+  "id": "ap-world-history",
+  "name": "AP World History: Modern",
+  "school_year_start": "2026-08-11",
+  "exam_date": "2027-05-15",
+  "exam_crunch_weeks": 6,
+  "exam_type": "ap",
+  "tutor_persona": "You are an experienced AP World History: Modern tutor. You teach students to think in patterns across civilizations and centuries, not to memorize isolated facts. Every explanation connects a specific event or development to a broader global process — trade networks, state-building patterns, cultural diffusion, or power dynamics. You require students to compare across regions and periods: 'How did this work differently in East Asia vs Western Europe?' is the kind of question you always push toward. You know that AP World History rewards complexity and comparison over detail, and you train accordingly.",
+  "subject_context": "AP World History: Modern rewards students who can identify patterns across civilizations and periods, not students who memorize the most facts. The hardest part for most students is the geographic and temporal scope — they must simultaneously track developments in East Asia, South Asia, the Middle East, Africa, Europe, and the Americas across 800 years. FRQs require specific evidence (named empires, trade routes, events, people) but always in service of a broader comparative or causal argument. Common failure modes: answering about only one region when the prompt requires comparison, describing change without explaining the process that caused it, DBQs that summarize documents in order rather than grouping them as evidence for an argument, and LEQ thesis statements that describe rather than argue.",
+  "units": [
+    {
+      "id": "unit-1-global-tapestry",
+      "name": "The Global Tapestry (1200-1450)",
+      "ap_exam_weight_min": 8,
+      "ap_exam_weight_max": 10,
+      "prerequisite_unit_ids": [],
+      "topics": [
+        {
+          "id": "unit-1-global-tapestry.developments-east-asia",
+          "name": "Developments in East Asia: Song and Early Ming China",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": [],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Song China's technological innovations — gunpowder, the compass, movable-type printing — are heavily tested; require the student to explain how they spread west along the Silk Roads, not just list them",
+            "The civil service examination system based on Neo-Confucianism should be explained as a mechanism for governing a vast bureaucracy on merit, distinct from hereditary aristocracy",
+            "Push students to decenter Europe: Song and early Ming China (1200-1450) were more urbanized, technologically advanced, and commercially sophisticated than contemporary Western Europe"
+          ],
+          "common_errors": [
+            "Listing Song innovations (gunpowder, compass, printing) without explaining their global diffusion through trade networks or their eventual impact once adopted elsewhere",
+            "Treating the civil service examination system as identical to a modern meritocracy without addressing how Neo-Confucian values shaped what was tested and who could realistically compete",
+            "Assuming medieval Europe was the technological leader of this period rather than recognizing Song/Ming China's relative sophistication"
+          ]
+        },
+        {
+          "id": "unit-1-global-tapestry.developments-dar-al-islam",
+          "name": "Developments in Dar al-Islam: Abbasid Decline and Regional Islamic States",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-1-global-tapestry.developments-east-asia"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain that Abbasid political decline did not mean the end of Islamic civilization — regional successor states (Seljuks, later Mamluks) maintained and expanded trade and scholarship",
+            "Connect Islamic scholarship (preservation and translation of Greek texts, advances in mathematics and astronomy) to the Silk Road and Indian Ocean trade routes passing through the Islamic world",
+            "Push students to see Dar al-Islam as a connective hub linking East Asia, Africa, and Europe, not an isolated civilization"
+          ],
+          "common_errors": [
+            "Equating the Abbasid Caliphate's political fragmentation with the decline of Islamic civilization as a whole",
+            "Failing to connect Islamic trade and scholarship networks to their central geographic position between East Asia, Africa, and Europe",
+            "Treating the Islamic world as culturally uniform rather than encompassing distinct Persian, Arab, and Turkic regional traditions"
+          ]
+        },
+        {
+          "id": "unit-1-global-tapestry.developments-south-southeast-asia",
+          "name": "Developments in South and Southeast Asia: Hindu-Buddhist Kingdoms and Indian Ocean Trade",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-1-global-tapestry.developments-dar-al-islam"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific states (Delhi Sultanate, Majapahit, Srivijaya) rather than describing 'South Asia' or 'Southeast Asia' generically",
+            "Push students to explain how Indian Ocean trade carried Hinduism and Buddhism, and later Islam, into Southeast Asia via merchants and peaceful contact, not conquest",
+            "Ask students to identify syncretic religious practice — blending Hindu, Buddhist, and later Islamic elements — as characteristic of Southeast Asian states"
+          ],
+          "common_errors": [
+            "Describing the spread of religion in South/Southeast Asia as driven by military conquest rather than trade and merchant contact",
+            "Treating 'South Asia' as religiously and politically uniform rather than home to competing Hindu and Muslim states like the Delhi Sultanate",
+            "Missing Southeast Asia's role as a crossroads of the Indian Ocean network connecting China, India, and the Islamic world"
+          ]
+        },
+        {
+          "id": "unit-1-global-tapestry.state-building-africa",
+          "name": "State Building in Africa: Mali Empire, Great Zimbabwe, and the Swahili Coast",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-1-global-tapestry.developments-south-southeast-asia"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Mansa Musa's 1324 pilgrimage to Mecca is high-value evidence — require students to use it to demonstrate Mali's wealth, trans-Saharan gold-salt trade, and integration into the Islamic scholarly world (Timbuktu)",
+            "Require a real comparison between Mali's trans-Saharan trade-based state and the Swahili Coast city-states' Indian Ocean trade-based economy — same category (trade-based statehood), different network",
+            "Push students to address Great Zimbabwe as evidence of sophisticated state building not dependent on any single external trade network"
+          ],
+          "common_errors": [
+            "Treating Africa as a single undifferentiated region rather than distinguishing trans-Saharan (Mali), Indian Ocean (Swahili Coast), and interior (Great Zimbabwe) state-building patterns",
+            "Mentioning Mansa Musa's pilgrimage only as a colorful anecdote without using it as evidence of Mali's economic power and Islamic scholarly connections",
+            "Assuming African states before European contact lacked complex political organization"
+          ]
+        },
+        {
+          "id": "unit-1-global-tapestry.state-building-americas",
+          "name": "State Building in the Americas: Maya Decline, Aztec and Inca Origins",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-1-global-tapestry.state-building-africa"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to distinguish the Maya's political decline (largely complete by 1200, driven by environmental and internal factors) from the Aztec and Inca, which were rising powers in this same period",
+            "Push students to compare Aztec tribute-based imperial control (military conquest of vassal city-states) with Inca administrative control (road networks, mit'a labor, centralized bureaucracy) — a real point-by-point comparison, not parallel description",
+            "Contextualize the Americas as developing complex, populous states in complete isolation from Afro-Eurasian networks before 1492"
+          ],
+          "common_errors": [
+            "Conflating the Maya, Aztec, and Inca as a single 'ancient civilization' rather than distinguishing their different time periods, locations, and governing strategies",
+            "Describing Aztec and Inca state-building without a real point-by-point comparison of their different methods of control (tribute/conquest vs. administrative integration)",
+            "Assuming these American civilizations had contact with or were influenced by Afro-Eurasian developments before 1492"
+          ]
+        },
+        {
+          "id": "unit-1-global-tapestry.state-building-europe",
+          "name": "State Building in Europe: Feudalism, the Catholic Church, and the Crusades",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-1-global-tapestry.state-building-americas"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain feudalism as a decentralized system of mutual obligation (land for military service), contrasting it with the centralized bureaucratic states of contemporary Ming China",
+            "Push students to treat the Crusades as a two-way exchange — European contact with the more advanced Islamic and Byzantine worlds brought back knowledge, goods, and trade connections, not just military conflict",
+            "This topic is where students should explicitly decenter Europe: require them to state how European state-building compared unfavorably in scale and centralization to contemporary Ming China or the Mongol Empire"
+          ],
+          "common_errors": [
+            "Treating medieval Europe as the most advanced or 'default' civilization of 1200-1450, rather than one of several regional powers, and a less centralized one at that",
+            "Describing the Crusades purely as religious warfare without addressing their role in reopening trade and cultural exchange with the Islamic Mediterranean",
+            "Assuming feudalism was a uniquely European phenomenon rather than one of several possible governance strategies in this era"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-2-networks-exchange",
+      "name": "Networks of Exchange (1200-1450)",
+      "ap_exam_weight_min": 8,
+      "ap_exam_weight_max": 10,
+      "prerequisite_unit_ids": ["unit-1-global-tapestry"],
+      "topics": [
+        {
+          "id": "unit-2-networks-exchange.silk-roads",
+          "name": "The Silk Roads: Goods, Ideas, Religion, and Disease",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-1-global-tapestry.state-building-europe"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to describe the Silk Roads as a network of overland routes relayed between regional traders, not a single road walked start to finish",
+            "Push students to address exchange beyond luxury goods: Buddhism's spread from South Asia into Central Asia and China, and the eventual westward transmission of the Black Death, both traveled the same routes",
+            "Ask students to connect Silk Road volume directly to the political stability of the states controlling each segment — trade surged when a single power (like the Mongols) controlled multiple segments"
+          ],
+          "common_errors": [
+            "Treating the Silk Roads as a single continuous road rather than a relay network of regional traders and middlemen",
+            "Focusing only on luxury goods (silk, spices) while ignoring the exchange of religious ideas and technology",
+            "Missing the connection between Silk Road connectivity and the spread of the Black Death into Europe"
+          ]
+        },
+        {
+          "id": "unit-2-networks-exchange.mongol-empire",
+          "name": "The Mongol Empire and the Pax Mongolica",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-2-networks-exchange.silk-roads"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "The Mongol Empire must be treated with complexity: require students to acknowledge both the initial devastation of conquest AND the Pax Mongolica's facilitation of trade, religious tolerance, and cross-cultural exchange across a unified Eurasia",
+            "Push students to use the Mongols as evidence that a single political power controlling multiple trade segments dramatically increases exchange volume — connect this directly to the Silk Roads topic",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a Mongol edict on religious tolerance, a European or Chinese traveler's account of Mongol rule), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, and require the rubric to include HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Describing the Mongol Empire as purely destructive without acknowledging the Pax Mongolica — trade facilitation, religious tolerance, and disease transmission — missing the complexity AP rewards",
+            "Treating the Mongol Empire as religiously or administratively uniform rather than acknowledging its pragmatic tolerance of local religions and governing systems",
+            "Missing the role of Mongol-facilitated connectivity in spreading the Black Death from Central Asia into Europe and the Middle East"
+          ]
+        },
+        {
+          "id": "unit-2-networks-exchange.indian-ocean-trade",
+          "name": "The Indian Ocean Trading Network",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-2-networks-exchange.mongol-empire"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the role of monsoon winds in making the Indian Ocean network predictable and safe for large-scale seasonal trade, distinguishing it from the more dangerous overland Silk Roads",
+            "Zheng He's voyages (1405-1433) should be used as evidence: require students to explain why Ming China discontinued them, and what that decision reveals about Ming state priorities (tribute-based prestige over sustained commercial expansion)",
+            "Push students to name the Swahili Coast city-states as the network's African anchor, connecting East Africa, Arabia, India, and China commercially and culturally"
+          ],
+          "common_errors": [
+            "Describing Indian Ocean trade without explaining the predictable monsoon wind pattern that made it structurally different from Silk Road overland trade",
+            "Mentioning Zheng He's voyages without explaining why they were discontinued or what that reveals about Ming priorities",
+            "Treating the Swahili Coast as peripheral to the network rather than as a central node linking Africa to Arabia, India, and China"
+          ]
+        },
+        {
+          "id": "unit-2-networks-exchange.trans-saharan-trade",
+          "name": "The Trans-Saharan Trade Network",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-2-networks-exchange.indian-ocean-trade"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the gold-salt trade as the network's economic core, connecting West African gold-producing regions to North African and Mediterranean salt and manufactured goods",
+            "Push students to connect trans-Saharan trade to the spread of Islam into West African kingdoms (Mali, later Songhai) via merchants and scholars, not conquest",
+            "Ask students to explain how camel caravans made regular, large-scale desert crossing logistically possible, similar to how monsoons enabled Indian Ocean trade"
+          ],
+          "common_errors": [
+            "Describing trans-Saharan trade only in terms of gold without addressing salt's equal economic importance to the exchange",
+            "Missing the connection between trans-Saharan trade routes and the peaceful spread of Islam into West Africa",
+            "Treating West African kingdoms as passive recipients of trade rather than active participants who controlled and taxed the gold supply"
+          ]
+        },
+        {
+          "id": "unit-2-networks-exchange.mediterranean-trade",
+          "name": "The Mediterranean Trading Network",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-2-networks-exchange.trans-saharan-trade"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific Italian city-states (Venice, Genoa) and explain their role as intermediaries between Asian/Islamic goods arriving via the Silk Roads or Indian Ocean and Western European consumers",
+            "Push students to connect Byzantine Constantinople's position as a bridge between the Islamic world and Latin Christendom to the flow of goods and ideas along this network"
+          ],
+          "common_errors": [
+            "Treating Italian city-state wealth as self-generated rather than dependent on their intermediary position between Asian/Islamic trade networks and Western Europe",
+            "Missing Byzantine Constantinople's central bridging role between the Islamic and Christian worlds before its 1453 fall"
+          ]
+        },
+        {
+          "id": "unit-2-networks-exchange.cultural-consequences-exchange",
+          "name": "Cultural Consequences of Exchange: Religion and Technology Diffusion",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-2-networks-exchange.mediterranean-trade"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to compare how different trade networks facilitated different types of exchange — the Silk Roads spread technology (paper, gunpowder) and disease, the Indian Ocean and trans-Saharan networks spread religion (Buddhism, Islam) via merchant contact",
+            "Push for a synthesis argument across at least three networks (Silk Roads, Indian Ocean, trans-Saharan) rather than treating each network's cultural consequences in isolation",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a merchant's travel account, a religious conversion narrative), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating the cultural consequences of exchange as identical across all networks rather than distinguishing what each network primarily spread",
+            "Discussing only one network's cultural effects when the prompt requires cross-network synthesis",
+            "Describing religious spread without addressing that most conversion happened through merchant contact and elite adoption, not conquest"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-3-land-empires",
+      "name": "Land-Based Empires (1450-1750)",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 15,
+      "prerequisite_unit_ids": ["unit-2-networks-exchange"],
+      "topics": [
+        {
+          "id": "unit-3-land-empires.ottoman-empire",
+          "name": "The Ottoman Empire",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-2-networks-exchange.cultural-consequences-exchange"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the devshirme system (conscripting and training Christian boys as elite administrators and janissary soldiers) as a specific mechanism for building a loyal, merit-based ruling class",
+            "Push students to address Ottoman religious tolerance under the millet system as a genuine administrative strategy for governing a religiously diverse empire (Muslims, Christians, Jews), not just passive coexistence",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., an Ottoman administrative decree, a European traveler's account of Istanbul), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Describing the devshirme system as simple slavery without addressing how it created a genuinely powerful, socially mobile administrative and military class",
+            "Treating Ottoman religious tolerance as incidental rather than a deliberate administrative strategy (the millet system) for governing a diverse empire",
+            "Confusing Ottoman expansion into Europe and the Middle East with a purely military story, missing the administrative innovations that sustained it"
+          ]
+        },
+        {
+          "id": "unit-3-land-empires.safavid-empire",
+          "name": "The Safavid Empire",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-3-land-empires.ottoman-empire"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain Shia Islam as the Safavid state religion and a deliberate tool of political legitimacy and identity distinct from the Sunni Ottoman and Mughal states",
+            "Push students to connect Ottoman-Safavid religious and territorial conflict (Sunni vs. Shia, competition over Mesopotamia and the Caucasus) as a central dynamic of the era's land-based empires, not a minor detail"
+          ],
+          "common_errors": [
+            "Confusing Sunni Ottomans with Shia Safavids, or treating their religious difference as unimportant rather than a major source of sustained conflict",
+            "Describing the Safavid Empire without addressing how Shia Islam functioned as a state-building tool of legitimacy and unification"
+          ]
+        },
+        {
+          "id": "unit-3-land-empires.mughal-empire",
+          "name": "The Mughal Empire",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-3-land-empires.safavid-empire"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain Akbar's policy of religious tolerance and syncretism (abolishing the jizya tax on non-Muslims, incorporating Hindu elites into administration) as a deliberate strategy for ruling a Hindu-majority empire",
+            "Push students to contrast this directly with Aurangzeb's later reversal (reinstating the jizya, favoring Islamic orthodoxy) as a CCOT example within a single empire — what changed and what stayed the same in Mughal governance",
+            "Ask students to connect Aurangzeb's policies to the empire's later internal tension and eventual decline"
+          ],
+          "common_errors": [
+            "Describing Mughal religious policy as static rather than addressing the significant Akbar-to-Aurangzeb shift as a CCOT example within a single empire",
+            "Treating Akbar's tolerance as simple personal kindness rather than a calculated strategy for stable rule over a Hindu-majority population",
+            "Failing to connect Aurangzeb's religious policy reversal to the empire's growing internal instability"
+          ]
+        },
+        {
+          "id": "unit-3-land-empires.ming-qing-china",
+          "name": "Ming and Qing China",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-3-land-empires.mughal-empire"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the Mandate of Heaven as the ideological basis for both Ming and the Manchu Qing dynasty's legitimacy, including how the Qing (a non-Han conquest dynasty) used it to justify their rule",
+            "Push students to compare Ming maritime retreat after Zheng He (isolationism, restricted trade) with Qing's own selective, tightly controlled trade policy (the Canton System) — both limited engagement, for different reasons",
+            "Require the examination system's continuation under both dynasties as evidence of administrative continuity despite the Ming-to-Qing dynastic and ethnic transition"
+          ],
+          "common_errors": [
+            "Treating the Ming-to-Qing transition as a complete break rather than addressing real continuities (the examination system, Confucian bureaucratic structure, the Mandate of Heaven)",
+            "Describing Chinese isolationism as total rather than acknowledging tightly controlled trade continued (the Canton System) even during periods of restriction",
+            "Forgetting that the Qing were a Manchu conquest dynasty and missing how they had to legitimize non-Han rule over a Han-majority population"
+          ]
+        },
+        {
+          "id": "unit-3-land-empires.russian-empire",
+          "name": "The Russian Empire",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-3-land-empires.ming-qing-china"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain Russian eastward territorial expansion across Siberia as a land-based imperial process comparable to European maritime expansion happening in the same era — both driven by resource extraction and state power projection",
+            "Push students to explain Peter the Great's forced Westernization (military and administrative reform, new capital at St. Petersburg) as a deliberate response to perceived Russian backwardness relative to Western Europe",
+            "Require students to connect serfdom's persistence and intensification to Russia's agrarian, land-based economic structure, distinguishing it from Western European labor trends in the same period"
+          ],
+          "common_errors": [
+            "Treating Russian eastward expansion as fundamentally different from Western European maritime expansion rather than recognizing both as land/resource-driven imperial projects of the same era",
+            "Describing Peter the Great's reforms as random modernization rather than a targeted response to specific military and administrative weaknesses relative to Western Europe",
+            "Missing that serfdom was expanding and hardening in Russia during this period even as other labor systems were changing elsewhere"
+          ]
+        },
+        {
+          "id": "unit-3-land-empires.comparing-land-empire-administration",
+          "name": "Comparing Land-Based Empire Administration",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-3-land-empires.russian-empire"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to compare how the Ottomans, Mughals, and Qing each managed religiously or ethnically diverse populations — millet system, Akbar's syncretism vs. Aurangzeb's orthodoxy, and Qing accommodation of Han bureaucratic tradition — this is a high-frequency AP comparison",
+            "Push students to explain how gunpowder weaponry enabled all of these empires (Ottoman, Safavid, Mughal) to centralize power against regional nobility, forming a real causal link between military technology and administrative centralization",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., administrative decrees from two different empires on governing a religious minority), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating all land-based empires as administratively identical rather than distinguishing their different approaches to religious/ethnic diversity, succession, and centralization",
+            "Comparing only two empires when the prompt or synthesis calls for three, missing the fuller cross-regional pattern",
+            "Describing gunpowder weapons without connecting them causally to these empires' ability to centralize power against regional nobility"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-4-transoceanic",
+      "name": "Transoceanic Interconnections (1450-1750)",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 15,
+      "prerequisite_unit_ids": ["unit-3-land-empires"],
+      "topics": [
+        {
+          "id": "unit-4-transoceanic.european-exploration-motivations",
+          "name": "European Motivations for Exploration",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-3-land-empires.comparing-land-empire-administration"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name multiple specific motivations — technological (caravel, compass, astrolabe), economic (a direct route to Asian spices bypassing Ottoman/Italian middlemen), religious (missionary conversion), and competitive (Iberian rivalry) — rather than a single vague cause",
+            "Push students to connect these motivations to earlier units: European desire to bypass Ottoman and Italian control of Silk Road/Mediterranean trade is a direct causal link back to unit 2 and 3 content"
+          ],
+          "common_errors": [
+            "Listing 'God, Gold, Glory' without connecting each motivation to a concrete historical cause, such as the desire to bypass Ottoman-controlled trade routes",
+            "Treating European exploration motivations as arising in a vacuum rather than as a direct response to Ottoman and Italian control over existing Eurasian trade networks"
+          ]
+        },
+        {
+          "id": "unit-4-transoceanic.columbian-exchange",
+          "name": "The Columbian Exchange",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-4-transoceanic.european-exploration-motivations"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "The Columbian Exchange is bidirectional — require students to acknowledge consequences in both directions: American crops (maize, potato, tomato) transforming Afro-Eurasian food systems and populations, and Old World disease, animals, and plants transforming the Americas",
+            "Push students to address demographic catastrophe honestly — disease killed an estimated 50-90% of indigenous American populations — as the exchange's most consequential and tragic effect",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a Spanish colonial account, an indigenous account of demographic collapse, a European agricultural record), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating the Columbian Exchange as flowing only from Europe to the Americas — missing how American crops (potato, maize, tomato) transformed Afro-Eurasian food systems and enabled population growth there",
+            "Treating the Columbian Exchange as purely positive progress without addressing the catastrophic indigenous demographic collapse from disease",
+            "Describing disease transmission without explaining why it was so one-sidedly devastating (lack of prior immunity in isolated American populations)"
+          ]
+        },
+        {
+          "id": "unit-4-transoceanic.atlantic-slave-trade",
+          "name": "The Atlantic Slave Trade",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-4-transoceanic.columbian-exchange"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the causal chain: indigenous demographic collapse plus growing plantation labor demand in the Americas drove the shift to a permanent, racially defined enslaved African labor force",
+            "Push students to address Africa's active role beyond being a source of enslaved people — African kingdoms (Kongo, Dahomey, Asante) actively participated in, profited from, and were also politically transformed and destabilized by the trade",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a ship captain's log, an enslaved person's account, an African ruler's correspondence with European traders), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Missing Africa's active role in the Atlantic system beyond being a source of enslaved people — African kingdoms actively participated in and were transformed by the trade",
+            "Failing to explain the specific causal chain linking indigenous population collapse to the demand for enslaved African labor",
+            "Describing the Middle Passage without connecting its brutal scale to the plantation economy's specific labor demands (sugar being especially labor- and life-intensive)"
+          ]
+        },
+        {
+          "id": "unit-4-transoceanic.spanish-portuguese-colonial-systems",
+          "name": "Spanish and Portuguese Colonial Systems",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-4-transoceanic.atlantic-slave-trade"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the encomienda system's specific mechanics — Spanish colonists granted rights to indigenous labor and tribute in exchange for nominal 'protection' and religious conversion",
+            "Push students to explain the casta system as a specific racial hierarchy that structured colonial Spanish American society, distinguishing peninsulares, creoles, mestizos, and enslaved and indigenous peoples by legal and social status"
+          ],
+          "common_errors": [
+            "Describing the encomienda system vaguely as 'slavery' without addressing its distinct legal structure and how it differed from later chattel slavery",
+            "Describing the casta system as simply 'racism' without explaining its specific function as a structured, legally codified social hierarchy"
+          ]
+        },
+        {
+          "id": "unit-4-transoceanic.coercive-labor-systems",
+          "name": "Comparing Coercive Labor Systems",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-4-transoceanic.spanish-portuguese-colonial-systems"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to compare coercive labor systems — encomienda, mita, chattel slavery, and indentured servitude — for similarities in function (extracting labor from a subordinated population) and differences in legal form and geography",
+            "Push students to explicitly distinguish encomienda (labor tribute owed by a nominally free indigenous population) from chattel slavery (permanent, hereditary legal ownership of a person) as a common point of confusion",
+            "Require students to explain mita (an adapted Inca labor-tax system used by the Spanish, especially at Potosí's silver mines) as a distinct third system, not a synonym for encomienda"
+          ],
+          "common_errors": [
+            "Confusing encomienda (labor tribute) with chattel slavery (ownership of persons) as if they were the same system",
+            "Treating mita as identical to encomienda rather than recognizing it as a separate system adapted from pre-existing Inca labor-tax practices",
+            "Comparing only two of the four major coercive labor systems when a full comparison requires addressing the range across the Atlantic world"
+          ]
+        },
+        {
+          "id": "unit-4-transoceanic.silver-trade-global-economy",
+          "name": "The Silver Trade and the Global Economy",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-4-transoceanic.coercive-labor-systems"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to use Potosí (in present-day Bolivia) and the Manila Galleon trade as specific evidence connecting the Americas, Europe, Africa, and Asia into a single global silver economy for the first time in history",
+            "Push students to explain Chinese demand for silver (used to pay taxes under the Ming single-whip reform) as the specific pull factor driving the trade's massive scale across the Pacific",
+            "Ask students to treat this as the first genuinely global economic network, connecting all major inhabited continents through a single commodity"
+          ],
+          "common_errors": [
+            "Describing the silver trade only within the Atlantic world, missing the trans-Pacific Manila Galleon connection to China",
+            "Failing to explain why Chinese demand specifically drove global silver flows (the shift to silver-based taxation)",
+            "Treating the silver trade as a minor side effect of colonization rather than the first truly global economic network"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-5-revolutions",
+      "name": "Revolutions (1750-1900)",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 15,
+      "prerequisite_unit_ids": ["unit-4-transoceanic"],
+      "topics": [
+        {
+          "id": "unit-5-revolutions.enlightenment-ideas",
+          "name": "Enlightenment Ideas and Their Global Spread",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-4-transoceanic.silver-trade-global-economy"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific Enlightenment concepts — natural rights, popular sovereignty, the social contract — and connect each to a specific revolutionary document or movement rather than describing 'Enlightenment ideas' vaguely",
+            "Push students to explain how print culture and expanding literacy allowed these ideas to spread across the Atlantic world, connecting colonial elites in the Americas to European intellectual debates"
+          ],
+          "common_errors": [
+            "Naming Enlightenment thinkers or concepts without connecting them to a specific application in a specific revolution",
+            "Treating the Enlightenment as a purely European phenomenon rather than addressing its rapid spread to and adaptation within the Americas"
+          ]
+        },
+        {
+          "id": "unit-5-revolutions.atlantic-revolutions",
+          "name": "Atlantic Revolutions: American, French, and Haitian",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-5-revolutions.enlightenment-ideas"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "The Haitian Revolution should be treated as uniquely radical — the only successful large-scale slave revolt to create an independent nation — require students to connect it to both Enlightenment ideals and the contradiction of Atlantic slavery",
+            "Require students to compare the outcomes of these three revolutions — why did the American Revolution produce a stable republic while the French Revolution cycled through radical phases and Napoleon, and Haiti faced international isolation and enormous indemnity debt?",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., excerpts from the Declaration of the Rights of Man, the Haitian Declaration of Independence, or a French revolutionary pamphlet), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating the French and American Revolutions as equally radical — the French Revolution went through far more violent phases and produced Napoleon's empire",
+            "Discussing the Haitian Revolution only briefly or omitting it entirely, missing its unique status as the only successful slave-led revolution to create an independent state",
+            "Describing these revolutions in isolation rather than comparing their differing long-term outcomes"
+          ]
+        },
+        {
+          "id": "unit-5-revolutions.latin-american-independence",
+          "name": "Latin American Independence Movements",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-5-revolutions.atlantic-revolutions"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific leaders (Simón Bolívar in South America, José de San Martín in the south, Miguel Hidalgo in Mexico) and connect their movements to specific regions rather than treating 'Latin American independence' as a single undifferentiated event",
+            "Push students to explain creole leadership's central role — colonial-born elites of European descent who led independence movements but often preserved existing racial and economic hierarchies afterward"
+          ],
+          "common_errors": [
+            "Treating Latin American independence as one unified movement rather than a series of distinct regional struggles with different leaders and timelines",
+            "Failing to note that creole-led independence often left existing racial and class hierarchies largely intact, unlike Haiti's more thorough social revolution"
+          ]
+        },
+        {
+          "id": "unit-5-revolutions.abolitionist-movements",
+          "name": "Abolitionist Movements and the End of the Slave Trade",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-5-revolutions.latin-american-independence"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to connect abolitionism causally to Enlightenment natural rights ideas and to the Haitian Revolution's demonstration that enslaved people could successfully overthrow their enslavers",
+            "Push students to distinguish the end of the legal slave trade (Britain, 1807) from the end of slavery itself (which persisted for decades longer in many places), a frequently conflated timeline"
+          ],
+          "common_errors": [
+            "Conflating the abolition of the slave trade with the abolition of slavery itself — these occurred on very different timelines in most states",
+            "Describing abolitionism as a purely moral awakening without connecting it to Enlightenment ideology or the Haitian Revolution's precedent"
+          ]
+        },
+        {
+          "id": "unit-5-revolutions.nationalism",
+          "name": "Nationalism as a Political Force",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-5-revolutions.abolitionist-movements"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific cases of nationalist unification (German unification under Prussia, Italian unification) and explain the shared political and military strategies used",
+            "Push students to treat nationalism as a global, not purely European, phenomenon — it also fueled Latin American independence and would later fuel anticolonial movements covered in later units"
+          ],
+          "common_errors": [
+            "Treating nationalism as a purely European phenomenon — missing its role in Latin American independence and its later role in anticolonial movements",
+            "Describing German or Italian unification without naming the specific political/military strategy used (e.g., Prussia's role and Bismarck's realpolitik in German unification)"
+          ]
+        },
+        {
+          "id": "unit-5-revolutions.industrial-revolution",
+          "name": "The Industrial Revolution: Causes and Global Spread",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-5-revolutions.nationalism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain multiple causes for why industrialization began in Britain specifically — coal and iron deposits, colonial markets and raw material access, the enclosure movement freeing agricultural labor, and relative political stability — rather than a single cause",
+            "Push students to address uneven global spread: industrialization moved to continental Europe and the United States relatively quickly, but require students to explain why other regions industrialized later or not at all in this period (colonial extraction relationships, lack of capital, deliberate deindustrialization by colonizers, as in India's textile industry)",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a factory inspector's report, a colonial trade statistic, a worker's account), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating industrialization as a purely British then European phenomenon — missing its uneven global spread and the reasons non-industrializing regions did not follow the same path",
+            "Explaining Britain's head start with a single cause (usually just coal) rather than the fuller combination of factors AP rewards",
+            "Failing to connect deindustrialization in colonized regions (like India's handloom textile industry) to European industrial competition and colonial policy"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-6-industrialization",
+      "name": "Consequences of Industrialization (1750-1900)",
+      "ap_exam_weight_min": 12,
+      "ap_exam_weight_max": 15,
+      "prerequisite_unit_ids": ["unit-5-revolutions"],
+      "topics": [
+        {
+          "id": "unit-6-industrialization.new-imperialism",
+          "name": "New Imperialism: Causes and Justifications",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-5-revolutions.industrial-revolution"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the economic logic of new imperialism — raw materials for industry, captured markets for finished goods, and investment opportunities — as driving expansion as much as ideology",
+            "Push students to explain Social Darwinism and 'civilizing mission' rhetoric as ideological justifications constructed to legitimize what was fundamentally an economic and strategic project"
+          ],
+          "common_errors": [
+            "Missing the economic logic of imperialism — raw materials, markets, investment opportunities drove expansion as much as ideology did",
+            "Treating Social Darwinist and civilizing-mission rhetoric as sincere belief rather than also functioning as post-hoc justification for economically motivated expansion"
+          ]
+        },
+        {
+          "id": "unit-6-industrialization.scramble-for-africa",
+          "name": "The Scramble for Africa",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-6-industrialization.new-imperialism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the Berlin Conference (1884-85) as the organizing framework for African partition — European powers dividing territory among themselves with no African representation, using arbitrary boundaries that ignored existing ethnic and political geography",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a Berlin Conference provision, an African ruler's letter of protest, a colonial administrator's report), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Describing the Scramble for Africa without naming the Berlin Conference or explaining its specific role in setting the rules for partition",
+            "Treating African colonial boundaries as reflecting existing political or ethnic geography rather than arbitrary European divisions"
+          ]
+        },
+        {
+          "id": "unit-6-industrialization.imperialism-south-asia",
+          "name": "British Imperialism in South Asia",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-6-industrialization.scramble-for-africa"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to trace the transition from East India Company rule to direct British Crown rule, using the 1857 Sepoy Mutiny/Rebellion as the specific triggering event",
+            "Push students to connect British economic extraction (heavy taxation, forced cash-crop cultivation, deindustrialization of Indian textiles) to the industrial-revolution content from the prior unit — a real causal link"
+          ],
+          "common_errors": [
+            "Describing British rule in India as static rather than tracing the specific shift from Company rule to Crown rule triggered by the 1857 rebellion",
+            "Discussing British imperialism in India without connecting economic extraction to the deindustrialization of India's traditional textile production"
+          ]
+        },
+        {
+          "id": "unit-6-industrialization.imperialism-east-asia",
+          "name": "Imperialism in East Asia: Opium Wars and the Meiji Restoration",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-6-industrialization.imperialism-south-asia"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the Opium Wars and resulting Unequal Treaties as the mechanism of Western economic penetration into Qing China without full territorial colonization",
+            "The Meiji Restoration should be used as evidence of a successful, deliberate response to Western imperial pressure — require students to contrast it directly with China's less successful self-strengthening movement, a high-value comparison"
+          ],
+          "common_errors": [
+            "Describing the Opium Wars without explaining the Unequal Treaties' specific mechanisms (extraterritoriality, treaty ports, fixed low tariffs)",
+            "Discussing Meiji Japan and Qing China in isolation rather than making the direct comparison AP rewards — one successful response to Western pressure, one less so"
+          ]
+        },
+        {
+          "id": "unit-6-industrialization.settler-colonialism",
+          "name": "Settler Colonialism: Australia, New Zealand, and South Africa",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-6-industrialization.imperialism-east-asia"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to distinguish settler colonialism (permanent European settlement and displacement of indigenous populations) from extractive/administrative colonialism (as in most of British India or the Belgian Congo) as a real category difference",
+            "Push students to connect indigenous displacement in these settler colonies to land dispossession and demographic marginalization, similar in mechanism (if not identical in outcome) to earlier Native American displacement in the Americas"
+          ],
+          "common_errors": [
+            "Treating settler colonialism (permanent displacement and replacement of indigenous populations) as equivalent to extractive colonialism (administrative and economic control without mass settlement) rather than distinguishing the two",
+            "Describing indigenous displacement in Australia, New Zealand, or South Africa without naming a specific mechanism (land seizure, forced removal, legal dispossession)"
+          ]
+        },
+        {
+          "id": "unit-6-industrialization.resistance-to-imperialism",
+          "name": "Resistance to Imperialism",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-6-industrialization.settler-colonialism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to compare at least two African or Asian responses to imperialism — Ethiopia's successful military resistance at Adwa (1896) vs. the brutal extraction and resistance in the Congo Free State vs. settler displacement resistance in South Africa (Zulu resistance) — a real cross-regional comparison",
+            "Push students to treat colonized peoples as active historical agents — the Sepoy Mutiny and the Boxer Rebellion should be presented as deliberate, organized resistance with specific causes, not spontaneous chaos",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., an Ethiopian account of Adwa, a Boxer Rebellion proclamation, a colonial administrator's account of resistance), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating colonized peoples as passive victims — AP rewards acknowledging active resistance and adaptation, not just suffering",
+            "Confusing the Sepoy Mutiny (1857, India) with the Boxer Rebellion (1899-1901, China) — different regions, different causes, different outcomes",
+            "Discussing only one instance of resistance when a comparative prompt requires addressing multiple regions"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-7-global-conflict",
+      "name": "Global Conflict (1900-present)",
+      "ap_exam_weight_min": 8,
+      "ap_exam_weight_max": 10,
+      "prerequisite_unit_ids": ["unit-6-industrialization"],
+      "topics": [
+        {
+          "id": "unit-7-global-conflict.wwi-global-conflict",
+          "name": "World War I as a Global Conflict",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-6-industrialization.resistance-to-imperialism"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to use the MAIN framework (Militarism, Alliances, Imperialism, Nationalism) as long-term preconditions the 1914 assassination merely triggered, not the sole cause",
+            "Push students to frame WWI as a genuinely global conflict — colonial troops from Africa, South Asia, and the Pacific fought and died for European imperial powers; require this global framing over a purely European one",
+            "Require students to name the Ottoman Empire's collapse and the Armenian Genocide as significant global consequences beyond the Western Front",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a colonial soldier's letter, a war propaganda poster description, a treaty excerpt), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating WWI as purely a European war — missing its global dimensions and the colonial troops who fought for European powers",
+            "Attributing WWI to the assassination of Franz Ferdinand alone — the MAIN causes were preconditions the assassination triggered, not the root cause itself",
+            "Omitting the Ottoman collapse and Armenian Genocide as significant global consequences beyond the Western Front"
+          ]
+        },
+        {
+          "id": "unit-7-global-conflict.russian-revolution",
+          "name": "The Russian Revolution",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-7-global-conflict.wwi-global-conflict"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to trace a causation chain: WWI's military and economic strain on Russia, layered on long-term weaknesses of the tsarist system, created the conditions for Bolshevik organization and eventual victory",
+            "Push students to connect the early Soviet state's formation to the broader global pattern of WWI destabilizing existing empires (also seen in the Ottoman and Austro-Hungarian collapse)"
+          ],
+          "common_errors": [
+            "Attributing the Russian Revolution to WWI strain alone without addressing the long-term structural weaknesses of the tsarist autocracy",
+            "Describing the Bolshevik rise to power without explaining their specific organizational advantages over other revolutionary factions"
+          ]
+        },
+        {
+          "id": "unit-7-global-conflict.interwar-period",
+          "name": "The Interwar Period: Depression and the Rise of Fascism",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-7-global-conflict.russian-revolution"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the Great Depression as a genuinely global economic collapse, not just an American event, connecting it to international trade and lending networks built up since the silver-trade era",
+            "Push students to trace the causal chain from WWI's punitive peace settlements and economic instability, through the Depression, to the rise of fascism in Italy and Germany and Japanese military expansionism"
+          ],
+          "common_errors": [
+            "Discussing the Great Depression as a purely American phenomenon rather than a global economic collapse with global causes and effects",
+            "Missing the connection between WWI's peace settlement, the Depression, and the rise of fascism as a causal chain rather than unrelated interwar events"
+          ]
+        },
+        {
+          "id": "unit-7-global-conflict.wwii-global-dimensions",
+          "name": "World War II: Global Dimensions and the Holocaust",
+          "type": "mixed",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-7-global-conflict.interwar-period"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to address WWII's genuinely global scope — the Pacific theater and Japanese expansion into China and Southeast Asia deserve equal treatment with the European theater, not an afterthought",
+            "Push students to contextualize the Holocaust within both modern state administrative capacity (enabling genocide at unprecedented scale) and long-term patterns of European antisemitism, rather than treating it as an isolated aberration",
+            "Require students to address colonial soldiers' and colonies' contributions to the Allied war effort as part of the war's global — not just European and American — dimensions",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., a wartime propaganda excerpt, a survivor's account, a colonial soldier's letter), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating WWII as primarily a European conflict and giving the Pacific theater and Japanese expansion in Asia only minor attention",
+            "Presenting the Holocaust as an inexplicable aberration rather than contextualizing it within modern state capacity and long-term patterns of antisemitism",
+            "Omitting colonial troops' and colonies' contributions to the Allied war effort"
+          ]
+        },
+        {
+          "id": "unit-7-global-conflict.atomic-bomb-nuclear-age",
+          "name": "The Atomic Bomb and the Beginning of the Nuclear Age",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-7-global-conflict.wwii-global-dimensions"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to address the atomic bomb decision as a genuinely contested historical judgment — competing justifications (avoiding a costly invasion of Japan) and criticisms (a demonstration to the Soviet Union, civilian death toll) — rather than a settled, uncomplicated fact",
+            "Push students to connect the bomb's use to the beginning of Cold War nuclear dynamics, setting up the next unit's content on US-Soviet rivalry"
+          ],
+          "common_errors": [
+            "Presenting the atomic bomb decision as an uncomplicated, obviously correct or incorrect choice rather than addressing the genuine historical debate over its justification",
+            "Discussing the bomb only as WWII's ending event without connecting it forward to the nuclear-armed Cold War dynamic that followed"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-8-cold-war-decolonization",
+      "name": "Cold War and Decolonization (1900-present)",
+      "ap_exam_weight_min": 8,
+      "ap_exam_weight_max": 10,
+      "prerequisite_unit_ids": ["unit-7-global-conflict"],
+      "topics": [
+        {
+          "id": "unit-8-cold-war-decolonization.origins-cold-war",
+          "name": "Origins of the Cold War",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-7-global-conflict.atomic-bomb-nuclear-age"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name the Truman Doctrine and containment policy specifically, connecting containment to its later applications in Korea and Vietnam rather than describing US-Soviet tension abstractly",
+            "Push students to explain the ideological rivalry (capitalism vs. communism) as running alongside, not replacing, direct US-Soviet strategic and territorial competition in postwar Europe",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., the Truman Doctrine speech, a Soviet policy statement, a Marshall Plan document), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Describing Cold War origins without naming the Truman Doctrine or explaining containment as a specific, named policy",
+            "Treating the Cold War as purely ideological without addressing the concrete territorial and strategic competition over postwar Europe"
+          ]
+        },
+        {
+          "id": "unit-8-cold-war-decolonization.cold-war-global-south",
+          "name": "The Cold War in the Global South",
+          "type": "conceptual",
+          "difficulty": 3,
+          "prerequisite_topic_ids": ["unit-8-cold-war-decolonization.origins-cold-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to treat the Global South as an active arena and participant, not a passive battleground — newly independent nations often deliberately played the superpowers against each other for aid and advantage",
+            "Push students to name the Non-Aligned Movement as a specific, deliberate strategy some newly independent nations used to avoid full alignment with either superpower",
+            "Require students to name at least two specific proxy conflicts (Korea, Vietnam, Angola, Afghanistan) rather than describing 'proxy wars' generically"
+          ],
+          "common_errors": [
+            "Treating the Cold War as purely US-Soviet bilateral — missing the Global South as an active arena and participant, not just a battleground",
+            "Describing 'proxy wars' generically without naming specific conflicts and their specific regional causes and consequences",
+            "Omitting the Non-Aligned Movement as newly independent states' deliberate strategic response to superpower pressure"
+          ]
+        },
+        {
+          "id": "unit-8-cold-war-decolonization.decolonization-asia",
+          "name": "Decolonization in Asia",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-8-cold-war-decolonization.cold-war-global-south"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific cases — Indian independence and partition (creating India and Pakistan, with massive violence and displacement), Indonesian independence from the Dutch, and Vietnamese independence struggles against France then the US — as distinct paths, not a single process",
+            "Push students to connect WWII directly to decolonization's timing: colonial soldiers who fought for European powers returned home with new expectations, and European powers emerged from the war too economically weakened to maintain their empires by force"
+          ],
+          "common_errors": [
+            "Treating Asian decolonization as a single unified event rather than addressing very different paths and outcomes (India's partition violence vs. Indonesia's revolution vs. Vietnam's prolonged war)",
+            "Missing the connection between WWII and decolonization's timing — colonial soldiers returned with new expectations, and European powers were economically too weakened to maintain empire"
+          ]
+        },
+        {
+          "id": "unit-8-cold-war-decolonization.decolonization-africa",
+          "name": "Decolonization in Africa",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-8-cold-war-decolonization.decolonization-asia"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to compare decolonization paths across at least two African states — Ghana's largely negotiated, peaceful independence under Nkrumah vs. Algeria's prolonged violent war against France vs. the Congo's chaotic, externally destabilized transition — a real comparative argument",
+            "Push students to treat African peoples as active agents building the independence movements themselves, not passive recipients of granted freedom",
+            "For FRQ questions on this topic, generate document-based questions (DBQs): include 2-3 realistic primary source excerpts inline in question_text (e.g., an African independence leader's speech, a colonial power's withdrawal statement, an account of post-independence instability), formatted as 'Document 1: [source attribution]' followed by a brief quote. Require the student to cite and analyze the documents plus outside knowledge, with HAPP sourcing for at least 3 documents"
+          ],
+          "common_errors": [
+            "Treating colonized peoples as passive victims rather than active resisters and agents who organized and led their own independence movements",
+            "Describing African decolonization as a single unified event rather than addressing very different paths across decades with different levels of violence and outcomes",
+            "Comparing only one African state's decolonization when the prompt calls for cross-regional comparison"
+          ]
+        },
+        {
+          "id": "unit-8-cold-war-decolonization.arab-israeli-apartheid",
+          "name": "Origins of the Arab-Israeli Conflict and Apartheid in South Africa",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-8-cold-war-decolonization.decolonization-africa"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the origins of the Arab-Israeli conflict as rooted in competing national claims following the end of the British Mandate and the 1948 creation of Israel, rather than a purely religious conflict",
+            "Push students to explain apartheid in South Africa as a formal, legally codified system of racial segregation and settler-colonial control, distinct from informal discrimination, and to name resistance (the African National Congress) as an organized political response"
+          ],
+          "common_errors": [
+            "Framing the Arab-Israeli conflict as purely religious rather than addressing the competing national and territorial claims at its origin",
+            "Describing apartheid vaguely as 'discrimination' without addressing its specific legal, institutionalized structure and the organized resistance it provoked"
+          ]
+        },
+        {
+          "id": "unit-8-cold-war-decolonization.cuban-revolution",
+          "name": "The Cuban Revolution and Its Significance",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-8-cold-war-decolonization.arab-israeli-apartheid"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to explain the Cuban Revolution's significance beyond Cuba itself — it demonstrated that a Marxist revolution could succeed in the Western Hemisphere, directly shaping US Cold War policy toward Latin America afterward",
+            "Push students to connect the Cuban Missile Crisis as evidence of how a Global South state's alignment decision could bring the superpowers to the brink of direct nuclear conflict"
+          ],
+          "common_errors": [
+            "Discussing the Cuban Revolution in isolation from its broader Cold War significance for US policy toward Latin America",
+            "Omitting the Cuban Missile Crisis as evidence of how Global South alignment decisions could escalate superpower tensions to a near-nuclear crisis"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "unit-9-globalization",
+      "name": "Globalization (1900-present)",
+      "ap_exam_weight_min": 8,
+      "ap_exam_weight_max": 10,
+      "prerequisite_unit_ids": ["unit-8-cold-war-decolonization"],
+      "topics": [
+        {
+          "id": "unit-9-globalization.end-of-cold-war",
+          "name": "The End of the Cold War",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-8-cold-war-decolonization.cuban-revolution"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to address this as a genuinely debated historical question — how much credit belongs to Reagan-era US policy vs. internal Soviet economic weakness and Gorbachev's own reforms (glasnost, perestroika)",
+            "Push students to distinguish the fall of the Berlin Wall (1989) from the formal dissolution of the Soviet Union (1991) as separate, sequential milestones, not the same event"
+          ],
+          "common_errors": [
+            "Attributing the Cold War's end entirely to Reagan's policies without acknowledging the debated role of internal Soviet weakness and Gorbachev's reforms",
+            "Treating the fall of the Berlin Wall (1989) and the collapse of the Soviet Union (1991) as the same event rather than distinct milestones"
+          ]
+        },
+        {
+          "id": "unit-9-globalization.economic-globalization",
+          "name": "Economic Globalization",
+          "type": "mixed",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-9-globalization.end-of-cold-war"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to connect contemporary globalization to earlier patterns of global exchange covered earlier in the course — the Silk Roads, Indian Ocean trade, and the Columbian Exchange — for a strong CCOT argument about connectivity over the full 800-year span",
+            "Push students to address the uneven distribution of globalization's benefits and costs across regions — multinational corporations and global supply chains benefit some regions while displacing labor and manufacturing in others",
+            "Require students to connect communications technology (internet, telecommunications) to the accelerated pace of contemporary global exchange compared to earlier eras"
+          ],
+          "common_errors": [
+            "Treating contemporary globalization as entirely new — AP rewards connecting it to earlier patterns of global exchange like the Silk Roads and Indian Ocean trade",
+            "Missing the uneven distribution of globalization's benefits and costs across regions and social classes",
+            "Discussing globalization only in economic terms without addressing the technological changes (internet, telecommunications) that accelerated it"
+          ]
+        },
+        {
+          "id": "unit-9-globalization.environmental-consequences",
+          "name": "Environmental Consequences of Global Development",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-9-globalization.economic-globalization"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to treat climate change, deforestation, and resource depletion as global historical processes with uneven causes and consequences — industrialized nations as the primary historical cause, developing nations often bearing disproportionate present-day consequences",
+            "Push students to connect environmental change causally back to the industrialization pattern established in unit 5/6, extending that causal chain into the present"
+          ],
+          "common_errors": [
+            "Discussing environmental change as a recent, disconnected issue rather than tracing its causal roots to industrialization covered earlier in the course",
+            "Missing the uneven distribution of environmental causes and consequences across industrialized vs. developing regions"
+          ]
+        },
+        {
+          "id": "unit-9-globalization.demographic-migration-changes",
+          "name": "Demographic and Migration Changes",
+          "type": "mixed",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-9-globalization.environmental-consequences"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to connect population growth and urbanization to specific causes (public health/medical advances, the Green Revolution's agricultural productivity gains) rather than describing demographic change as a generic trend",
+            "Push students to name specific contemporary migration patterns and connect them to economic globalization's uneven regional effects"
+          ],
+          "common_errors": [
+            "Describing population growth and urbanization without naming specific driving causes such as public health advances or the Green Revolution",
+            "Discussing migration patterns without connecting them to specific economic push/pull factors established elsewhere in the unit"
+          ]
+        },
+        {
+          "id": "unit-9-globalization.resistance-to-globalization",
+          "name": "Resistance to Globalization",
+          "type": "conceptual",
+          "difficulty": 2,
+          "prerequisite_topic_ids": ["unit-9-globalization.demographic-migration-changes"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to address multiple distinct forms of resistance — religious fundamentalism, resurgent nationalism, and anti-globalization economic protest — as different responses to the same underlying pressures, not a single movement",
+            "Push students to connect resistance to globalization's uneven economic effects, tying this topic back to the economic-globalization topic's content on unequal benefits and costs"
+          ],
+          "common_errors": [
+            "Treating resistance to globalization as a single unified reaction rather than distinguishing religious, nationalist, and economic forms of resistance",
+            "Discussing resistance movements without connecting them to specific globalization-driven economic or cultural pressures"
+          ]
+        },
+        {
+          "id": "unit-9-globalization.global-health",
+          "name": "Global Health as a Global Historical Process",
+          "type": "conceptual",
+          "difficulty": 1,
+          "prerequisite_topic_ids": ["unit-9-globalization.resistance-to-globalization"],
+          "input_mode": "typed",
+          "prompt_hints": [
+            "Require students to name specific examples (HIV/AIDS, SARS) and connect disease spread directly to increased global connectivity — a direct CCOT parallel to the Black Death's spread along Silk Road and Mongol-facilitated networks in unit 2",
+            "Push students to address unequal global access to treatment and public health infrastructure as part of the broader pattern of globalization's uneven benefits and costs"
+          ],
+          "common_errors": [
+            "Discussing modern disease spread without connecting it back to the same connectivity-driven pattern seen in the Black Death's spread along Silk Road networks",
+            "Describing global health crises without addressing unequal access to treatment and public health infrastructure across regions"
+          ]
+        }
+      ]
+    }
+  ],
+  "pacing_calendar": [
+    { "week": 1, "topic_ids": ["unit-1-global-tapestry.developments-east-asia", "unit-1-global-tapestry.developments-dar-al-islam"] },
+    { "week": 2, "topic_ids": ["unit-1-global-tapestry.developments-south-southeast-asia"] },
+    { "week": 3, "topic_ids": ["unit-1-global-tapestry.state-building-africa", "unit-1-global-tapestry.state-building-americas"] },
+    { "week": 4, "topic_ids": ["unit-1-global-tapestry.state-building-europe"] },
+    { "week": 5, "topic_ids": ["unit-2-networks-exchange.silk-roads"] },
+    { "week": 6, "topic_ids": ["unit-2-networks-exchange.mongol-empire"] },
+    { "week": 7, "topic_ids": ["unit-2-networks-exchange.indian-ocean-trade", "unit-2-networks-exchange.trans-saharan-trade"] },
+    { "week": 8, "topic_ids": ["unit-2-networks-exchange.mediterranean-trade", "unit-2-networks-exchange.cultural-consequences-exchange"] },
+    { "week": 9, "topic_ids": ["unit-3-land-empires.ottoman-empire"] },
+    { "week": 10, "topic_ids": ["unit-3-land-empires.safavid-empire"] },
+    { "week": 11, "topic_ids": ["unit-3-land-empires.mughal-empire"] },
+    { "week": 12, "topic_ids": ["unit-3-land-empires.ming-qing-china"] },
+    { "week": 13, "topic_ids": ["unit-3-land-empires.russian-empire", "unit-3-land-empires.comparing-land-empire-administration"] },
+    { "week": 14, "topic_ids": ["unit-4-transoceanic.european-exploration-motivations"] },
+    { "week": 15, "topic_ids": ["unit-4-transoceanic.columbian-exchange"] },
+    { "week": 16, "topic_ids": ["unit-4-transoceanic.atlantic-slave-trade"] },
+    { "week": 17, "topic_ids": ["unit-4-transoceanic.spanish-portuguese-colonial-systems", "unit-4-transoceanic.coercive-labor-systems"] },
+    { "week": 18, "topic_ids": ["unit-4-transoceanic.silver-trade-global-economy"] },
+    { "week": 19, "topic_ids": ["unit-5-revolutions.enlightenment-ideas"] },
+    { "week": 20, "topic_ids": ["unit-5-revolutions.atlantic-revolutions"] },
+    { "week": 21, "topic_ids": ["unit-5-revolutions.latin-american-independence", "unit-5-revolutions.abolitionist-movements"] },
+    { "week": 22, "topic_ids": ["unit-5-revolutions.nationalism"] },
+    { "week": 23, "topic_ids": ["unit-5-revolutions.industrial-revolution"] },
+    { "week": 24, "topic_ids": ["unit-6-industrialization.new-imperialism"] },
+    { "week": 25, "topic_ids": ["unit-6-industrialization.scramble-for-africa"] },
+    { "week": 26, "topic_ids": ["unit-6-industrialization.imperialism-south-asia", "unit-6-industrialization.imperialism-east-asia"] },
+    { "week": 27, "topic_ids": ["unit-6-industrialization.settler-colonialism"] },
+    { "week": 28, "topic_ids": ["unit-6-industrialization.resistance-to-imperialism"] },
+    { "week": 29, "topic_ids": ["unit-7-global-conflict.wwi-global-conflict", "unit-7-global-conflict.russian-revolution"] },
+    { "week": 30, "topic_ids": ["unit-7-global-conflict.interwar-period", "unit-7-global-conflict.wwii-global-dimensions"] },
+    { "week": 31, "topic_ids": ["unit-7-global-conflict.atomic-bomb-nuclear-age"] },
+    { "week": 32, "topic_ids": ["unit-8-cold-war-decolonization.origins-cold-war", "unit-8-cold-war-decolonization.cold-war-global-south"] },
+    { "week": 33, "topic_ids": ["unit-8-cold-war-decolonization.decolonization-asia", "unit-8-cold-war-decolonization.decolonization-africa"] },
+    { "week": 34, "topic_ids": ["unit-8-cold-war-decolonization.arab-israeli-apartheid", "unit-8-cold-war-decolonization.cuban-revolution"] },
+    { "week": 35, "topic_ids": ["unit-9-globalization.end-of-cold-war", "unit-9-globalization.economic-globalization", "unit-9-globalization.environmental-consequences"] },
+    { "week": 36, "topic_ids": ["unit-9-globalization.demographic-migration-changes", "unit-9-globalization.resistance-to-globalization", "unit-9-globalization.global-health"] }
+  ],
+  "common_misconceptions": [
+    {
+      "id": "mongol-complexity",
+      "description": "Students treat the Mongol Empire as purely destructive without acknowledging the Pax Mongolica — trade facilitation, religious tolerance, and disease transmission across a unified Eurasia.",
+      "affected_topic_ids": ["unit-2-networks-exchange.mongol-empire"],
+      "detection_hints": [
+        "Check whether the response mentions any positive or connective consequence of Mongol rule, not only conquest and destruction",
+        "Watch for responses that describe the Mongols solely through casualty figures without addressing the Pax Mongolica"
+      ]
+    },
+    {
+      "id": "columbian-exchange-bidirectional",
+      "description": "Students treat the Columbian Exchange as flowing only from Europe to the Americas, missing how American crops (potato, maize, tomato) transformed Afro-Eurasian food systems and populations.",
+      "affected_topic_ids": ["unit-4-transoceanic.columbian-exchange"],
+      "detection_hints": [
+        "Check whether the response addresses effects in both directions across the Atlantic, not just the arrival of European disease and goods in the Americas",
+        "Watch for a response that never names a specific American crop's impact on the Old World"
+      ]
+    },
+    {
+      "id": "decolonization-passive",
+      "description": "Students treat colonized peoples as passive victims rather than active resisters and agents who organized and led their own independence movements and forms of resistance.",
+      "affected_topic_ids": [
+        "unit-6-industrialization.resistance-to-imperialism",
+        "unit-8-cold-war-decolonization.decolonization-africa"
+      ],
+      "detection_hints": [
+        "Check whether the response names specific resistance leaders, movements, or organized strategies rather than describing colonized peoples only as recipients of events",
+        "Watch for language that frames independence as something 'granted' rather than fought for and won"
+      ]
+    },
+    {
+      "id": "cold-war-bilateral",
+      "description": "Students treat the Cold War as purely a US-Soviet bilateral conflict, missing the Global South's role as an active arena and participant rather than a passive battleground.",
+      "affected_topic_ids": ["unit-8-cold-war-decolonization.cold-war-global-south"],
+      "detection_hints": [
+        "Check whether the response names a specific Global South state or the Non-Aligned Movement as an active participant, not just a site of superpower competition",
+        "Watch for a response that frames every Global South conflict as entirely externally driven by the superpowers"
+      ]
+    },
+    {
+      "id": "europe-centered",
+      "description": "Students center Europe in pre-1450 global history, when AP World History explicitly decenters Europe — Song/Ming China, the Islamic world, and West African states were often more advanced or more globally connected in this period.",
+      "affected_topic_ids": [
+        "unit-1-global-tapestry.developments-east-asia",
+        "unit-1-global-tapestry.state-building-africa"
+      ],
+      "detection_hints": [
+        "Check whether the response treats medieval Europe as the default or most advanced civilization of the period rather than one of several regional powers",
+        "Watch for responses that describe non-European societies primarily by comparison to Europe rather than on their own terms"
+      ]
+    },
+    {
+      "id": "single-region-comparison",
+      "description": "Students answer comparison and CCOT questions about only one world region when the prompt explicitly requires cross-regional analysis, a skill-level error that recurs across every unit.",
+      "affected_topic_ids": [],
+      "detection_hints": [
+        "Check whether the response names specific evidence from at least two distinct world regions when a comparative or CCOT prompt requires it",
+        "Watch for a response that appears comparative in structure but only ever develops evidence from a single region"
+      ]
+    },
+    {
+      "id": "industrial-revolution-britain-only",
+      "description": "Students treat industrialization as a purely British then European phenomenon, missing its uneven global spread and the specific reasons some regions industrialized later or not at all.",
+      "affected_topic_ids": ["unit-5-revolutions.industrial-revolution"],
+      "detection_hints": [
+        "Check whether the response addresses why industrialization spread unevenly rather than assuming it happened everywhere on the same timeline",
+        "Watch for a response that omits deindustrialization or delayed industrialization in colonized regions"
+      ]
+    },
+    {
+      "id": "globalization-as-new",
+      "description": "Students treat contemporary globalization as historically unprecedented rather than connecting it to earlier patterns of global exchange like the Silk Roads, Indian Ocean trade, and the Columbian Exchange.",
+      "affected_topic_ids": ["unit-9-globalization.economic-globalization"],
+      "detection_hints": [
+        "Check whether the response draws an explicit connection to an earlier exchange network covered elsewhere in the course",
+        "Watch for language implying that large-scale global connectivity began only in the 20th or 21st century"
+      ]
+    },
+    {
+      "id": "dbq-summary-not-argument",
+      "description": "On DBQs, students summarize each document in order rather than grouping them as evidence to support a historical argument, and often fail to bring in outside knowledge beyond the documents — a skill-level error across every DBQ-eligible topic.",
+      "affected_topic_ids": [],
+      "detection_hints": [
+        "Check whether documents are cited as grouped evidence for specific argument points, or merely summarized document-by-document in order",
+        "Check whether the response includes at least one piece of specific outside knowledge beyond the provided documents"
+      ]
+    },
+    {
+      "id": "ccot-one-dimension",
+      "description": "In Continuity and Change Over Time (CCOT) arguments, students address only change or only continuity across a period and world region, rather than analyzing both — a skill-level error that recurs across every unit.",
+      "affected_topic_ids": [],
+      "detection_hints": [
+        "Check whether the response explicitly addresses both what changed and what stayed the same across the stated period",
+        "Watch for a response that reads as a list of changes with no continuity discussed, or vice versa"
+      ]
+    }
+  ],
+  "frq_rubric": {
+    "general_guidance": "AP World History FRQs require historical argument supported by specific evidence from multiple world regions. A response earns no credit for discussing only one region when comparison is required, or for vague generalities without named empires, trade routes, events, or people. The thesis must make a historically defensible claim with a line of reasoning — not a description. For DBQs: source at least 3 documents using HAPP (Historical situation, Audience, Purpose, Point of view), use documents as evidence rather than summarizing them, and bring in outside knowledge beyond the documents. For LEQs: contextualize within a broader global process before making specific claims. For SAQs: be specific and concise — these are short-answer, not essay.",
+    "point_allocation_pattern": "Score out of 4: 4 = defensible thesis with specific named evidence from at least two world regions, analysis of causation or change/continuity across regions, and contextualization within a broader global process; 3 = thesis present and specific evidence from multiple regions used but analysis or contextualization underdeveloped; 2 = attempts an argument with some specific evidence but thesis is descriptive rather than analytical, or evidence from only one region; 1 = minimal attempt with general claims and no specific cross-regional evidence; 0 = no credit",
+    "common_reasoning_gaps": [
+      "Thesis describes what happened rather than making a historically defensible argument about causation, change, or comparison",
+      "Evidence from only one world region when the prompt requires cross-regional comparison",
+      "DBQ responses summarize each document in order rather than grouping them as evidence for an argument",
+      "CCOT responses address only change or only continuity — AP requires both",
+      "Contextualization is a one-sentence mention rather than a developed connection to a broader global process",
+      "Outside knowledge in DBQ is a single vague reference rather than a specific named example beyond the documents"
+    ]
+  }
+}

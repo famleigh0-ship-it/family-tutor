@@ -14,6 +14,7 @@ import calcAbBcRaw from '../../course-packs/calc-ab-bc/pack.json' with { type: '
 import apHumanGeographyRaw from '../../course-packs/ap-human-geography/pack.json' with { type: 'json' }
 import nmsqt2026Raw from '../../course-packs/nmsqt-2026/pack.json' with { type: 'json' }
 import apUsHistoryRaw from '../../course-packs/ap-us-history/pack.json' with { type: 'json' }
+import apWorldHistoryRaw from '../../course-packs/ap-world-history/pack.json' with { type: 'json' }
 
 /**
  * @param {unknown} raw
@@ -32,7 +33,7 @@ function loadAndValidate(raw) {
 
 /** @type {Record<string, CoursePack>} */
 const packsById = {}
-for (const raw of [apPhysics1Raw, calcAbBcRaw, apHumanGeographyRaw, nmsqt2026Raw, apUsHistoryRaw]) {
+for (const raw of [apPhysics1Raw, calcAbBcRaw, apHumanGeographyRaw, nmsqt2026Raw, apUsHistoryRaw, apWorldHistoryRaw]) {
   const pack = loadAndValidate(raw)
   packsById[pack.id] = pack
 }
